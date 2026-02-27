@@ -596,4 +596,4 @@ export default function TimelinePage() {
             </Card>
         </div>
     )
-}
+ }
