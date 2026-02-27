@@ -1,0 +1,2 @@
+﻿src/app/settings/app-url/page.tsx(39,9): error TS2304: Cannot find name 'setIsLoading'.
+src/app/settings/app-url/page.tsx(83,9): error TS2304: Cannot find name 'setIsLoading'.

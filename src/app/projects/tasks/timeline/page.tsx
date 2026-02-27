@@ -248,13 +248,13 @@ export default function TimelinePage() {
         if (be < timelineStart || bs > timelineEnd) return null
 
         let startCol = colOffset
-        let totalCols = days.length
+        const totalCols = days.length
 
         if (bs > timelineStart) {
             startCol = colOffset + Math.round((bs.getTime() - timelineStart.getTime()) / 86400000)
         }
         
-        let duration = Math.round((be.getTime() - bs.getTime()) / 86400000) + 1
+        const duration = Math.round((be.getTime() - bs.getTime()) / 86400000) + 1
         let endCol = startCol + duration
 
         startCol = Math.max(colOffset, Math.min(startCol, totalCols + colOffset))

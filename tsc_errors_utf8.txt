@@ -1,0 +1,29 @@
+﻿src/action/productivity.ts(78,60): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/action/productivity.ts(79,69): error TS7006: Parameter 'd' implicitly has an 'any' type.
+src/action/productivity.ts(79,88): error TS7006: Parameter 'd' implicitly has an 'any' type.
+src/action/productivity.ts(81,11): error TS2322: Type '({ name: unknown; type: "app_name"; } | { name: unknown; type: "domain"; })[]' is not assignable to type 'IUnclassifiedItem[]'.
+  Type '{ name: unknown; type: "app_name"; } | { name: unknown; type: "domain"; }' is not assignable to type 'IUnclassifiedItem'.
+    Type '{ name: unknown; type: "app_name"; }' is not assignable to type 'IUnclassifiedItem'.
+      Types of property 'name' are incompatible.
+        Type 'unknown' is not assignable to type 'string'.
+src/app/activity/screenshots/10min/page.tsx(15,3): error TS6133: 'generateMemberInsight' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(16,3): error TS6133: 'generateMemberAppActivities' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(17,3): error TS6133: 'generateMemberUrlActivities' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(18,3): error TS6133: 'MemberInsightSummary' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(23,3): error TS6133: 'getMembersForScreenshot' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(24,3): error TS6133: 'deleteScreenshot' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(35,7): error TS6133: 'formatDuration' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(82,9): error TS6133: 'parseTimeDetails' is declared but its value is never read.
+src/app/activity/screenshots/10min/page.tsx(109,42): error TS18048: 'item' is possibly 'undefined'.
+src/app/activity/screenshots/10min/page.tsx(118,49): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/app/activity/screenshots/10min/page.tsx(120,23): error TS2322: Type 'MemberScreenshotItem | undefined' is not assignable to type 'MemberScreenshotItem'.
+  Type 'undefined' is not assignable to type 'MemberScreenshotItem'.
+src/app/activity/screenshots/10min/page.tsx(123,25): error TS2345: Argument of type 'MemberScreenshotItem | undefined' is not assignable to parameter of type 'MemberScreenshotItem'.
+  Type 'undefined' is not assignable to type 'MemberScreenshotItem'.
+src/app/activity/screenshots/10min/page.tsx(195,54): error TS2304: Cannot find name 'IScreenshotWithActivity'.
+src/app/activity/screenshots/10min/page.tsx(211,27): error TS2304: Cannot find name 'IScreenshotWithActivity'.
+src/app/settings/app-url/page.tsx(12,10): error TS6133: 'IProductivityCategory' is declared but its value is never read.
+src/app/settings/app-url/page.tsx(13,10): error TS6133: 'IUnclassifiedItem' is declared but its value is never read.
+src/app/settings/app-url/page.tsx(33,12): error TS6133: 'isLoading' is declared but its value is never read.
+src/app/settings/screenshot/delete/page.tsx(76,9): error TS6133: 'setGlobalDeleteSetting' is declared but its value is never read.

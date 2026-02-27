@@ -11,18 +11,11 @@ import {
   X,
   ArrowUpDown,
 } from "lucide-react"
-import {
-  generateMemberInsight,
-  generateMemberAppActivities,
-  generateMemberUrlActivities,
-  MemberInsightSummary,
-  MemberScreenshotItem,
-} from "@/lib/data/dummy-data"
+import { MemberScreenshotItem } from "@/lib/data/dummy-data"
 import {
   getScreenshotsByMemberAndDate,
-  getMembersForScreenshot,
-  deleteScreenshot,
-  getMemberInsightsSummary
+  getMemberInsightsSummary,
+  type IScreenshotWithActivity
 } from "@/action/screenshots"
 import { useSelectedMemberContext } from "../selected-member-context"
 import { MemberScreenshotCard } from "@/components/activity/MemberScreenshotCard"
@@ -30,16 +23,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { ScreenshotCardSkeleton } from "@/components/activity/ScreenshotCardSkeleton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuthStore } from "@/store/user-store"
-
-
-const formatDuration = (totalMinutes: number) => {
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
-  if (hours === 0) {
-    return `${minutes}m`
-  }
-  return `${hours}h ${minutes.toString().padStart(2, "0")}m`
-}
 
 // Parse time string like "9:00 am - 9:10 am" to get start time for sorting
 const parseTimeForSort = (timeStr: string): number => {
@@ -79,16 +62,6 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
     return `${hours}h ${minutes.toString().padStart(2, "0")}m`
   }
 
-  const parseTimeDetails = (timeStr: string): { hours: number; minutes: number; period: string } => {
-    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i)
-    if (!match || !match[1] || !match[2] || !match[3]) return { hours: 0, minutes: 0, period: 'am' }
-    let hours = parseInt(match[1], 10)
-    const minutes = parseInt(match[2], 10)
-    if (match[3].toLowerCase() === 'pm' && hours !== 12) hours += 12
-    if (match[3].toLowerCase() === 'am' && hours === 12) hours = 0
-    return { hours, minutes, period: match[3] }
-  }
-
   const formatTimeFromHoursMinutes = (hours: number, minutes: number): string => {
     let displayHours = hours
     let period = 'am'
@@ -105,7 +78,7 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
   let startMinutes: number | null = null
 
   for (let i = 0; i < sorted.length; i++) {
-    const item = sorted[i]
+    const item = sorted[i]!
     const itemMinutes = parseTimeForSort(item.time)
 
     // Start a new block if:
@@ -115,7 +88,7 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
     if (startMinutes === null || currentChunk.length >= chunkSize || itemMinutes >= startMinutes + 60) {
       if (currentChunk.length > 0) {
         // Finalize previous chunk
-        blocks.push(finalizeBlock(currentChunk, startMinutes))
+        blocks.push(finalizeBlock(currentChunk, startMinutes as number))
       }
       currentChunk = [item]
       startMinutes = itemMinutes
@@ -126,7 +99,7 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
 
   // Finalize the last chunk
   if (currentChunk.length > 0 && startMinutes !== null) {
-    blocks.push(finalizeBlock(currentChunk, startMinutes))
+    blocks.push(finalizeBlock(currentChunk, startMinutes as number))
   }
 
   function finalizeBlock(chunk: MemberScreenshotItem[], blockStartMins: number) {

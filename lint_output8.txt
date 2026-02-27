@@ -1,0 +1,1350 @@
+﻿
+> absensi@0.1.0 lint
+> eslint
+
+
+D:\UBIG\Projek\Presensi-New\cek\fallback-ce627215c0e4a9af.js
+  1:259   warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:325   warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:474   warning  'r' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:511   warning  'r' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:885   warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:920   warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:1473  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:1505  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:1602  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:2302  warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\public\fallback-ce627215c0e4a9af.js
+  1:415   warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:481   warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:630   warning  'r' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:667   warning  'r' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:1041  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:1076  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:1629  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:1661  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:1758  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:2302  warning  'e' is defined but never used                                        @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\public\leaflet\.ts
+  3:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\public\workbox-3c9d0171.js
+  1:87     warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:298    warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:3102   warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:7954   warning  'i' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:11007  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:13367  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:14423  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:14599  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:16057  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:20988  warning  't' is defined but never used                                        @typescript-eslint/no-unused-vars
+  1:22227  warning  'e' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:22385  warning  's' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  1:23349  warning  't' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\action\apps.ts
+  49:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\attendance.ts
+  122:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  124:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  310:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  528:12  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  617:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  689:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  736:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  747:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  747:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  756:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  756:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  850:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  877:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  877:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  880:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  897:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  935:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  955:14  warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\action\auth-multi-org.ts
+  100:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  207:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  233:89  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\client.ts
+   47:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   50:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   69:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\create-organization.ts
+  133:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  233:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  680:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  680:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\dashboard.ts
+   36:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   43:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  407:12  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  450:12  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  478:12  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  653:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  663:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  671:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  683:12  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  815:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  816:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\debug.ts
+  93:93  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\group-comparison.ts
+   67:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\invitations.ts
+  194:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  830:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\member_performance.ts
+  159:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\members.ts
+   57:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  205:90  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  206:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  219:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  222:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  236:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  267:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  325:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  490:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  747:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  750:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  753:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  762:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  779:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  883:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\members_schedule.ts
+  227:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\organization-settings.ts
+  363:9  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+D:\UBIG\Projek\Presensi-New\src\action\project.ts
+  48:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\projects.ts
+   22:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  140:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  169:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  214:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  220:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  348:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  378:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  396:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\screenshot-settings.ts
+   62:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\screenshots.ts
+  191:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  241:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  262:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  317:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  318:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  361:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  413:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  428:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\settings-members.ts
+  129:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\shift.ts
+  166:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  174:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  174:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  175:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  175:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  198:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  198:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\task.ts
+   50:9   error    'resultData' is never reassigned. Use 'const' instead  prefer-const
+   55:35  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+   57:44  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+   73:38  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+   78:43  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+   80:52  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  108:18  warning  'error' is defined but never used                      @typescript-eslint/no-unused-vars
+  136:48  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  165:79  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\urls.ts
+   54:22  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+   64:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\user-organizations.ts
+  53:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\action\users.ts
+  126:115  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:45   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  140:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:33   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:32   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:46   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:23   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\account-inactive\page.tsx
+   80:53  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   81:50  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  103:6   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  153:14  warning  'error' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\apps\page.tsx
+  140:6   warning  React Hook useEffect has a missing dependency: 'selectedFilter.id'. Either include it or remove the dependency array                              react-hooks/exhaustive-deps
+  172:6   warning  React Hook useEffect has missing dependencies: 'dateRange.endDate' and 'dateRange.startDate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  172:25  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  172:56  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  186:9   error    'filtered' is never reassigned. Use 'const' instead                                                                                               prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\screenshots\10min\page.tsx
+  327:50   warning  Unexpected any. Specify a different type                                                                                                         @typescript-eslint/no-explicit-any
+  345:6    warning  React Hook useEffect has missing dependencies: 'fetchMemberInsights' and 'fetchScreenshots'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  353:6    warning  React Hook useEffect has missing dependencies: 'fetchMemberInsights' and 'fetchScreenshots'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  360:6    warning  React Hook useEffect has missing dependencies: 'fetchMemberInsights' and 'fetchScreenshots'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  360:7    warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked         react-hooks/exhaustive-deps
+  360:38   warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked         react-hooks/exhaustive-deps
+  596:6    warning  React Hook useEffect has missing dependencies: 'goNext' and 'goPrev'. Either include them or remove the dependency array                         react-hooks/exhaustive-deps
+  981:135  warning  Unexpected any. Specify a different type                                                                                                         @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\screenshots\all\page.tsx
+  280:6   warning  React Hook useEffect has a missing dependency: 'fetchScreenshots'. Either include it or remove the dependency array                       react-hooks/exhaustive-deps
+  288:6   warning  React Hook useEffect has a missing dependency: 'fetchScreenshots'. Either include it or remove the dependency array                       react-hooks/exhaustive-deps
+  294:6   warning  React Hook useEffect has a missing dependency: 'fetchScreenshots'. Either include it or remove the dependency array                       react-hooks/exhaustive-deps
+  294:7   warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  294:38  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\screenshots\layout.tsx
+   70:6   warning  React Hook useEffect has a missing dependency: 'selectedFilter.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  148:18  warning  'e' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  188:18  warning  'e' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\urls\page.tsx
+  144:6   warning  React Hook useEffect has a missing dependency: 'selectedFilter.id'. Either include it or remove the dependency array                              react-hooks/exhaustive-deps
+  171:6   warning  React Hook useEffect has missing dependencies: 'dateRange.endDate' and 'dateRange.startDate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  171:25  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  171:56  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  185:9   error    'filtered' is never reassigned. Use 'const' instead                                                                                               prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\api\applications\[id]\route.ts
+  72:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\applications\github\webhook\route.ts
+  33:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\applications\slack\webhook\route.ts
+  43:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\attendance\import\headers\route.ts
+   98:11  warning  'matchCount' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  333:52  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  340:30  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  431:37  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  455:19  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\attendance\import\process\route.ts
+  221:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  285:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  667:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  733:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  761:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\attendance\init\route.ts
+  68:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\attendance\today\route.ts
+  70:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  72:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\batch\route.ts
+   16:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   17:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   44:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\active-members\route.ts
+  21:54  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  27:42  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  29:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\active-rfid\route.ts
+  19:54  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  20:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  23:42  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  24:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  45:40  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\member-distribution\route.ts
+  26:54  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  27:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  30:42  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  31:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\monthly-late\route.ts
+  20:54  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  21:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  24:42  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  25:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\monthly-trend\route.ts
+  41:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\monthly\route.ts
+  18:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\today-summary\route.ts
+  36:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\dashboard\total-attendance\route.ts
+  22:54  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  23:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  26:42  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  27:13  warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+D:\UBIG\Projek\Presensi-New\src\app\api\finger\import\process\route.ts
+  153:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  268:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  280:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  292:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  312:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  598:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  652:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\finger\members\route.ts
+  139:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  227:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  244:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  368:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  415:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\finger\stats\route.ts
+   56:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\group\import\headers\route.ts
+  208:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\group\import\process\route.ts
+  123:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  374:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  429:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\log-client-error\route.ts
+  10:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\member-schedules\init\route.ts
+  82:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  83:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\export\count\route.ts
+  119:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\export\filter-options\route.ts
+   76:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\export\preview\route.ts
+  119:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  181:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  255:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\export\route.ts
+   71:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  195:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  216:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  249:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  385:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  398:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  401:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  498:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  727:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  748:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  758:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  771:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  781:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  790:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  900:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\export\rows\route.ts
+   61:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  179:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  215:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  224:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  266:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\import\debug-departments\route.ts
+  62:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\import\headers\route.ts
+  102:11  warning  'matchCount' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  331:52  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  341:46  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  355:30  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  383:69  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  395:60  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  546:53  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  705:25  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  717:32  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  717:61  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  755:46  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  797:32  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  798:29  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  809:68  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  824:25  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  839:32  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  872:31  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  919:23  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  920:29  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  933:30  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  936:32  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  952:45  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  955:47  warning  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\import\process\route.ts
+   159:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   161:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   257:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   270:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   277:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   288:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   299:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   318:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   423:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   522:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   522:88  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   533:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   533:97  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   621:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   665:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   734:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   796:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   797:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   864:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   942:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   962:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   963:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   976:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1025:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1082:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1131:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1204:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1277:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1454:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1505:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1505:97  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1518:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1633:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1662:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1669:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1777:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1971:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1982:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\route.ts
+  206:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:37   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  254:48   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  269:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  284:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:105  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  313:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  323:32   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  441:48   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  444:50   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\members\update\route.ts
+  13:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\organization\clear\route.ts
+  20:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\api\organization\info\route.ts
+  58:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\organizations\route.ts
+  47:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\position\import\headers\route.ts
+  129:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\api\position\import\process\route.ts
+  123:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  233:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  353:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  412:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\devices\activate\page.tsx
+  98:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\devices\page.tsx
+  140:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\list\import\page.tsx
+  394:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\list\page.tsx
+  297:6  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\locations\[id]\page.tsx
+  137:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\locations\new\page.tsx
+  106:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\attendance\page.tsx
+  128:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\debug\page.tsx
+   9:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\finger\import-simple\page.tsx
+  347:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  758:81  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\finger\page.tsx
+  349:6   warning  React Hook React.useCallback has an unnecessary dependency: 'fetchFingerStats'. Either exclude it or remove the dependency array                                            react-hooks/exhaustive-deps
+  369:6   warning  React Hook React.useEffect has a missing dependency: 'clearMembersCacheForOrg'. Either include it or remove the dependency array                                            react-hooks/exhaustive-deps
+  379:6   warning  React Hook React.useEffect has missing dependencies: 'clearMembersCacheForOrg', 'fetchFingerStats', and 'fetchMembers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  397:25  warning  Unexpected any. Specify a different type                                                                                                                                    @typescript-eslint/no-explicit-any
+  441:6   warning  React Hook React.useEffect has missing dependencies: 'DEBUG', 'clearMembersCacheForOrg', and 'fetchFingerStats'. Either include them or remove the dependency array         react-hooks/exhaustive-deps
+  456:19  warning  Unexpected any. Specify a different type                                                                                                                                    @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\global-error.tsx
+  52:6   warning  React Hook useEffect has missing dependencies: 'error?.digest', 'error?.message', and 'error?.name'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  62:17  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                          react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\group\import\page.tsx
+  344:49  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  762:55  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  795:37  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  795:42  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\group\move\page.tsx
+   87:9    warning  The 'handleMemberClick' function makes the dependencies of useMemo Hook (at line 355) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'handleMemberClick' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  271:6    warning  React Hook React.useCallback has missing dependencies: 'pagination.pageIndex', 'pagination.pageSize', and 'sortOrder'. Either include them or remove the dependency array                                                                   react-hooks/exhaustive-deps
+  279:6    warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array                                                                                                                                react-hooks/exhaustive-deps
+  337:42   warning  Unexpected any. Specify a different type                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  492:108  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                             react/no-unescaped-entities
+  492:166  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                             react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\group\page.tsx
+  278:6   warning  React Hook React.useCallback has a missing dependency: 'queryClient'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  295:14  warning  'error' is defined but never used                                                                                            @typescript-eslint/no-unused-vars
+  298:6   warning  React Hook React.useCallback has a missing dependency: 'queryClient'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  315:6   warning  React Hook React.useEffect has a missing dependency: 'fetchOrganizations'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  584:76  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                              react/no-unescaped-entities
+  584:80  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                              react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\insight\highlights\page.tsx
+  35:6  warning  React Hook useEffect has a missing dependency: 'selectedFilter.id'. Either include it or remove the dependency array                          react-hooks/exhaustive-deps
+  52:6  warning  React Hook useEffect has missing dependencies: 'memberIdFromUrl' and 'selectedFilter.id'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\insight\performance\page.tsx
+  92:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\insight\smart-notifications\page.tsx
+   45:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\invite\accept\[token]\page.tsx
+  192:61  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  206:50  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  218:93  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\member-schedules\member-schedules-client.tsx
+  118:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\member-schedules\page.tsx
+  35:16  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\members\[id]\page.tsx
+  165:17  warning  Unused eslint-disable directive (no problems were reported from '@next/next/no-img-element')
+  494:44  warning  Unexpected any. Specify a different type                                                      @typescript-eslint/no-explicit-any
+  494:76  warning  Unexpected any. Specify a different type                                                      @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\members\edit\[id]\page.tsx
+  82:43  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\members\export\page.tsx
+   91:65  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+   92:63  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+  276:6   warning  React Hook useEffect has missing dependencies: 'loadMemberRows' and 'loadMemberSummary'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  352:54  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+  523:26  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+  711:28  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+  718:21  warning  Unexpected any. Specify a different type                                                                                                     @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\members\import-simple\page.tsx
+   160:29   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   161:26   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   405:6    warning  React Hook useCallback has a missing dependency: 'sheetName'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   614:49   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  1181:105  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  1186:55   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  1289:37   warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                 react/no-unescaped-entities
+  1289:42   warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                 react/no-unescaped-entities
+  1431:70   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  1451:47   warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                 react/no-unescaped-entities
+  1451:61   warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                 react/no-unescaped-entities
+  1635:103  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  1640:53   warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\members\onboarding\page.tsx
+   42:11  warning  The 'invitations' logical expression could make the dependencies of useMemo Hook (at line 93) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'invitations' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   43:11  warning  The 'members' logical expression could make the dependencies of useMemo Hook (at line 93) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'members' in its own useMemo() Hook          react-hooks/exhaustive-deps
+   47:21  warning  Unexpected any. Specify a different type                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   51:34  warning  Unexpected any. Specify a different type                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   73:35  warning  Unexpected any. Specify a different type                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   98:40  warning  Unexpected any. Specify a different type                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  108:18  warning  'error' is defined but never used                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  123:18  warning  'error' is defined but never used                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  138:18  warning  'error' is defined but never used                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  222:57  warning  Unexpected any. Specify a different type                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  308:35  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                               react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\members\page.tsx
+   79:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   86:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  101:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  148:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  279:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  291:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  297:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  309:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  417:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  442:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  443:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  557:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  812:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  876:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  912:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  941:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\offline\page.tsx
+  107:22  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  107:88  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\organization-inactive\page.tsx
+  25:6   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  53:14  warning  'error' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\organization\applications\page.tsx
+  200:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\organization\page.tsx
+  77:6  warning  React Hook useEffect has missing dependencies: 'handleSelectOrganization', 'orgStore', and 'router'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\organization\settings\page.tsx
+  417:6   warning  React Hook useEffect has a missing dependency: 'fetchGeoData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  894:14  warning  'error' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\page.tsx
+   84:87  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  278:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\position\page.tsx
+  137:52   warning  Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  137:101  warning  Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  139:52   warning  Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  139:101  warning  Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  188:8    warning  React Hook React.useCallback has a missing dependency: 'queryClient'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  206:8    warning  React Hook React.useEffect has a missing dependency: 'fetchOrganizations'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\[id]\member\_clients\page.tsx
+  13:9  warning  The 'memberIds' logical expression could make the dependencies of useMemo Hook (at line 19) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'memberIds' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\[id]\member\page.tsx
+  50:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\page.tsx
+   51:38  warning  Unexpected any. Specify a different type                                                                                                       @typescript-eslint/no-explicit-any
+   53:52  warning  Unexpected any. Specify a different type                                                                                                       @typescript-eslint/no-explicit-any
+   69:36  warning  Unexpected any. Specify a different type                                                                                                       @typescript-eslint/no-explicit-any
+   73:15  warning  Unexpected any. Specify a different type                                                                                                       @typescript-eslint/no-explicit-any
+   81:26  warning  Unexpected any. Specify a different type                                                                                                       @typescript-eslint/no-explicit-any
+  157:8   warning  React Hook React.useEffect has missing dependencies: 'fetchDropdowns' and 'fetchProjects'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\tasks\list\page.tsx
+   89:53   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:42   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:125  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\tasks\timeline\page.tsx
+   69:19  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+   69:70  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  251:13  error    'totalCols' is never reassigned. Use 'const' instead  prefer-const
+  257:13  error    'duration' is never reassigned. Use 'const' instead   prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\apps-urls\page.tsx
+  120:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\client-budgets\page.tsx
+  270:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\custom\page.tsx
+  489:61  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  489:84  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\daily-limits\page.tsx
+  152:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\daily-totals\page.tsx
+  207:30  warning  Unexpected any. Specify a different type                                                                                                        @typescript-eslint/no-explicit-any
+  228:8   warning  React Hook useMemo has missing dependencies: 'dateRange.endDate' and 'dateRange.startDate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  360:67  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                 react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\expenses\page.tsx
+  133:46   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  394:105  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\payments\page.tsx
+  245:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\project-budgets\page.tsx
+  295:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\reports\weekly-limits\page.tsx
+  161:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\role\page.tsx
+  72:11  warning  The 'fetchroles' function makes the dependencies of useEffect Hook (at line 96) change on every render. To fix this, wrap the definition of 'fetchroles' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\role\role-permission\[id]\page.tsx
+  74:6  warning  React Hook useEffect has a missing dependency: 'form'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\schedule\[id]\page.tsx
+  192:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\schedule\page.tsx
+  48:16  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\schedule\schedule-client.tsx
+  135:61  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  502:71  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  502:84  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Policies\holidays\page.tsx
+  20:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Policies\overtime\page.tsx
+   19:46  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:39  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  126:88  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Policies\page.tsx
+  18:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Policies\time-off-balances\page.tsx
+   27:50   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:46   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   44:33   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   48:56   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   56:50   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:25   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:81   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:77   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:62   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:38   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:43   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  421:105  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Policies\work-breaks\page.tsx
+  27:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\Timesheet\page.tsx
+   98:44   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  101:48   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  101:52   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  101:138  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\app-url\page.tsx
+  86:8  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\page.tsx
+  201:42  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  201:56  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\project&task\global-todos\page.tsx
+  40:197  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  40:283  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  40:299  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\settings\screenshot\blur-context.tsx
+  26:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\setup-wizard\page.tsx
+  187:51  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\app\shift\assignment\shift-assignment-client.tsx
+  478:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\shift\management\page.tsx
+  44:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:16  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\app\shift\management\shift-management-client.tsx
+  146:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  180:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\app\subscription-expired\page.tsx
+  31:6   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  60:14  warning  'error' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\activity\DownloadDialog.tsx
+  42:52  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\attendance\attendance-analytics.tsx
+    8:9   warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+   22:25  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtreeΓÇÖs DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component ΓÇ£AttendanceAnalyticsΓÇ¥ and pass data as props  react/no-unstable-nested-components
+   22:54  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+   27:32  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  164:44  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  186:44  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  204:33  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\attendance\attendance-calendar-view.tsx
+  186:44  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\attendance\modern-attendance-list.tsx
+   52:17  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   53:18  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   58:56  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  131:26  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  156:6   warning  React Hook useCallback has missing dependencies: 'attendanceData.length' and 'departments.length'. Either include them or remove the dependency array                                                                                                                                                                                           react-hooks/exhaustive-deps
+  162:6   warning  React Hook useEffect has missing dependencies: 'currentPage', 'dateRange', 'departmentFilter', 'searchQuery', and 'statusFilter'. Either include them or remove the dependency array                                                                                                                                                            react-hooks/exhaustive-deps
+  192:27  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtreeΓÇÖs DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component ΓÇ£ModernAttendanceListΓÇ¥ and pass data as props  react/no-unstable-nested-components
+  192:75  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  300:49  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  473:45  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  651:49  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  863:44  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\attendance\modern-check-in.tsx
+  216:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\auth\reset-password-form.tsx
+  81:6  warning  React Hook useEffect has missing dependencies: 'searchParams', 'sessionReady', and 'supabase.auth'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\common\global-title-manager.tsx
+  33:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\common\page-title-updater.tsx
+  31:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\dashboard\activity-timeline.tsx
+  139:6  warning  React Hook useEffect has a missing dependency: 'fetchActivities'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\dashboard\live-attendance-table.tsx
+  259:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  460:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\dialogs\activate-device-dialog.tsx
+  113:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\form\attendance-form-batch.tsx
+  127:6   warning  React Hook useEffect has a missing dependency: 'form'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  143:6   warning  React Hook useEffect has a missing dependency: 'form'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  219:60  warning  Unexpected any. Specify a different type                                                                 @typescript-eslint/no-explicit-any
+  233:28  warning  Unexpected any. Specify a different type                                                                 @typescript-eslint/no-explicit-any
+  239:25  warning  Unexpected any. Specify a different type                                                                 @typescript-eslint/no-explicit-any
+  766:43  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                          react/no-unescaped-entities
+  766:59  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                          react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\form\attendance-form.tsx
+  499:18  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  600:31  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  616:37  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  616:47  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  616:52  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  616:62  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  741:53  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  748:54  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  781:9   warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\form\member-edit-form-improved.tsx
+  101:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  282:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  340:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\form\member-schedule-assign-form.tsx
+  114:33  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  146:42  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  146:88  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  147:37  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  150:42  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  150:88  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  151:39  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  160:32  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  161:46  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  163:49  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  166:46  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  166:94  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  167:47  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+  177:6   warning  React Hook React.useEffect has a missing dependency: 'getMemberDepartment'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  286:34  warning  Unexpected any. Specify a different type                                                                                      @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\form\members-form.tsx
+  127:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:81  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\insights\DateRangePicker.tsx
+  34:6   warning  React Hook useEffect has missing dependencies: 'dateRange.endDate' and 'dateRange.startDate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  34:7   warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  34:38  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\insights\InsightsHeader.tsx
+  186:6   warning  React Hook useEffect has missing dependencies: 'dateRange.endDate' and 'dateRange.startDate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  186:7   warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+  186:38  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked          react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\insights\smart-notifications\CustomNotificationDialog.tsx
+   11:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:19   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:110  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  365:111  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  447:71   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\insights\smart-notifications\EditNotificationDialog.tsx
+   11:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:18   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  245:110  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  347:111  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  429:71   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\layout\nav-user.tsx
+  76:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\layout\navbar-new.tsx
+  41:3   warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  42:9   warning  'user' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                    @typescript-eslint/no-unused-vars
+  42:37  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+  43:3   warning  Include a description after the "@ts-ignore" directive to explain why the @ts-ignore is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  44:50  warning  Unexpected any. Specify a different type                                                                                                           @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\layout\org-breadcrumb.tsx
+  51:6  warning  React Hook useEffect has missing dependencies: 'displayName' and 'organizationName'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\members\member-grid-cards.tsx
+   57:29  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+   61:51  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+   98:22  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtreeΓÇÖs DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component ΓÇ£MemberGridCardsΓÇ¥ and pass data as props  react/no-unstable-nested-components
+   99:29  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  107:35  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  109:29  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\members\modern-profile-card.tsx
+  330:57  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\members\recent30-data-table.tsx
+  51:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\notifications\toast-system.tsx
+  210:24  warning  React Hook "useToast" is called in function "toast" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"          react-hooks/rules-of-hooks
+  215:24  warning  React Hook "useToast" is called in function "toast.success" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+  220:24  warning  React Hook "useToast" is called in function "toast.error" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"    react-hooks/rules-of-hooks
+  225:24  warning  React Hook "useToast" is called in function "toast.warning" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+  230:24  warning  React Hook "useToast" is called in function "toast.info" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"     react-hooks/rules-of-hooks
+  235:24  warning  React Hook "useToast" is called in function "toast.loading" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+  250:30  warning  Unexpected any. Specify a different type                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  253:37  warning  React Hook "useToast" is called in function "toast.promise" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+
+D:\UBIG\Projek\Presensi-New\src\components\onboarding\modern-onboarding.tsx
+   37:32  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   70:14  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   70:71  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  255:52  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  439:47  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  441:66  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\organization\organization-status-checker.tsx
+  42:16  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  53:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\projects\TransferProjectDialog.tsx
+  116:62  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\report\AuditLogFilterSidebar.tsx
+  13:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\DailyLimitsFilterSidebar.tsx
+  11:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\EditScheduleDialog.tsx
+  15:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\PaymentsFilterSidebar.tsx
+  10:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\ProjectBudgetsFilterSidebar.tsx
+  11:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\TimeActivityFilterSidebar.tsx
+  14:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\VisitsMap.tsx
+  40:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\report\WeeklyLimitsFilterSidebar.tsx
+  9:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\account-settings-form.tsx
+  69:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\policies\AddHolidayDialog.tsx
+  23:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\policies\AddOvertimePolicyDialog.tsx
+   17:22  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   18:19  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  134:86  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\policies\AddTimeOffPolicyDialog.tsx
+   18:22   warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   19:19   warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  322:137  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\policies\AddWorkBreakPolicyDialog.tsx
+  18:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\settings\profile-settings-form.tsx
+  101:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:18  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  238:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  263:18  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\setup-wizard\steps\basic-settings.tsx
+  84:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\setup-wizard\steps\org-info.tsx
+  81:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\tables\data-table.tsx
+  153:53  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  155:38  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  161:59  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  162:33  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  163:36  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  174:34  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  184:38  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  185:38  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  190:38  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  191:38  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  197:29  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  197:60  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  198:29  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  198:60  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  204:29  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  204:60  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  205:29  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  205:60  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  255:6   warning  React Hook React.useEffect has a missing dependency: 'manualPagination'. Either include it or remove the dependency array                                react-hooks/exhaustive-deps
+  280:6   warning  React Hook React.useEffect has missing dependencies: 'handlePageIndexChange' and 'manualPagination'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\tables\groups-table.tsx
+  101:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\tables\invitations-table.tsx
+  163:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:98  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\tables\members-table.tsx
+  137:24  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtreeΓÇÖs DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component ΓÇ£MembersTableΓÇ¥ and pass data as props  react/no-unstable-nested-components
+  181:38  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  182:38  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  187:38  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  188:38  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  206:6   warning  React Hook React.useMemo has missing dependencies: 'getFullName', 'getGroupName', and 'getNik'. Either include them or remove the dependency array                                                                                                                                                                                      react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\tables\modern-data-table.tsx
+  318:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  322:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\timesheets\AddTimeEntryDialog.tsx
+  454:77  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\UBIG\Projek\Presensi-New\src\components\timesheets\EditTimeEntryDialog.tsx
+  477:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\animated-tooltip.tsx
+  36:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\background-gradient-animation.tsx
+  59:6  warning  React Hook useEffect has missing dependencies: 'blendingValue', 'fifthColor', 'firstColor', 'fourthColor', 'gradientBackgroundEnd', 'gradientBackgroundStart', 'pointerColor', 'secondColor', 'size', and 'thirdColor'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  74:6  warning  React Hook useEffect has missing dependencies: 'curX' and 'curY'. Either include them or remove the dependency array. You can also do a functional update 'setCurX(c => ...)' if you only need 'curX' in the 'setCurX' call                                                 react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\calendar.tsx
+  55:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\canvas-reveal-effect.tsx
+  195:42  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  207:21  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  213:29  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  216:22  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  283:6   warning  React Hook useMemo has a missing dependency: 'getUniforms'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  286:23  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\focus-cards.tsx
+  13:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\hover-border-gradient.tsx
+  19:10  warning  Unexpected any. Specify a different type                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  29:9   warning  The 'rotateDirection' function makes the dependencies of useEffect Hook (at line 58) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'rotateDirection' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\moving-border.tsx
+  25:8   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  83:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\multi-select.tsx
+  87:9  warning  React Hook React.useCallback has a missing dependency: 'handleUnselect'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\sparkles.tsx
+  83:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\components\ui\text-generate-effect.tsx
+  31:6  warning  React Hook useEffect has missing dependencies: 'animate', 'duration', and 'filter'. Either include them or remove the dependency array. Mutable values like 'scope.current' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\components\user\change-foto.tsx
+  115:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\components\user\photo-upload-dialog.tsx
+  109:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\hooks\use-dashboard-stats.ts
+   45:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\hooks\use-image-compression.ts
+  178:6  warning  React Hook useCallback has an unnecessary dependency: 'onProgress'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\UBIG\Projek\Presensi-New\src\hooks\use-member-recent-attendance.ts
+  46:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\hooks\use-monitoring.ts
+   70:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  101:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\applications\oauth-helpers.ts
+  124:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\lib\applications\trello-oauth.ts
+  39:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\applications\webhook-helpers.ts
+   20:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  206:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  280:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  281:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  398:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  408:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  428:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  438:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  452:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\cache.ts
+  89:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\data-cache.ts
+  35:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\export-utils.ts
+   6:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\logger.ts
+   37:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   37:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  306:81  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  317:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  324:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\metadata.ts
+  43:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\lib\rbac.ts
+  123:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  379:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\lib\redis.ts
+   7:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:12  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  22:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\middleware.ts
+  172:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\store\setup-wizard-store.ts
+  23:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\utils\image-utils.ts
+  110:16  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\UBIG\Projek\Presensi-New\src\utils\receipt-generator.ts
+  105:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\src\utils\supabase\client.ts
+  61:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\UBIG\Projek\Presensi-New\vitest.config.ts
+  6:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 896 problems (5 errors, 891 warnings)
+  5 errors and 1 warning potentially fixable with the `--fix` option.
+

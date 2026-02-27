@@ -73,20 +73,20 @@ export default function ScreenshotDeletePage() {
     return memberDeletes[memberId] !== undefined ? memberDeletes[memberId] : globalDelete
   }
 
-  const setGlobalDeleteSetting = async (value: boolean) => {
-    setGlobalDelete(value)
-
-    if (!organizationId) return
-    try {
-      await upsertScreenshotSetting({
-        organization_id: Number(organizationId),
-        organization_member_id: null,
-        allow_delete: value
-      })
-    } catch (e) {
-      console.error("Failed to update global delete", e)
-    }
-  }
+  // const setGlobalDeleteSetting = async (value: boolean) => {
+  //   setGlobalDelete(value)
+  //
+  //   if (!organizationId) return
+  //   try {
+  //     await upsertScreenshotSetting({
+  //       organization_id: Number(organizationId),
+  //       organization_member_id: null,
+  //       allow_delete: value
+  //     })
+  //   } catch (e) {
+  //     console.error("Failed to update global delete", e)
+  //   }
+  // }
 
   const handleMemberDeleteChange = async (memberId: string, checked: boolean) => {
     setMemberDeletes(prev => ({

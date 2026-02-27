@@ -8,9 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
     getProductivityCategories,
     getUnclassifiedItems,
-    upsertProductivityCategory,
-    type IProductivityCategory,
-    type IUnclassifiedItem
+    upsertProductivityCategory
 } from "@/action/productivity"
 import { useOrgStore } from "@/store/org-store"
 import { toast } from "sonner"
@@ -30,7 +28,6 @@ interface UrlEntry {
 export default function AppUrlPage() {
     const { organizationId } = useOrgStore()
     const [urls, setUrls] = useState<UrlEntry[]>([])
-    const [isLoading, setIsLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     const [jobType, setJobType] = useState("all")
     const [sortBy, setSortBy] = useState("most-common")
@@ -39,7 +36,6 @@ export default function AppUrlPage() {
     // Fetch data from DB
     const fetchData = async () => {
         if (!organizationId) return
-        setIsLoading(true)
 
         const [catRes, unRes] = await Promise.all([
             getProductivityCategories(organizationId),
@@ -83,7 +79,6 @@ export default function AppUrlPage() {
         }
 
         setUrls(mergedItems)
-        setIsLoading(false)
     }
 
     useEffect(() => {

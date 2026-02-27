@@ -47,7 +47,7 @@ export const getTasks = async (organizationId?: string | number) => {
         return { success: false, message: error.message, data: [] };
     }
 
-    let resultData = data || [];
+    const resultData = data || [];
 
     if (resultData.length > 0) {
         // Collect all unique user IDs from all task assignees

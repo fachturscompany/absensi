@@ -183,7 +183,7 @@ export default function AppsPage() {
 
   // Filter dan group data berdasarkan date
   const groupedData = useMemo(() => {
-    let filtered: AppActivityEntry[] = [...appActivities]
+    const filtered: AppActivityEntry[] = [...appActivities]
 
     // Group by date
     const grouped: Record<string, AppActivityEntry[]> = {}

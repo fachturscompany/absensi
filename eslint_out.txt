@@ -1,0 +1,17 @@
+
+D:\UBIG\Projek\Presensi-New\src\action\task.ts
+  50:9  error  'resultData' is never reassigned. Use 'const' instead  prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\apps\page.tsx
+  186:9  error  'filtered' is never reassigned. Use 'const' instead  prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\activity\urls\page.tsx
+  185:9  error  'filtered' is never reassigned. Use 'const' instead  prefer-const
+
+D:\UBIG\Projek\Presensi-New\src\app\projects\tasks\timeline\page.tsx
+  251:13  error  'totalCols' is never reassigned. Use 'const' instead  prefer-const
+  257:13  error  'duration' is never reassigned. Use 'const' instead   prefer-const
+
+✖ 5 problems (5 errors, 0 warnings)
+  5 errors and 0 warnings potentially fixable with the `--fix` option.
+

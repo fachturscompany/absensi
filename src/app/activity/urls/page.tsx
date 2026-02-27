@@ -182,7 +182,7 @@ export default function UrlsPage() {
 
   // Filter dan group data berdasarkan date
   const groupedData = useMemo(() => {
-    let filtered: UrlActivityEntry[] = [...urlActivities]
+    const filtered: UrlActivityEntry[] = [...urlActivities]
 
     // Group by date, then by project+site
     const grouped: Record<string, Record<string, UrlActivityEntry[]>> = {}
