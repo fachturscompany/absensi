@@ -2069,6 +2069,12 @@ export interface AppActivityEntry {
     timeSpent: number // in hours
     sessions: number
     date: string
+    details?: {
+        id: string
+        appName: string
+        timeSpent: number
+        sessions: number
+    }[]
 }
 
 export const DUMMY_APP_ACTIVITIES: AppActivityEntry[] = [

@@ -7,6 +7,7 @@ import { getAppsActivityByMemberAndDate } from "@/action/apps"
 import { getAllProjects, type IProject } from "@/action/projects"
 import { useOrgStore } from "@/store/org-store"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, Minus } from "lucide-react"
 import { useTimezone } from "@/components/providers/timezone-provider"
 import { InsightsHeader } from "@/components/insights/InsightsHeader"
 import type { DateRange, SelectedFilter } from "@/components/insights/types"
@@ -210,18 +211,26 @@ export default function AppsPage() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }, [appActivities])
 
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
-
+  // Toggle expand/collapse
+  const toggleExpand = (rowId: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId)
+      } else {
+        newSet.add(rowId)
+      }
+      return newSet
+    })
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <h1 className="text-xl font-semibold text-gray-900">App activity</h1>
-        {/* <a href="/activity/apps/settings" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          <Settings className="w-4 h-4" />
-          Settings
-        </a> */}
       </div>
 
       {/* Date & User Controls */}
@@ -278,16 +287,61 @@ export default function AppsPage() {
             ) : (
               groupedData.map((group) => (
                 <React.Fragment key={group.date}>
-
                   {/* Data Rows */}
-                  {group.items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-3 text-sm text-gray-900">{item.projectName}</td>
-                      <td className="px-6 py-3 text-sm text-gray-900">{item.appName}</td>
-                      <td className="px-6 py-3 text-sm text-gray-900 text-right">{formatTimeSpent(item.timeSpent)}</td>
-                      <td className="px-6 py-3 text-sm text-gray-900 text-right">{item.sessions}</td>
-                    </tr>
-                  ))}
+                  {group.items.map((item) => {
+                    const isExpanded = expandedRows.has(item.id)
+                    const hasDetails = item.details && item.details.length > 0
+
+                    return (
+                      <React.Fragment key={item.id}>
+                        <tr className="hover:bg-gray-50">
+                          <td className="px-6 py-3 text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              {hasDetails && (
+                                <button
+                                  onClick={() => toggleExpand(item.id)}
+                                  className="text-gray-500 hover:text-gray-700"
+                                  aria-label={isExpanded ? "Collapse" : "Expand"}
+                                >
+                                  {isExpanded ? (
+                                    <Minus className="h-4 w-4" />
+                                  ) : (
+                                    <Plus className="h-4 w-4" />
+                                  )}
+                                </button>
+                              )}
+                              {!hasDetails && <span className="text-blue-600">+</span>}
+                              <span>{item.projectName}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3 text-sm text-gray-900">{item.appName}</td>
+                          <td className="px-6 py-3 text-sm text-gray-900 text-right">{formatTimeSpent(item.timeSpent)}</td>
+                          <td className="px-6 py-3 text-sm text-gray-900 text-right">{item.sessions}</td>
+                        </tr>
+                        {isExpanded && hasDetails && (
+                          <>
+                            {/* Header row untuk sub-table */}
+                            <tr>
+                              <td colSpan={2} className="px-6 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wider pl-12">Session Name</td>
+                              <td className="px-6 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Time spent</td>
+                              <td className="px-6 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Sessions</td>
+                            </tr>
+                            {/* Data rows untuk sub-table */}
+                            {item.details!.map((detail, idx) => (
+                              <tr
+                                key={detail.id}
+                                className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                              >
+                                <td colSpan={2} className="px-6 py-2 text-sm text-gray-500 pl-12">{detail.appName}</td>
+                                <td className="px-6 py-2 text-sm text-gray-900 text-right">{formatTimeSpent(detail.timeSpent)}</td>
+                                <td className="px-6 py-2 text-sm text-gray-900 text-right">{detail.sessions}</td>
+                              </tr>
+                            ))}
+                          </>
+                        )}
+                      </React.Fragment>
+                    )
+                  })}
                 </React.Fragment>
               ))
             )}

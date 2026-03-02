@@ -51,22 +51,71 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
     return []
   }
 
-  // Sort items by time instead of shuffling
+  // Sort items by time
   const sorted = [...items].sort((a, b) => {
     const timeA = parseTimeForSort(a.time)
     const timeB = parseTimeForSort(b.time)
     return timeA - timeB
   })
 
-  const blocks = []
-  for (let i = 0; i < sorted.length; i += chunkSize) {
-    const chunk = sorted.slice(i, i + chunkSize)
+  const formatTimeFromHoursMinutes = (hours: number, minutes: number): string => {
+    let displayHours = hours
+    let period = 'am'
+    if (hours >= 12) {
+      period = 'pm'
+      if (hours > 12) displayHours = hours - 12
+    }
+    if (displayHours === 0) displayHours = 12
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`
+  }
 
-    // Pastikan chunk selalu memiliki 6 item, jika kurang tambahkan "No activity" placeholder
+  const blocks = []
+  let currentChunk: MemberScreenshotItem[] = []
+  let startMinutes: number | null = null
+
+  for (let i = 0; i < sorted.length; i++) {
+    const item = sorted[i]
+    if (!item) continue
+
+    const itemMinutes = parseTimeForSort(item.time)
+
+    // Start a new block if:
+    // 1. No block is started
+    // 2. Current block has 6 items
+    // 3. Current item's time is outside the 60-minute window of the block's start
+    if (startMinutes === null || currentChunk.length >= chunkSize || itemMinutes >= startMinutes + 60) {
+      if (currentChunk.length > 0 && startMinutes !== null) {
+        blocks.push(finalizeBlock(currentChunk, startMinutes))
+      }
+      currentChunk = [item]
+      startMinutes = itemMinutes
+    } else {
+      currentChunk.push(item)
+    }
+  }
+
+  if (currentChunk.length > 0 && startMinutes !== null) {
+    blocks.push(finalizeBlock(currentChunk, startMinutes))
+  }
+
+  function finalizeBlock(chunk: MemberScreenshotItem[], blockStartMins: number) {
+    const totalMinutes = chunk.reduce((sum, item) => sum + (item.minutes ?? 0), 0)
+    const summary = `Total time worked: ${formatDuration(totalMinutes)}`
+
+    const startMinsPart = blockStartMins % 60
+    const startHoursPart = Math.floor(blockStartMins / 60)
+    const startTimeFormatted = formatTimeFromHoursMinutes(startHoursPart, startMinsPart)
+
+    let endHours = startHoursPart + 1
+    if (endHours >= 24) endHours -= 24
+    const endTimeFormatted = formatTimeFromHoursMinutes(endHours, startMinsPart)
+
+    const label = `${startTimeFormatted} - ${endTimeFormatted}`
+
     const paddedChunk = [...chunk]
     while (paddedChunk.length < chunkSize) {
       paddedChunk.push({
-        id: `placeholder-${i}-${paddedChunk.length}`,
+        id: `placeholder-${blockStartMins}-${paddedChunk.length}`,
         time: "",
         progress: 0,
         minutes: 0,
@@ -76,49 +125,7 @@ const buildMemberTimeBlocks = (items: MemberScreenshotItem[], chunkSize = 6) => 
       })
     }
 
-    const totalMinutes = chunk.reduce((sum, item) => sum + (item.minutes ?? 0), 0)
-    const summary = `Total time worked: ${formatDuration(totalMinutes)}`
-
-    // Calculate 1-hour range from first item's start time
-    const firstTimeStr = chunk[0]?.time.split(" - ")[0] ?? ""
-    if (!firstTimeStr) {
-      blocks.push({ label: chunk[0]?.time ?? `Block ${Math.floor(i / chunkSize) + 1}`, summary, items: paddedChunk })
-      continue
-    }
-
-    // Parse first time and add 1 hour for end time
-    const parseTime = (timeStr: string): { hours: number; minutes: number; period: string } => {
-      const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i)
-      if (!match || !match[1] || !match[2] || !match[3]) return { hours: 0, minutes: 0, period: 'am' }
-      let hours = parseInt(match[1], 10)
-      const minutes = parseInt(match[2], 10)
-      const period = match[3].toLowerCase()
-      if (period === 'pm' && hours !== 12) hours += 12
-      if (period === 'am' && hours === 12) hours = 0
-      return { hours, minutes, period: match[3] }
-    }
-
-    const formatTime = (hours: number, minutes: number): string => {
-      let displayHours = hours
-      let period = 'am'
-      if (hours >= 12) {
-        period = 'pm'
-        if (hours > 12) displayHours = hours - 12
-      }
-      if (displayHours === 0) displayHours = 12
-      return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`
-    }
-
-    const firstTime = parseTime(firstTimeStr)
-    let endHours = firstTime.hours + 1
-    const endMinutes = firstTime.minutes
-    if (endHours >= 24) endHours = endHours - 24
-
-    const startTimeFormatted = firstTimeStr
-    const endTimeFormatted = formatTime(endHours, endMinutes)
-    const label = `${startTimeFormatted} - ${endTimeFormatted}`
-
-    blocks.push({ label, summary, items: paddedChunk })
+    return { label, summary, items: paddedChunk }
   }
 
   return blocks
