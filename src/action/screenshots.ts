@@ -226,10 +226,9 @@ export async function getMemberInsightsSummary(
             .from('timesheets')
             .select(`
                 id,
-                worked_seconds,
+                total_tracked_seconds,
                 focus_seconds,
-                unusual_instances,
-                avg_activity,
+                unusual_activity_count,
                 start_date,
                 end_date
             `)
@@ -247,16 +246,11 @@ export async function getMemberInsightsSummary(
         let avgActivitySum = 0
 
         if (timesheetsData && timesheetsData.length > 0) {
-            // Jika range adalah satu hari, kita mungkin ingin data spesifik hari itu.
-            // Namun tabel timesheets biasanya menyimpan aggregate per periode (mingguan/bulanan).
-            // Untuk akurasi harian, idealnya kita query tabel 'activities' atau 'time_entries'.
-            // Sementara kita gunakan aggregate dari timesheet yang mencakup hari tersebut.
             const ts = timesheetsData[0]
             if (ts) {
-                totalWorkedSeconds = ts.worked_seconds || 0
+                totalWorkedSeconds = ts.total_tracked_seconds || 0
                 totalFocusSeconds = ts.focus_seconds || 0
-                totalUnusualCount = ts.unusual_instances || 0
-                avgActivitySum = ts.avg_activity || 0
+                totalUnusualCount = ts.unusual_activity_count || 0
             }
         }
 
@@ -265,7 +259,7 @@ export async function getMemberInsightsSummary(
         // ... (sisanya tetap sesuai kebutuhan UI)
         const { data: activitiesData, error: activitiesError } = await supabase
             .from('activities')
-            .select('overall_seconds, tracked_seconds')
+            .select('overall_seconds, keyboard_seconds, mouse_seconds')
             .eq('organization_member_id', organizationMemberId)
             .gte('activity_date', startDate)
             .lte('activity_date', endDate)
@@ -275,17 +269,30 @@ export async function getMemberInsightsSummary(
         }
 
         let totalOverallSeconds = 0
-        let totalTrackedActivitySeconds = 0
+        let totalKbdSeconds = 0
+        let totalMouseSeconds = 0
 
         if (activitiesData && activitiesData.length > 0) {
             activitiesData.forEach((act: any) => {
-                totalOverallSeconds += (act.overall_seconds || 0)
-                totalTrackedActivitySeconds += (act.tracked_seconds || 0)
+                let rowOverall = act.overall_seconds || 0
+                // Fallback: Jika overall_seconds 0 tapi ada aktivitas input,
+                // asumsikan slot ini terpakai (600s).
+                if (rowOverall === 0 && ((act.keyboard_seconds || 0) > 0 || (act.mouse_seconds || 0) > 0)) {
+                    rowOverall = 600
+                }
+                totalOverallSeconds += rowOverall
+                totalKbdSeconds += (act.keyboard_seconds || 0)
+                totalMouseSeconds += (act.mouse_seconds || 0)
             })
+
+            // FALLBACK: Jika worked_seconds dari timesheet adalah 0, gunakan totalOverallSeconds dari activities
+            if (totalWorkedSeconds === 0) {
+                totalWorkedSeconds = totalOverallSeconds
+            }
         }
 
-        const avgActivityPercent = totalTrackedActivitySeconds > 0
-            ? Math.round((totalOverallSeconds / totalTrackedActivitySeconds) * 100)
+        const avgActivityPercent = totalOverallSeconds > 0
+            ? Math.min(100, Math.round(((totalKbdSeconds + totalMouseSeconds) / totalOverallSeconds) * 100))
             : 0
 
         // 3. Work Classification dari url_visits & tool_usages
