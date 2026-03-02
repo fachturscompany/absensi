@@ -5,9 +5,8 @@ import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { UserAvatar } from "@/components/common/user-avatar"
-import { Separator } from "@/components/ui/separator"
-import { Search, Pencil, Plus, Upload } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Search, Pencil, Plus, Upload, LayoutGrid, List, X, Trash2, Archive } from "lucide-react"
 import {
     Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 } from "@/components/ui/dialog"
@@ -35,6 +34,7 @@ import AddProjectDialog from "@/components/projects/AddProjectDialog"
 import EditProjectDialog from "@/components/projects/EditProjectDialog"
 import TransferProjectDialog from "@/components/projects/TransferProjectDialog"
 import type { Project, NewProjectForm } from "@/components/projects/types"
+import ProjectGridView from "@/components/projects/ProjectGridView"
 import { getAllProjects, createProject, updateProject, deleteProject, archiveProject, unarchiveProject, IProject, getSimpleMembersForDropdown } from "@/action/projects"
 import { getClients } from "@/action/client"
 import { getAllGroups } from "@/action/group"
@@ -85,24 +85,12 @@ function mapProjectData(p: IProject): Project {
     }
 }
 
-
-function MemberAvatar({ member, size = 6 }: { member: { id: string; name: string; avatarUrl?: string | null }; size?: number }) {
-    return (
-        <UserAvatar
-            name={member.name}
-            photoUrl={member.avatarUrl}
-            userId={member.id}
-            size={size}
-            className="ring-2 ring-background"
-        />
-    )
-}
-
 export default function ProjectsPage() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const urlClientName = searchParams.get("client")
     const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
+    const [viewMode, setViewMode] = useState<"list" | "grid">("list")
     const [search, setSearch] = useState("")
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [data, setData] = useState<Project[]>([])
@@ -292,7 +280,7 @@ export default function ProjectsPage() {
             </div>
 
             <div>
-                <div className="space-y-6">
+                <div className="space-y-3">
                     {/* Toolbar */}
                     <div className="flex items-center justify-between flex-gap-3">
                         {/* Search */}
@@ -306,6 +294,34 @@ export default function ProjectsPage() {
                             />
                         </div>
                         <div className="flex items-center gap-2">
+                            <div className="flex items-center p-1 bg-white rounded-lg border border-gray-200 shadow-sm mr-2">
+                                <Button
+                                    variant="ghost"
+                                    className={cn(
+                                        "h-8 gap-2 px-4 rounded-md transition-all text-sm",
+                                        viewMode === "list"
+                                            ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                                            : "text-muted-foreground hover:bg-muted"
+                                    )}
+                                    onClick={() => setViewMode("list")}
+                                >
+                                    <List className={cn("h-4 w-4", viewMode === "list" ? "text-white" : "text-gray-400")} />
+                                    <span className="font-semibold text-xs uppercase tracking-tight">List</span>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    className={cn(
+                                        "h-8 gap-2 px-4 rounded-md transition-all text-sm",
+                                        viewMode === "grid"
+                                            ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                                            : "text-muted-foreground hover:bg-muted"
+                                    )}
+                                    onClick={() => setViewMode("grid")}
+                                >
+                                    <LayoutGrid className={cn("h-4 w-4", viewMode === "grid" ? "text-white" : "text-gray-400")} />
+                                    <span className="font-semibold text-xs uppercase tracking-tight">Grid</span>
+                                </Button>
+                            </div>
                             <Button variant="outline" className="px-3 hidden md:inline-flex" onClick={() => setImportOpen(true)}>
                                 <Upload />
                                 Import
@@ -316,202 +332,175 @@ export default function ProjectsPage() {
                         </div>
                     </div>
 
-                    {/* Batch Actions + Selected Count */}
-                    <div className="flex items-center gap-3 text-sm">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="px-3" disabled={selectedIds.length === 0}>
-                                    Batch actions
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem onSelect={() => setBatchOpen(true)}>Edit Projects</DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onSelect={() => {
-                                        const first = data.find(d => d.id === selectedIds[0]) || null
-                                        setEditTab("budget")
-                                        setEditing(first)
-                                    }}
-                                >
-                                    Edit Budget
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => { setArchiveTargets(selectedIds); setArchiveOpen(true) }}>
-                                    Archive
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        <span className="text-sm text-muted-foreground min-w-[90px] text-right">
-                            {selectedIds.length}/ {filtered.length} selected
-                        </span>
-                    </div>
 
-                    <Separator className="my-4" />
 
-                    {/* Table */}
-                    <div className="mt-4 md:mt-6">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-10">
-                                        <input
-                                            type="checkbox"
-                                            checked={allSelected}
-                                            onChange={toggleSelectAll}
-                                            className="rounded border-gray-300"
-                                        />
-                                    </TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Client</TableHead>
-                                    <TableHead>Teams</TableHead>
-                                    <TableHead>Members</TableHead>
-                                    <TableHead>Tasks</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filtered.length === 0 ? (
+                    {/* Content View */}
+                    <div className="">
+                        {viewMode === "list" ? (
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
-                                            {fetchError ? (
-                                                <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
-                                            ) : (
-                                                isLoading ? "Loading projects..." : "No projects found"
-                                            )}
-                                        </TableCell>
+                                        <TableHead className="w-10">
+                                            <input
+                                                type="checkbox"
+                                                checked={allSelected}
+                                                onChange={toggleSelectAll}
+                                                className="rounded border-gray-300"
+                                            />
+                                        </TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Client</TableHead>
+                                        <TableHead>Teams</TableHead>
+                                        <TableHead>Members</TableHead>
+                                        <TableHead>Tasks</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ) : (
-                                    paginated.map((p) => (
-                                        <TableRow
-                                            key={p.id}
-                                            className="cursor-pointer hover:bg-muted/50 transition-colors"
-                                            onClick={() => router.push(`/projects/${p.id}/member`)}
-                                        >
-                                            <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedIds.includes(p.id)}
-                                                    onChange={() => toggleSelect(p.id)}
-                                                    className="rounded border-gray-300"
-                                                />
+                                </TableHeader>
+                                <TableBody>
+                                    {filtered.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                                                {fetchError ? (
+                                                    <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
+                                                ) : (
+                                                    isLoading ? "Loading projects..." : "No projects found"
+                                                )}
                                             </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <UserAvatar
-                                                        name={p.name}
-                                                        size={8}
-                                                        className="rounded-full"
+                                        </TableRow>
+                                    ) : (
+                                        paginated.map((p) => (
+                                            <TableRow
+                                                key={p.id}
+                                                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                                                onClick={() => router.push(`/projects/${p.id}/tasks`)}
+                                            >
+                                                <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.includes(p.id)}
+                                                        onChange={() => toggleSelect(p.id)}
+                                                        className="rounded border-gray-300"
                                                     />
+                                                </TableCell>
+                                                <TableCell>
                                                     <div className="min-w-0">
-                                                        <Link href={`/projects/${p.id}/member`} className="font-medium text-sm hover:underline block truncate">
+                                                        <Link href={`/projects/${p.id}/tasks`} className="font-medium text-sm hover:underline block truncate">
                                                             {p.name}
                                                         </Link>
                                                     </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {p.clientName ? (
-                                                    <Link
-                                                        href={`/projects/clients?q=${encodeURIComponent(p.clientName)}`}
-                                                        className="hover:underline hover:text-foreground transition-colors"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        {p.clientName}
-                                                    </Link>
-                                                ) : "—"}
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {p.teams.length === 0 ? "None" : p.teams.join(", ")}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex -space-x-2">
-                                                    {p.members.slice(0, 3).map((m) => (
-                                                        <MemberAvatar key={m.id} member={m} size={6} />
-                                                    ))}
-                                                    {p.members.length > 3 && (
-                                                        <div className="h-6 w-6 rounded-full bg-muted text-xs grid place-items-center ring-2 ring-background">
-                                                            +{p.members.length - 3}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {p.taskCount}
-                                            </TableCell>
-                                            {/* <TableCell className="text-muted-foreground">{p.memberLimitLabel}</TableCell> */}
-                                            <TableCell onClick={(e) => e.stopPropagation()}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" size="sm" className="px-3">
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-48">
-                                                        {!p.archived ? (
-                                                            <>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("general"); setEditing(p) }}>Edit project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("budget"); setEditing(p) }}>Edit budget</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem>Duplicate project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setArchiveTargets([p.id]); setArchiveOpen(true) }}>
-                                                                    Archive project
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onSelect={() => {
-                                                                        setTransferProject(p);
-                                                                        setTransferOpen(true)
-                                                                    }}
-                                                                >
-                                                                    Transfer
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    className="text-destructive focus:text-destructive"
-                                                                    onSelect={() => {
-                                                                        setDeleteTarget(p)
-                                                                        setDeleteOpen(true)
-                                                                    }}
-                                                                >
-                                                                    Delete project
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <DropdownMenuItem disabled>Edit project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
-                                                                <DropdownMenuItem disabled>Duplicate project</DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onSelect={async () => {
-                                                                        await unarchiveProject(Number(p.id));
-                                                                        setData(prev => prev.map(it => it.id === p.id ? { ...it, archived: false } : it))
-                                                                        setSelectedIds(prev => prev.filter(id => id !== p.id))
-                                                                        setActiveTab("active")
-                                                                    }}
-                                                                >
-                                                                    Restore project
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem disabled>Transfer</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    className="text-destructive focus:text-destructive"
-                                                                    onSelect={() => {
-                                                                        setDeleteTarget(p)
-                                                                        setDeleteOpen(true)
-                                                                    }}
-                                                                >
-                                                                    Delete project
-                                                                </DropdownMenuItem>
-                                                            </>
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground">
+                                                    {p.clientName ? (
+                                                        <Link
+                                                            href={`/projects/clients?q=${encodeURIComponent(p.clientName)}`}
+                                                            className="hover:underline hover:text-foreground transition-colors"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {p.clientName}
+                                                        </Link>
+                                                    ) : "—"}
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground">
+                                                    {p.teams.length === 0 ? "None" : p.teams.join(", ")}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="text-sm text-muted-foreground">{p.members.length} members</span>
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground">
+                                                    {p.taskCount}
+                                                </TableCell>
+                                                {/* <TableCell className="text-muted-foreground">{p.memberLimitLabel}</TableCell> */}
+                                                <TableCell onClick={(e) => e.stopPropagation()}>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="outline" size="sm" className="px-3">
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-48">
+                                                            {!p.archived ? (
+                                                                <>
+                                                                    <DropdownMenuItem onSelect={() => { setEditTab("general"); setEditing(p) }}>Edit project</DropdownMenuItem>
+                                                                    <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
+                                                                    <DropdownMenuItem onSelect={() => { setEditTab("budget"); setEditing(p) }}>Edit budget</DropdownMenuItem>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem>Duplicate project</DropdownMenuItem>
+                                                                    <DropdownMenuItem onSelect={() => { setArchiveTargets([p.id]); setArchiveOpen(true) }}>
+                                                                        Archive project
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        onSelect={() => {
+                                                                            setTransferProject(p);
+                                                                            setTransferOpen(true)
+                                                                        }}
+                                                                    >
+                                                                        Transfer
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem
+                                                                        className="text-destructive focus:text-destructive"
+                                                                        onSelect={() => {
+                                                                            setDeleteTarget(p)
+                                                                            setDeleteOpen(true)
+                                                                        }}
+                                                                    >
+                                                                        Delete project
+                                                                    </DropdownMenuItem>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <DropdownMenuItem disabled>Edit project</DropdownMenuItem>
+                                                                    <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
+                                                                    <DropdownMenuItem disabled>Duplicate project</DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        onSelect={async () => {
+                                                                            await unarchiveProject(Number(p.id));
+                                                                            setData(prev => prev.map(it => it.id === p.id ? { ...it, archived: false } : it))
+                                                                            setSelectedIds(prev => prev.filter(id => id !== p.id))
+                                                                            setActiveTab("active")
+                                                                        }}
+                                                                    >
+                                                                        Restore project
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem disabled>Transfer</DropdownMenuItem>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem
+                                                                        className="text-destructive focus:text-destructive"
+                                                                        onSelect={() => {
+                                                                            setDeleteTarget(p)
+                                                                            setDeleteOpen(true)
+                                                                        }}
+                                                                    >
+                                                                        Delete project
+                                                                    </DropdownMenuItem>
+                                                                </>
 
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                                                            )}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        ) : (
+                            filtered.length === 0 ? (
+                                <div className="text-center text-muted-foreground py-12 bg-muted/20 rounded-lg border-2 border-dashed">
+                                    {fetchError ? (
+                                        <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
+                                    ) : (
+                                        isLoading ? "Loading projects..." : "No projects found"
+                                    )}
+                                </div>
+                            ) : (
+                                <ProjectGridView
+                                    projects={paginated}
+                                    selectedIds={selectedIds}
+                                    onToggleSelect={toggleSelect}
+                                />
+                            )
+                        )}
                     </div>
 
                     <PaginationFooter
@@ -732,6 +721,55 @@ export default function ProjectsPage() {
                     />
 
                 </div>
+
+                {/* Floating Batch Action Bar */}
+                {selectedIds.length > 0 && (
+                    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl rounded-full px-6 py-3 flex items-center gap-4 z-50 animate-in slide-in-from-bottom-5 ring-1 ring-black/5">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 border-r border-gray-100 dark:border-gray-800 pr-4">
+                            {selectedIds.length} selected
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                onClick={() => setBatchOpen(true)}
+                            >
+                                <Pencil className="w-3.5 h-3.5 mr-2" />
+                                Edit
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                onClick={() => { setArchiveTargets(selectedIds); setArchiveOpen(true) }}
+                            >
+                                <Archive className="w-3.5 h-3.5 mr-2" />
+                                Archive
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                className="h-8 text-[10px] font-bold uppercase tracking-wider opacity-90 hover:opacity-100"
+                                onClick={() => {
+                                    setArchiveTargets(selectedIds);
+                                    setArchiveOpen(true);
+                                }}
+                            >
+                                <Trash2 className="w-3.5 h-3.5 mr-2 text-white" />
+                                Delete
+                            </Button>
+                        </div>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                            onClick={() => setSelectedIds([])}
+                        >
+                            <X className="w-4 h-4 text-gray-400" />
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     )
