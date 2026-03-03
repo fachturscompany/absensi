@@ -3,14 +3,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
-import { DUMMY_TIME_ENTRIES } from "@/lib/data/dummy-data"
-import type { TimesheetApproval } from "@/lib/data/dummy-data"
 import { Badge } from "@/components/ui/badge"
+import type { TimesheetApprovalRow } from "@/action/timesheets"
 
 interface ApprovalDetailDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    approval: TimesheetApproval | null
+    approval: TimesheetApprovalRow | null
     onApprove: (id: string) => void
     onReject: (id: string) => void
 }
@@ -24,9 +23,9 @@ export function ApprovalDetailDialog({
 }: ApprovalDetailDialogProps) {
     if (!approval) return null
 
-    // Simulate fetching entries for this period/member
-    // In a real app, this would be an API call based on approval.memberId, dateStart, dateEnd
-    const entries = DUMMY_TIME_ENTRIES.filter(e => e.memberId === approval.memberId)
+    // TODO: In a real app, this would be an API call fetching actual time_entries 
+    // based on approval.memberId, dateStart, and dateEnd
+    const entries: any[] = []
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

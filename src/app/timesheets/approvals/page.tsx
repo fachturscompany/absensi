@@ -2,8 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react"
 import { DateRangePicker } from "@/components/insights/DateRangePicker"
-
-import { DUMMY_MEMBERS, DUMMY_TIMESHEET_APPROVALS } from "@/lib/data/dummy-data"
 import type { SelectedFilter, DateRange } from "@/components/insights/types"
 import { Button } from "@/components/ui/button"
 import { Download, Search, CheckCircle2, XCircle, Eye, Settings, Pencil, ListFilter, X } from "lucide-react"
@@ -12,6 +10,8 @@ import { PaginationFooter } from "@/components/tables/pagination-footer"
 import { toast } from "sonner"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
+import { getTimesheetApprovals, updateTimesheetStatus, type TimesheetApprovalRow } from "@/action/timesheets"
+import { useOrgStore } from "@/store/org-store"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,8 +30,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ApprovalDetailDialog } from "@/components/timesheets/approvals/ApprovalDetailDialog"
 import { ActionConfirmDialog } from "@/components/timesheets/approvals/ActionConfirmDialog"
-import type { TimesheetApproval } from "@/lib/data/dummy-data"
-
 
 const getStatusBadge = (status: string) => {
     switch (status) {
@@ -71,10 +69,13 @@ export default function TimesheetApprovalsPage() {
 
     const [searchQuery, setSearchQuery] = useState("")
     const [isLoading, setIsLoading] = useState(true)
-
     // Data State
-    const [approvals, setApprovals] = useState<TimesheetApproval[]>([])
+    const [approvals, setApprovals] = useState<TimesheetApprovalRow[]>([])
+    const [members, setMembers] = useState<{ id: string; name: string }[]>([])
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+
+    // Org State
+    const organizationId = useOrgStore((s) => s.organizationId)
 
     // UI State
     const [filters, setFilters] = useState({
@@ -83,11 +84,10 @@ export default function TimesheetApprovalsPage() {
     })
 
     // Dialog States
-    // Dialog States
     const [detailDialogOpen, setDetailDialogOpen] = useState(false)
     const [actionDialogOpen, setActionDialogOpen] = useState(false)
     const [actionMode, setActionMode] = useState<'approve' | 'reject'>('approve')
-    const [activeApproval, setActiveApproval] = useState<TimesheetApproval | null>(null)
+    const [activeApproval, setActiveApproval] = useState<TimesheetApprovalRow | null>(null)
     const [isBulkAction, setIsBulkAction] = useState(false)
 
     const [page, setPage] = useState(1)
@@ -107,12 +107,30 @@ export default function TimesheetApprovalsPage() {
         actions: true
     })
 
+    const loadData = React.useCallback(async () => {
+        setIsLoading(true)
+        const filtersParams = {
+            startDate: dateRange.startDate ? format(dateRange.startDate, "yyyy-MM-dd") : undefined,
+            endDate: dateRange.endDate ? format(dateRange.endDate, "yyyy-MM-dd") : undefined,
+            organizationId: organizationId || undefined
+        }
+
+        const res = await getTimesheetApprovals(filtersParams)
+        if (res.success) {
+            setApprovals(res.data)
+
+            // Extract unique members for filter dropdown
+            const uniqueMembers = Array.from(new Map(res.data.map((item: any) => [item.memberId, { id: item.memberId, name: item.memberName }])).values())
+            setMembers(uniqueMembers as { id: string, name: string }[])
+        } else {
+            toast.error("Failed to load approvals")
+        }
+        setIsLoading(false)
+    }, [dateRange, organizationId])
+
     useEffect(() => {
-        // Initialize with dummy data
-        setApprovals(DUMMY_TIMESHEET_APPROVALS)
-        const timer = setTimeout(() => setIsLoading(false), 800)
-        return () => clearTimeout(timer)
-    }, [])
+        loadData()
+    }, [loadData])
 
     const filteredData = useMemo(() => {
         return approvals.filter(item => {
@@ -176,26 +194,42 @@ export default function TimesheetApprovalsPage() {
         }
     }
 
-    const handleRejectClick = (approval: TimesheetApproval) => {
+    const handleRejectClick = (approval: TimesheetApprovalRow) => {
         setActiveApproval(approval)
         setActionMode('reject')
         setIsBulkAction(false)
         setActionDialogOpen(true)
     }
 
-    const handleConfirmAction = (reason: string) => {
+    const handleConfirmAction = async (reason: string) => {
         const newStatus = actionMode === 'approve' ? 'approved' : 'rejected'
         const successConfig = actionMode === 'approve'
-            ? { status: 'approved', approvalDate: new Date().toISOString(), comments: reason }
+            ? { status: 'approved', submittedDate: new Date().toISOString(), comments: reason }
             : { status: 'rejected', comments: reason }
 
         if (isBulkAction) {
-            setApprovals(prev => prev.map(a => selectedRows.has(a.id) ? { ...a, ...successConfig } as TimesheetApproval : a))
-            toast.success(`${selectedRows.size} timesheets ${newStatus}`)
-            setSelectedRows(new Set())
+            // Bulk update
+            const ids = Array.from(selectedRows)
+            let successCount = 0
+            for (const id of ids) {
+                const res = await updateTimesheetStatus(id, newStatus as any, reason)
+                if (res.success) successCount++
+            }
+            if (successCount > 0) {
+                setApprovals(prev => prev.map(a => selectedRows.has(a.id) ? { ...a, ...successConfig } as TimesheetApprovalRow : a))
+                toast.success(`${successCount} timesheets ${newStatus}`)
+                setSelectedRows(new Set())
+            } else {
+                toast.error(`Failed to update timesheets`)
+            }
         } else if (activeApproval) {
-            setApprovals(prev => prev.map(a => a.id === activeApproval.id ? { ...a, ...successConfig } as TimesheetApproval : a))
-            toast.success(`Timesheet ${newStatus}`)
+            const res = await updateTimesheetStatus(activeApproval.id, newStatus as any, reason)
+            if (res.success) {
+                setApprovals(prev => prev.map(a => a.id === activeApproval.id ? { ...a, ...successConfig } as TimesheetApprovalRow : a))
+                toast.success(`Timesheet ${newStatus}`)
+            } else {
+                toast.error(`Failed to update timesheet: ${res.message}`)
+            }
         }
         setDetailDialogOpen(false)
         setActionDialogOpen(false)
@@ -213,7 +247,7 @@ export default function TimesheetApprovalsPage() {
         setActionDialogOpen(true)
     }
 
-    const handleViewDetails = (approval: TimesheetApproval) => {
+    const handleViewDetails = (approval: TimesheetApprovalRow) => {
         setActiveApproval(approval)
         setDetailDialogOpen(true)
     }
@@ -290,7 +324,7 @@ export default function TimesheetApprovalsPage() {
                 <SearchableSelect
                     value={selectedFilter.id === 'all' || !selectedFilter.id ? "" : selectedFilter.id}
                     onValueChange={(val) => setSelectedFilter({ type: "members", all: !val, id: val || "all" })}
-                    options={DUMMY_MEMBERS.map(m => ({ value: m.id, label: m.name }))}
+                    options={members.map(m => ({ value: m.id, label: m.name }))}
                     placeholder="Select members"
                     searchPlaceholder="Search members..."
                     className="w-full"
