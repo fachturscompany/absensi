@@ -12,8 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format, differenceInMinutes, parse, isValid, isAfter, isBefore } from "date-fns"
 import { Calendar as CalendarIcon, Clock, HelpCircle, Plus, Trash2, Coffee } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { DUMMY_PROJECTS, DUMMY_MEMBERS, DUMMY_TASKS } from "@/lib/data/dummy-data"
 import type { TimeEntry, Break } from "@/lib/data/dummy-data"
+import type { TimesheetMember, TimesheetProject, TimesheetTask } from "@/action/timesheets"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -23,6 +23,9 @@ interface AddTimeEntryDialogProps {
     onOpenChange: (open: boolean) => void
     onSave: (entry: Partial<TimeEntry>) => void
     isAdmin?: boolean
+    members?: TimesheetMember[]
+    projects?: TimesheetProject[]
+    tasks?: TimesheetTask[]
 }
 
 const REASONS = [
@@ -37,6 +40,9 @@ export function AddTimeEntryDialog({
     open,
     onOpenChange,
     onSave,
+    members = [],
+    projects = [],
+    tasks = [],
 }: AddTimeEntryDialogProps) {
     const [formData, setFormData] = useState<Partial<TimeEntry>>({
         memberId: "",
@@ -66,7 +72,7 @@ export function AddTimeEntryDialog({
         if (open) {
             const today = new Date()
             setFormData({
-                memberId: DUMMY_MEMBERS[0]?.id || "",
+                memberId: members[0]?.id || "",
                 projectId: "",
                 taskId: "",
                 date: today.toISOString().split('T')[0],
@@ -182,13 +188,13 @@ export function AddTimeEntryDialog({
             return
         }
 
-        const project = DUMMY_PROJECTS.find(p => p.id === formData.projectId)
-        const task = DUMMY_TASKS.find(t => t.id === formData.taskId)
+        const project = projects.find(p => p.id === formData.projectId)
+        const task = tasks.find(t => t.id === formData.taskId)
         const finalReason = formData.reason === "Other" ? otherReason : formData.reason
 
         onSave({
             ...formData,
-            memberId: formData.memberId || DUMMY_MEMBERS[0]?.id,
+            memberId: formData.memberId || members[0]?.id,
             projectName: project?.name,
             taskId: formData.taskId || undefined,
             taskName: task?.title,
@@ -222,7 +228,7 @@ export function AddTimeEntryDialog({
                                     <SelectValue placeholder="Select member" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {DUMMY_MEMBERS.map(m => (
+                                    {members.map(m => (
                                         <SelectItem key={m.id} value={m.id}>
                                             <div className="flex items-center gap-2">
                                                 <Avatar className="h-5 w-5">
@@ -259,7 +265,7 @@ export function AddTimeEntryDialog({
                                 <SelectValue placeholder="Select project" />
                             </SelectTrigger>
                             <SelectContent>
-                                {DUMMY_PROJECTS.map(p => (
+                                {projects.map(p => (
                                     <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -281,7 +287,7 @@ export function AddTimeEntryDialog({
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">-- No Task --</SelectItem>
-                                {DUMMY_TASKS.map(t => (
+                                {tasks.filter(t => !formData.projectId || t.projectId === formData.projectId).map(t => (
                                     <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
                                 ))}
                             </SelectContent>

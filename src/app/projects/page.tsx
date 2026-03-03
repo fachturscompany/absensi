@@ -372,11 +372,8 @@ export default function ProjectsPage() {
                                             <TableRow
                                                 key={p.id}
                                                 className="cursor-pointer hover:bg-muted/50 transition-colors"
-<<<<<<< HEAD
                                                 onClick={() => router.push(`/projects/${p.id}/tasks`)}
-=======
-                                                onClick={() => router.push(`/projects/${p.id}/member`)}
->>>>>>> 9616b628fdb22ceeef59f56219534a1a8f5f3016
+
                                             >
                                                 <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
                                                     <input
