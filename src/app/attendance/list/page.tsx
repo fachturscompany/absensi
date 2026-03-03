@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState, useMemo, useDeferredValue } from "react"
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import type { DateFilterState } from "@/components/analytics/date-filter-bar"
 import { DateFilterBar } from "@/components/analytics/date-filter-bar"
@@ -15,35 +15,16 @@ import { toast } from "sonner"
 import { deleteAttendanceRecord, deleteMultipleAttendanceRecords, updateAttendanceRecord } from "@/action/attendance"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 } from "@/components/ui/dialog"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { AnimatePresence, motion } from "framer-motion"
 import {
-  Search,
-  RotateCcw,
-  Plus,
-  Download,
-  Edit,
-  Trash2,
-  CheckCircle2,
-  Timer,
-  XCircle,
-  AlertCircle,
+  Search, RotateCcw, Plus, Download, Edit, Trash2, CheckCircle2, Timer, XCircle, AlertCircle,
 } from "lucide-react"
-
 import { UserAvatar } from "@/components/common/user-avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -51,281 +32,513 @@ import { PaginationFooter } from "@/components/tables/pagination-footer"
 import { cn } from "@/lib/utils"
 import { formatLocalTime } from "@/utils/timezone"
 
-
-// Tambahan helper untuk konsistensi tanggal sesuai timezone organisasi
-function toOrgYMD(d: Date, tz?: string): string {
-  if (!tz || tz === "UTC") {
-    const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-    return dt.toISOString().slice(0, 10)
-  }
-  try {
-    return formatInTimeZone(d, tz, "yyyy-MM-dd")
-  } catch {
-    const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-    return dt.toISOString().slice(0, 10)
-  }
+interface AttendanceRowProps {
+  record: AttendanceListItem
+  isSelected: boolean
+  onToggleSelect: (id: string, checked: boolean) => void
+  onEdit: () => void
+  onDelete: () => void
+  showLocation: boolean
+  checkInDisplay: { date: string; time: string; method: string }
+  checkOutDisplay: { date: string; time: string; method: string }
+  breakInDisplay: { date: string; time: string; method: string }
+  breakOutDisplay: { date: string; time: string; method: string }
 }
 
-// Clone lokal (sementara tetap delegasi ke komponen lama agar UI identik)
+const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
+  record, isSelected, onToggleSelect, onEdit, onDelete, showLocation,
+  checkInDisplay, checkOutDisplay, breakInDisplay, breakOutDisplay
+}) => {
+  const getStatusColor = (status: string): string => {
+    const colors: Record<string, string> = {
+      present: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      late: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+      absent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      leave: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    }
+    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400"
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "present": return <CheckCircle2 className="h-3 w-3" />
+      case "late": return <Timer className="h-3 w-3" />
+      case "absent": return <XCircle className="h-3 w-3" />
+      default: return <AlertCircle className="h-3 w-3" />
+    }
+  }
+
+  return (
+    <tr className={cn(
+      "border-b transition-colors cursor-pointer custom-hover-row",
+      isSelected && "bg-blue-50 dark:bg-blue-950/50"
+    )}>
+      {/* Checkbox */}
+      <td className="p-3">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => onToggleSelect(record.id, e.target.checked)}
+          className="rounded border-gray-300"
+        />
+      </td>
+      
+      {/* Member */}
+      <td className="p-3">
+        <div className="flex items-center gap-3">
+          <UserAvatar
+            name={record.member?.name || ''}
+            photoUrl={record.member?.avatar}
+            userId={record.member?.userId}
+            size={8}
+          />
+          <div>
+            <p className="font-medium text-sm">
+              <Link href={`/members/${record.member?.id ?? ""}`} className="hover:underline">
+                {record.member?.name || 'Unknown'}
+              </Link>
+            </p>
+            <p className="text-xs text-muted-foreground">{record.member?.email || 'no email'}</p>
+          </div>
+        </div>
+      </td>
+      
+      {/* Department */}
+      <td className="p-3">
+        <p className="font-medium text-xs">{record.member?.department || '-'}</p>
+      </td>
+      
+      {/* Check In */}
+      <td className="p-3">
+        <div className="flex flex-col text-xs font-mono">
+          <span className="font-medium whitespace-nowrap">{checkInDisplay.date}</span>
+          <span className="text-muted-foreground">{checkInDisplay.time}</span>
+          {checkInDisplay.method && (
+            <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
+              {checkInDisplay.method}
+            </span>
+          )}
+        </div>
+      </td>
+      
+      {/* Check Out */}
+      <td className="p-3">
+        <div className="flex flex-col text-xs font-mono">
+          <span className="font-medium whitespace-nowrap">{checkOutDisplay.date}</span>
+          <span className="text-muted-foreground">{checkOutDisplay.time}</span>
+          {checkOutDisplay.method && (
+            <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
+              {checkOutDisplay.method}
+            </span>
+          )}
+        </div>
+      </td>
+      
+      {/* Break In */}
+      <td className="p-3">
+        <div className="flex flex-col text-xs font-mono">
+          <span className="font-medium whitespace-nowrap">{breakInDisplay.date}</span>
+          <span className="text-muted-foreground">{breakInDisplay.time}</span>
+          {breakInDisplay.method && (
+            <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
+              {breakInDisplay.method}
+            </span>
+          )}
+        </div>
+      </td>
+      
+      {/* Break Out */}
+      <td className="p-3">
+        <div className="flex flex-col text-xs font-mono">
+          <span className="font-medium whitespace-nowrap">{breakOutDisplay.date}</span>
+          <span className="text-muted-foreground">{breakOutDisplay.time}</span>
+          {breakOutDisplay.method && (
+            <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
+              {breakOutDisplay.method}
+            </span>
+          )}
+        </div>
+      </td>
+      
+      {/* Work Hours */}
+      <td className="p-3">
+        <span className="font-medium text-xs">{record.workHours || '0h'}</span>
+      </td>
+      
+      {/* Status */}
+      <td className="p-3">
+        <Badge className={cn("gap-1 px-2 py-0.5 text-xs", getStatusColor(record.status))}>
+          {getStatusIcon(record.status)}
+          <span className="capitalize">
+            {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+          </span>
+        </Badge>
+      </td>
+      
+      {/* Location */}
+      {showLocation && <td className="p-3">-</td>}
+      
+      {/* Actions */}
+      <td className="p-3">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" title="Edit" onClick={onEdit}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" title="Delete" onClick={onDelete} className="text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+const AttendanceRow = React.memo(AttendanceRowPure)
+
+// ============================================================================
+// ✅ MAIN COMPONENT - FULLY OPTIMIZED
+// ============================================================================
 function ModernAttendanceListCloned() {
   const orgStore = useOrgStore()
 
-  const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null)
-  const [dateRange, setDateRange] = useState<DateFilterState>(() => {
-    const start = new Date()
-    start.setHours(0, 0, 0, 0)
-    const end = new Date()
-    end.setHours(23, 59, 59, 999)
-    return { from: start, to: end, preset: "today" }
+  // ✅ SINGLE STATE OBJECT
+  type QueryParams = {
+    orgId: number | null
+    page: number
+    limit: number
+    dateFrom: string
+    dateTo: string
+    search: string
+    status: string
+    department: string
+  }
+
+  const [queryParams, setQueryParams] = useState<QueryParams>({
+    orgId: null,
+    page: 1,
+    limit: 10,
+    dateFrom: (() => {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return today.toISOString().slice(0, 10)
+    })(),
+    dateTo: (() => {
+      const today = new Date()
+      today.setHours(23, 59, 59, 999)
+      return today.toISOString().slice(0, 10)
+    })(),
+    search: "",
+    status: "all",
+    department: "all"
   })
 
-  const [searchInput, setSearchInput] = useState<string>("")
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [departmentFilter, setDepartmentFilter] = useState<string>("all")
-  const [selectedRecords, setSelectedRecords] = useState<string[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
-  const [totalItems, setTotalItems] = useState<number>(0)
-  const [attendanceData, setAttendanceData] = useState<AttendanceListItem[]>([])
-  const [userTimezone, setUserTimezone] = useState<string>("UTC")
-  //state list party
-  const [initialized, setInitialized] = useState(false)
-
-  // Tambahan untuk toolbar
+  const deferredSearch = useDeferredValue(queryParams.search)
+  const [data, setData] = useState<{ items: AttendanceListItem[], total: number }>({ items: [], total: 0 })
+  const [loading, setLoading] = useState(true)
+  const [userTimezone, setUserTimezone] = useState("UTC")
+  const [selectedIds, setSelectedIds] = useState(new Set<string>())
   const [departments, setDepartments] = useState<string[]>([])
   const [isMounted, setIsMounted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const SHOW_LOCATION = false
 
-  // Confirm dialog state
-  type ConfirmState = { mode: "single" | "bulk"; id?: string }
+  // Dialog states
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [confirmState, setConfirmState] = useState<ConfirmState | null>(null)
-
-  // Edit dialog state
+  const [confirmState, setConfirmState] = useState<{ mode: "single" | "bulk"; id?: string } | null>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<AttendanceListItem | null>(null)
-  const [editIn, setEditIn] = useState<string>("")
-  const [editOut, setEditOut] = useState<string>("")
-  const [editRemarks, setEditRemarks] = useState<string>("")
-  // const fetchRef = useRef<(opts?: { mode?: "full" | "single"; id?: string }) => void>(() => {})
-  // useEffect(() => { fetchRef.current = fetchData }, [fetchData])
+  const [editIn, setEditIn] = useState("")
+  const [editOut, setEditOut] = useState("")
+  const [editRemarks, setEditRemarks] = useState("")
 
-  // request id guard untuk menghindari stale update
-  const latestRequestRef = useRef(0)
+  // Performance refs
+  const latestReqIdRef = useRef(0)
+  const fetchCacheRef = useRef<Map<string, Promise<GetAttendanceResult>>>(new Map())
+  const realtimeChannelRef = useRef<any>(null)
+  const fetchDataRef = useRef<() => void>(() => {})
+  const queryParamsRef = useRef(queryParams)
+  queryParamsRef.current = queryParams
+  const orgIdRef = useRef(orgStore.organizationId)
+  orgIdRef.current = orgStore.organizationId
+  const queryKeyRef = useRef('')
+  const rafRef = useRef<number | null>(null)
 
-  useEffect(() => {
-    const orgId = selectedOrgId || orgStore.organizationId
-    if (!orgId) return
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`attendance_records:${orgId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'attendance_records' },
-        (
-          payload: RealtimePostgresChangesPayload<{
-            new: { id?: string | number } | null
-            old: { id?: string | number } | null
-          }>
-        ) => {
-          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            const id = String((payload.new as { id?: string | number })?.id ?? '')
-            if (id) fetchRef.current({ mode: 'single', id })
-            else fetchRef.current({ mode: 'full' })
-          } else if (payload.eventType === 'DELETE') {
-            const id = String((payload.old as { id?: string | number })?.id ?? '')
-            if (id) {
-              setAttendanceData(prev => prev.filter(r => r.id !== id))
-              setTotalItems(prev => Math.max(0, prev - 1))
-            } else {
-              fetchRef.current({ mode: 'full' })
-            }
-          }
-        }
-      )
-      .subscribe()
-
-    return () => {
-      try { supabase.removeChannel(channel) } catch { }
+  // Helper functions
+  function toOrgYMD(d: Date, tz?: string): string {
+    if (!tz || tz === "UTC") {
+      const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      return dt.toISOString().slice(0, 10)
     }
-  }, [selectedOrgId, orgStore.organizationId])
-
-  // Fallback org dari cookie jika store belum siap
-  useEffect(() => {
-    if (selectedOrgId || orgStore.organizationId) return
     try {
-      const m = document.cookie.match(/(?:^|; )org_id=(\d+)/)
-      if (m && m[1]) {
-        const oid = Number(m[1])
-        if (!Number.isNaN(oid)) setSelectedOrgId(oid)
-      }
-    } catch { }
-  }, [selectedOrgId, orgStore.organizationId])
+      return formatInTimeZone(d, tz, "yyyy-MM-dd")
+    } catch {
+      const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      return dt.toISOString().slice(0, 10)
+    }
+  }
 
-  // Debounce input ke query
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const v = (searchInput || '').trim()
-      // Backend-driven: trigger hanya jika kosong (reset) atau >= 2 karakter
-      if (v.length === 0 || v.length >= 2) {
-        setSearchQuery(v)
-      }
-    }, 400)
-    return () => window.clearTimeout(timer)
-  }, [searchInput])
+// ✅ FIXED QUERY KEY - Stable dependencies
+const orgId = useMemo(() => 
+  queryParams.orgId || orgStore.organizationId, 
+  [queryParams.orgId, orgStore.organizationId]
+)
 
-  // Mounted flag untuk skeleton di toolbar filter
-  useEffect(() => {
-    setIsMounted(true)
+const queryKey = useMemo(() => JSON.stringify({
+  orgId,
+  page: queryParams.page,
+  limit: queryParams.limit,
+  dateFrom: queryParams.dateFrom,
+  dateTo: queryParams.dateTo,
+  status: queryParams.status,
+  department: queryParams.department,
+  search: deferredSearch?.trim() ?? "",
+}), [orgId, queryParams.page, queryParams.limit, queryParams.dateFrom, queryParams.dateTo,
+    queryParams.status, queryParams.department, deferredSearch])
+
+
+  // Update query helper
+  const updateQueryParams = useCallback((updates: Partial<QueryParams>) => {
+    setQueryParams(prev => ({ ...prev, ...updates, page: 1 }))
   }, [])
 
-  // Recompute departments dari attendanceData
-  useEffect(() => {
-    const uniqueDepts = Array.from(new Set(
-      attendanceData.map((r) => r.member?.department)
-    )).filter((d): d is string => Boolean(d && d !== "No Department")).sort()
-    const same = uniqueDepts.length === departments.length && uniqueDepts.every((d, i) => d === departments[i])
-    if (!same) setDepartments(uniqueDepts)
-  }, [attendanceData, departments])
-
-  // Key untuk cache (match dgn komponen lama)
-  const cacheKeyBase = useMemo(() => {
-    const orgId = selectedOrgId || orgStore.organizationId || "no-org"
-    const localToYMD = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
-    const effFrom = (userTimezone && userTimezone !== "UTC") ? formatInTimeZone(dateRange.from, userTimezone, "yyyy-MM-dd") : localToYMD(dateRange.from)
-    const effTo = (userTimezone && userTimezone !== "UTC") ? formatInTimeZone(dateRange.to, userTimezone, "yyyy-MM-dd") : localToYMD(dateRange.to)
-    const status = statusFilter || "all"
-    const dept = departmentFilter || "all"
-    const q = searchQuery || ""
-    return `attendance:list:${orgId}:p=${currentPage}:l=${itemsPerPage}:from=${effFrom}:to=${effTo}:status=${status}:dept=${dept}:q=${q}`
-  }, [selectedOrgId, orgStore.organizationId, currentPage, itemsPerPage, dateRange.from, dateRange.to, statusFilter, departmentFilter, searchQuery, userTimezone])
-
-  // Fetch attendance data via server action (sudah Anda tambahkan di Tahap-5)
-  // helper untuk merge 1 record ke state saat incremental
-  // function upsertRecord(next: AttendanceListItem) {
-  //   setAttendanceData(prev => {
-  //     const idx = prev.findIndex(r => r.id === next.id)
-  //     if (idx >= 0) {
-  //       const copied = [...prev]
-  //       copied[idx] = next
-  //       return copied
-  //     }
-  //     return [next, ...prev]
-  //   })
-  //   setTotalItems(prev => Math.max(prev, 1))
-  // }
-
-  const fetchData = useCallback(
-    async (opts?: { mode?: "full" | "single"; id?: string }) => {
-      const orgId = selectedOrgId || orgStore.organizationId
-      if (!orgId) {
-        setLoading(true)
-        return
-      }
-
-      const mode = opts?.mode ?? "full"
-      const recordId = opts?.id
-
-      if (mode === "single" && recordId) {
-        // Rekomendasi: gunakan API route GET /api/attendance-records?id=...&organizationId=...
-        // agar hasilnya sama dengan shape AttendanceListItem.
-        // Di sini contoh minimal: fallback ke full fetch jika endpoint by-id belum tersedia.
-        // Ketika endpoint by-id siap, ganti blok ini:
-        //   const one = await fetchSingleAttendance(recordId, orgId)
-        //   if (one && isRecordMatchesActiveFilters(one)) upsertRecord(one)
-        await (async () => {
-          await fetchData({ mode: "full" })
-        })()
-        return
-      }
-
+  // Fetch data - cached + deduped
+  const fetchData = useCallback(async () => {
+    const qp = queryParamsRef.current
+    const orgId = qp.orgId || orgIdRef.current
+    if (!orgId) {
       setLoading(true)
-      const reqId = latestRequestRef.current + 1
-      latestRequestRef.current = reqId
-
-      try {
-        const searchParam = (searchQuery || "").trim()
-        const params = new URLSearchParams()
-        params.set("page", String(currentPage))
-        params.set("limit", String(itemsPerPage))
-        params.set("dateFrom", toOrgYMD(dateRange.from, userTimezone))
-        params.set("dateTo", toOrgYMD(dateRange.to, userTimezone))
-        params.set("organizationId", String(orgId))
-        if (statusFilter && statusFilter !== "all") params.set("status", statusFilter)
-        if (departmentFilter && departmentFilter !== "all") params.set("department", departmentFilter)
-        if (searchParam.length >= 2) params.set("search", searchParam)
-
-        const res = await fetch(`/api/attendance-records?${params.toString()}`, {
-          method: "GET",
-          credentials: "same-origin",
-        })
-        const result: GetAttendanceResult = await res.json()
-        if (reqId !== latestRequestRef.current) return
-
-        if (result.success) {
-          const data = (result.data || []) as AttendanceListItem[]
-          setAttendanceData(data)
-          setTotalItems(Math.max(result.meta?.total || 0, data.length))
-          if (data.length > 0) {
-            const nextTz = data[0]?.timezone ?? "UTC"
-            setUserTimezone((prev) => (prev === nextTz ? prev : nextTz))
-          }
-        } else {
-          setAttendanceData([])
-          setTotalItems(0)
-        }
-      } catch {
-        if (reqId !== latestRequestRef.current) return
-      } finally {
-        if (reqId === latestRequestRef.current) setLoading(false)
-      }
-    },
-    [selectedOrgId, orgStore.organizationId, currentPage, itemsPerPage, dateRange.from, dateRange.to, searchQuery, statusFilter, departmentFilter, userTimezone]
-  )
-
-  const fetchRef = useRef<(opts?: { mode?: "full" | "single"; id?: string }) => Promise<void>>(async () => { })
-  useEffect(() => { fetchRef.current = fetchData }, [fetchData])
-
-  useEffect(() => {
-    const orgId = selectedOrgId || orgStore.organizationId
-    if (!orgId) return
-    fetchData({ mode: 'full' })
-
-  }, [dateRange.from, dateRange.to, statusFilter, departmentFilter, searchQuery, itemsPerPage, currentPage, selectedOrgId, orgStore.organizationId])
-
-  // Handler Selected Actions (sementara no-op; akan diisi setelah list pindah)
-  // Handler Selected Actions
-  const handleEditClick = () => {
-    if (selectedRecords.length === 1) {
-      const id = selectedRecords[0]
-      const rec = attendanceData.find(r => r.id === id) || null
-      if (!rec) {
-        toast.error("Selected record not found")
-        return
-      }
-      // Prefill form
-      setEditTarget(rec)
-      setEditIn(rec.checkIn ?? "")
-      setEditOut(rec.checkOut ?? "")
-      setEditRemarks("") // tidak ada kolom remarks di list, default kosong
-      setEditOpen(true)
-    } else if (selectedRecords.length > 1) {
-      toast.info("Bulk edit belum didukung")
-    } else {
-      toast.info("Pilih satu record untuk diedit")
+      return
     }
-  }
 
-  const handleEditSingle = (rec: AttendanceListItem) => {
-    setEditTarget(rec)
-    setEditIn(rec.checkIn ?? "")
-    setEditOut(rec.checkOut ?? "")
-    setEditRemarks("")
-    setEditOpen(true)
-  }
+    const reqId = ++latestReqIdRef.current
+    const cacheKey = `fetch_${queryKeyRef.current}`
+
+    if (fetchCacheRef.current.has(cacheKey)) {
+      const cached = await fetchCacheRef.current.get(cacheKey)!
+      if (latestReqIdRef.current === reqId) handleFetchSuccess(cached)
+      return
+    }
+
+    setLoading(true)
+    const promise = (async () => {
+      const params = new URLSearchParams({
+        page: qp.page.toString(),
+        limit: qp.limit.toString(),
+        dateFrom: qp.dateFrom,
+        dateTo: qp.dateTo,
+        organizationId: orgId.toString(),
+        ...(qp.status !== "all" && { status: qp.status }),
+        ...(qp.department !== "all" && { department: qp.department }),
+        ...(qp.search?.trim().length >= 2 && { search: qp.search.trim() })
+      })
+
+      const res = await fetch(`/api/attendance-records?${params}`, {
+        credentials: "same-origin",
+      })
+      return res.json() as Promise<GetAttendanceResult>
+    })()
+
+    fetchCacheRef.current.set(cacheKey, promise)
+    
+    try {
+      const result = await promise
+      if (latestReqIdRef.current === reqId) {
+        handleFetchSuccess(result)
+      }
+    } finally {
+      fetchCacheRef.current.delete(cacheKey)
+      if (latestReqIdRef.current === reqId) setLoading(false)
+    }
+  }, []) // No deps — reads everything from refs (queryParamsRef, orgIdRef, queryKeyRef)
+
+  // Keep ref in sync so the realtime callback always calls the latest fetchData
+  // without being a useEffect dependency (prevents infinite re-subscription loop)
+  queryKeyRef.current = queryKey
+  fetchDataRef.current = fetchData
+
+  const handleFetchSuccess = useCallback((result: GetAttendanceResult) => {
+    if (result.success) {
+      const items = (result.data || []) as AttendanceListItem[]
+      setData({ items, total: result.meta?.total || items.length })
+
+      // Only update timezone if it actually changed — avoids re-render cascade
+      if (items.length > 0) {
+        const nextTz = items[0]?.timezone ?? "UTC"
+        setUserTimezone(prev => prev === nextTz ? prev : nextTz)
+      }
+
+      // Only update departments if the list actually changed — avoids re-render cascade
+      const uniqueDepts = Array.from(new Set(
+        items.map(r => r.member?.department)
+          .filter((d): d is string => Boolean(d && d !== "No Department"))
+      )).sort()
+      setDepartments(prev => {
+        const same = prev.length === uniqueDepts.length && prev.every((d, i) => d === uniqueDepts[i])
+        return same ? prev : uniqueDepts
+      })
+    } else {
+      setData({ items: [], total: 0 })
+    }
+  }, [])
+
+  // Realtime subscription - single effect, stable channel name with orgId
+  useEffect(() => {
+    if (!orgId) return
+
+    const supabase = createClient()
+    // Use orgId in channel name to avoid collisions across orgs/tabs
+    const channelName = `attendance_records:org_${orgId}`
+    const channel = supabase.channel(channelName)
+
+    channel
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'attendance_records',
+        },
+        (_payload: RealtimePostgresChangesPayload<{ organization_member_id: number }>) => {
+          // Clear cache and fetch fresh — does NOT change queryKey so won't
+          // trigger the filter useEffect, preventing false re-renders
+          fetchCacheRef.current.clear()
+          fetchDataRef.current()
+        }
+      )
+
+    realtimeChannelRef.current = channel
+
+    return () => {
+      supabase.removeChannel(channel)
+      realtimeChannelRef.current = null
+    }
+  }, [orgId]) // fetchData intentionally omitted — accessed via fetchDataRef to prevent infinite loop
+
+
+  // Initial fetch + re-fetch whenever queryKey changes (filters, page, org, search)
+  useEffect(() => {
+    if (!orgId) return
+    fetchDataRef.current()
+  }, [queryKey, orgId])
+
+  // Selection handlers
+  const toggleSelect = useCallback((id: string, checked: boolean) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (checked) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }, [])
+
+  const selectAll = useCallback(() => {
+    setSelectedIds(prev => 
+      prev.size === data.items.length 
+        ? new Set() 
+        : new Set(data.items.map(r => r.id))
+    )
+  }, [data.items.length])
+
+  // ✅ FIXED VISIBLE ROWS - Precompute outside hooks
+  const visibleRows = useMemo(() => {
+    return data.items.map((record) => {
+      // Pre-compute displays (NO HOOKS)
+      const checkInDisplay = (() => {
+        if (!record.checkIn) return { date: '-', time: '-', method: '' }
+        try {
+          const formatted = formatLocalTime(record.checkIn, userTimezone, "24h", true)
+          const [datePart, timePart] = formatted.split(', ')
+          return { 
+            date: datePart || '-', 
+            time: timePart || '-', 
+            method: record.checkInMethod || '' 
+          }
+        } catch {
+          return { date: '-', time: '-', method: '' }
+        }
+      })()
+
+      const checkOutDisplay = (() => {
+        if (!record.checkOut) return { date: '-', time: '-', method: '' }
+        try {
+          const formatted = formatLocalTime(record.checkOut, userTimezone, "24h", true)
+          const [datePart, timePart] = formatted.split(', ')
+          return { 
+            date: datePart || '-', 
+            time: timePart || '-', 
+            method: record.checkOutMethod || '' 
+          }
+        } catch {
+          return { date: '-', time: '-', method: '' }
+        }
+      })()
+
+      const breakInDisplay = (() => {
+        if (!record.actualBreakStart) return { date: '-', time: '-', method: '' }
+        try {
+          const formatted = formatLocalTime(record.actualBreakStart, userTimezone, "24h", true)
+          const [datePart, timePart] = formatted.split(', ')
+          return { 
+            date: datePart || '-', 
+            time: timePart || '-', 
+            method: record.breakInMethod || '' 
+          }
+        } catch {
+          return { date: '-', time: '-', method: '' }
+        }
+      })()
+
+      const breakOutDisplay = (() => {
+        if (!record.actualBreakEnd) return { date: '-', time: '-', method: '' }
+        try {
+          const formatted = formatLocalTime(record.actualBreakEnd, userTimezone, "24h", true)
+          const [datePart, timePart] = formatted.split(', ')
+          return { 
+            date: datePart || '-', 
+            time: timePart || '-', 
+            method: record.breakOutMethod || '' 
+          }
+        } catch {
+          return { date: '-', time: '-', method: '' }
+        }
+      })()
+
+      return (
+        <AttendanceRow
+          key={record.id}
+          record={record}
+          isSelected={selectedIds.has(record.id)}
+          onToggleSelect={toggleSelect}
+          onEdit={() => {
+            setEditTarget(record)
+            setEditIn(record.checkIn ?? "")
+            setEditOut(record.checkOut ?? "")
+            setEditRemarks("")
+            setEditOpen(true)
+          }}
+          onDelete={() => {
+            setConfirmState({ mode: "single", id: record.id })
+            setConfirmOpen(true)
+          }}
+          showLocation={false}
+          checkInDisplay={checkInDisplay}
+          checkOutDisplay={checkOutDisplay}
+          breakInDisplay={breakInDisplay}
+          breakOutDisplay={breakOutDisplay}
+        />
+      )
+    })
+  }, [data.items, userTimezone, selectedIds, toggleSelect])
+
+  // Event handlers
+  const handleManualRefresh = useCallback(() => fetchData(), [fetchData])
+  const handleDeleteMultiple = useCallback(() => {
+    if (selectedIds.size === 0) {
+      toast.info("No records selected")
+      return
+    }
+    setConfirmState({ mode: "bulk" })
+    setConfirmOpen(true)
+  }, [selectedIds.size])
 
   const submitEdit = async () => {
     if (!editTarget) return
@@ -337,518 +550,284 @@ function ModernAttendanceListCloned() {
         actual_check_out: editOut.trim() === "" ? null : editOut.trim(),
         remarks: editRemarks.trim() === "" ? null : editRemarks.trim(),
       })
-      if (!res.success) {
+      
+      if (res.success) {
+        toast.success("Record updated")
+        setEditOpen(false)
+        setEditTarget(null)
+        setEditIn("")
+        setEditOut("")
+        setEditRemarks("")
+        fetchData()
+      } else {
         toast.error(res.message || "Failed to update record")
-        return
       }
-      // Optimistic update
-      setAttendanceData(prev => {
-        const next = prev.map(r => {
-          if (r.id !== editTarget.id) return r
-          return {
-            ...r,
-            checkIn: editIn.trim() === "" ? null : editIn.trim(),
-            checkOut: editOut.trim() === "" ? null : editOut.trim(),
-            // status akan ikut dikoreksi oleh realtime/refresh; biarkan server hitung
-          }
-        })
-        return next
-      })
-      toast.success("Record updated")
-      setEditOpen(false)
-      setEditTarget(null)
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to update record"
-      toast.error(msg)
+      toast.error("Failed to update record")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleDeleteMultiple = async () => {
-    if (selectedRecords.length === 0) {
-      toast.info("No records selected")
-      return
-    }
-    setConfirmState({ mode: "bulk" })
-    setConfirmOpen(true)
-  }
-
+  // Effects
   useEffect(() => {
-    // Jika data sudah ada, kita anggap initialized
-    if (attendanceData) setInitialized(true)
-  }, [attendanceData])
+    setIsMounted(true)
+  }, [])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "present":
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-      case "late":
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-      case "absent":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-      case "leave":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400"
-    }
-  }
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "present":
-        return <CheckCircle2 className="h-3 w-3" />
-      case "late":
-        return <Timer className="h-3 w-3" />
-      case "absent":
-        return <XCircle className="h-3 w-3" />
-      default:
-        return <AlertCircle className="h-3 w-3" />
-    }
-  }
-
-  const LocationDisplay: React.FC<{ checkInLocationName: string | null; checkOutLocationName: string | null }> = () => null
-
-  const handleSelectAll = () => {
-    if (selectedRecords.length === attendanceData.length) {
-      setSelectedRecords([])
-    } else {
-      setSelectedRecords(attendanceData.map((r) => r.id))
-    }
-  }
-
-
-
-  const handleDeleteClick = (id: string) => {
-    setConfirmState({ mode: "single", id })
-    setConfirmOpen(true)
-  }
-
-  // Flag sementara agar UI TIDAK berubah (toolbar baru tidak ditampilkan)
-  const SHOW_LOCAL_TOOLBAR = true
-  const SHOW_LOCAL_LIST = true
-
+  const SHOW_LOCATION = false
 
   return (
     <>
       <style jsx global>{`
         html body .custom-hover-row:hover,
         html body .custom-hover-row:hover > td {
-          background-color: #d1d5db !important; /* dark gray hover */
+          background-color: #d1d5db !important;
         }
         html body.dark .custom-hover-row:hover,
         html body.dark .custom-hover-row:hover > td {
           background-color: #374151 !important;
         }
       `}</style>
-      {SHOW_LOCAL_TOOLBAR && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold">Attendance list</h1>
-          </div>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-2 flex-wrap">
-            {/* Search */}
-            <div className="w-full md:flex-1 md:min-w-[200px] relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Search..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") setSearchQuery(searchInput)
-                }}
-                className="pl-10 border-gray-300 bg-white w-full"
-              />
-            </div>
-
-            {/* Date Filter */}
-            <div className="w-full md:w-auto shrink-0">
-              <DateFilterBar
-                dateRange={dateRange}
-                onDateRangeChange={setDateRange}
-                className="w-full justify-start"
-              />
-            </div>
-
-            {/* Status & Department Filter Group */}
-            <div className="flex w-full md:w-auto gap-2 shrink-0">
-              {/* Status Filter */}
-              <div className="flex-1 md:w-auto">
-                {isMounted ? (
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full md:w-[140px] border-gray-300 bg-white">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="present">Present</SelectItem>
-                      <SelectItem value="late">Late</SelectItem>
-                      <SelectItem value="absent">Absent</SelectItem>
-                      <SelectItem value="leave">On Leave</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="w-full md:w-[140px] h-9 border border-gray-300 rounded bg-muted/50" aria-hidden />
-                )}
-              </div>
-
-              {/* Department Filter */}
-              <div className="flex-1 md:w-auto">
-                {isMounted ? (
-                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                    <SelectTrigger className="w-full md:w-[160px] border-gray-300 bg-white">
-                      <SelectValue placeholder="Groups" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Groups</SelectItem>
-                      {departments.map((dept) => (
-                        <SelectItem key={dept} value={dept}>
-                          {dept}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="w-full md:w-[160px] h-9 border border-gray-300 rounded bg-muted/50" aria-hidden />
-                )}
-              </div>
-            </div>
-
-            {/* Actions Group */}
-            <div className="flex w-full md:w-auto gap-2 shrink-0">
-              {/* Refresh */}
-              <Button
-                onClick={() => {
-                  try {
-                    localStorage.removeItem(cacheKeyBase)
-                    localStorage.removeItem(`${cacheKeyBase}:loading`)
-                  } catch { }
-                  fetchData()
-                }}
-                title="Refresh"
-                className="shrink-0 bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 hover:cursor-pointer flex-1 md:flex-none border-0"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-
-              {/* Import */}
-              <Link href="/attendance/list/import" className="flex-1 md:flex-none">
-                <Button variant="outline" className="w-full border-gray-300 bg-white whitespace-nowrap">
-                  <Download className="mr-2 h-4 w-4" />
-                  Import
-                </Button>
-              </Link>
-
-              {/* Manual Entry */}
-              <Link href="/attendance/list/add" className="flex-1 md:flex-none">
-                <Button className="w-full bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 whitespace-nowrap border-0">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Entry
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Selected Actions */}
-          <AnimatePresence>
-            {selectedRecords.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2"
-              >
-                <span className="text-sm font-medium">
-                  {selectedRecords.length} selected
-                </span>
-                <Separator orientation="vertical" className="h-6" />
-                <Button variant="ghost" size="sm" onClick={handleEditClick}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  {selectedRecords.length === 1 ? "Edit" : "Bulk Edit"}
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleDeleteMultiple}
-                  disabled={isSubmitting}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Selected
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedRecords([])}
-                  className="ml-auto"
-                >
-                  Clear Selection
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Toolbar */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Attendance list</h1>
         </div>
-      )}
 
-      {SHOW_LOCAL_LIST && (
-        <div className="space-y-6">
-          {/* Attendance List - LIST MODE */}
-          <Card>
-            <CardContent className="p-0">
-              {/* Mobile Card View - hidden dulu (sesuai komponen lama) */}
-              <div className="hidden">
-                {(loading || !initialized) ? (
-                  <div className="divide-y">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={`mobile-skel-${i}`} className="p-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <Skeleton className="h-4 w-40" />
-                            <Skeleton className="h-3 w-24" />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
-                      </div>
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-2 flex-wrap">
+          {/* Search */}
+          <div className="w-full md:flex-1 md:min-w-[200px] relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search..."
+              value={queryParams.search}
+              onChange={(e) => updateQueryParams({ search: e.target.value })}
+              className="pl-10 border-gray-300 bg-white w-full"
+            />
+          </div>
+
+          {/* Date Filter */}
+          <div className="w-full md:w-auto shrink-0">
+            <DateFilterBar
+              dateRange={{ 
+                from: new Date(queryParams.dateFrom), 
+                to: new Date(queryParams.dateTo), 
+                preset: "custom" as const
+              }}
+              onDateRangeChange={({ from, to }) => 
+                updateQueryParams({ 
+                  dateFrom: toOrgYMD(from, userTimezone), 
+                  dateTo: toOrgYMD(to, userTimezone) 
+                })
+              }
+              className="w-full justify-start"
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="flex w-full md:w-auto gap-2 shrink-0">
+            {/* Status */}
+            <div className="flex-1 md:w-auto">
+              {isMounted ? (
+                <Select 
+                  value={queryParams.status} 
+                  onValueChange={(v) => updateQueryParams({ status: v })}
+                >
+                  <SelectTrigger className="w-full md:w-[140px] border-gray-300 bg-white">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="present">Present</SelectItem>
+                    <SelectItem value="late">Late</SelectItem>
+                    <SelectItem value="absent">Absent</SelectItem>
+                    <SelectItem value="leave">On Leave</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="w-full md:w-[140px] h-9 border border-gray-300 rounded bg-muted/50" />
+              )}
+            </div>
+
+            {/* Department */}
+            <div className="flex-1 md:w-auto">
+              {isMounted ? (
+                <Select 
+                  value={queryParams.department} 
+                  onValueChange={(v) => updateQueryParams({ department: v })}
+                >
+                  <SelectTrigger className="w-full md:w-40 border-gray-300 bg-white">
+                    <SelectValue placeholder="Groups" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Groups</SelectItem>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
                     ))}
-                  </div>
-                ) : attendanceData.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground">
-                    No attendance records found
-                  </div>
-                ) : (
-                  attendanceData.map((record, index: number) => (
-                    <div key={`mobile-${record.id}-${index}`} className="p-4 space-y-3 border-b last:border-b-0">
-                      {/* ... bagian mobile card sama persis, dipersingkat di sini ... */}
-                    </div>
-                  ))
-                )}
-              </div>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="w-full md:w-40 h-9 border border-gray-300 rounded bg-muted/50" />
+              )}
+            </div>
+          </div>
 
-              {/* Desktop Table View */}
-              <div className="overflow-x-auto w-full">
-                <table className="w-full min-w-[880px]">
-                  <thead className="border-b bg-muted/50">
-                    <tr>
-                      <th className="p-3 text-left">
-                        <input
-                          type="checkbox"
-                          checked={selectedRecords.length === attendanceData.length && attendanceData.length > 0}
-                          onChange={handleSelectAll}
-                          className="rounded border-gray-300"
-                        />
-                      </th>
-                      <th className="p-3 text-left text-xs font-medium">Member</th>
-                      <th className="p-3 text-left text-xs font-medium">Check In</th>
-                      <th className="p-3 text-left text-xs font-medium">Check Out</th>
-                      <th className="p-3 text-left text-xs font-medium">Break In</th>
-                      <th className="p-3 text-left text-xs font-medium">Break Out</th>
-                      <th className="p-3 text-left text-xs font-medium">Work Hours</th>
-                      <th className="p-3 text-left text-xs font-medium">Status</th>
-                      {SHOW_LOCATION ? <th className="p-3 text-left text-xs font-medium">Location</th> : null}
-                      <th className="p-3 text-left text-xs font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="[&>tr:nth-child(even)]:bg-muted/50">
-                    {(loading || !initialized) ? (
-                      <>
-                        {Array.from({ length: 6 }).map((_, i) => (
-                          <tr key={`table-skel-${i}`} className="border-b">
-                            <td className="p-3"><Skeleton className="h-3 w-3 rounded" /></td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-3">
-                                <Skeleton className="h-8 w-8 rounded-full" />
-                                <div className="space-y-2">
-                                  <Skeleton className="h-3 w-40" />
-                                  <Skeleton className="h-2.5 w-24" />
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-3"><Skeleton className="h-3 w-16" /></td>
-                            <td className="p-3"><Skeleton className="h-3 w-16" /></td>
-                            <td className="p-3"><Skeleton className="h-3 w-20" /></td>
-                            <td className="p-3"><Skeleton className="h-5 w-20 rounded-full" /></td>
-                            <td className="p-3"><Skeleton className="h-3 w-24" /></td>
-                            {SHOW_LOCATION ? <td className="p-3"><Skeleton className="h-3 w-28" /></td> : null}
-                            <td className="p-3"><div className="flex items-center gap-1"><Skeleton className="h-8 w-8 rounded" /><Skeleton className="h-8 w-8 rounded" /></div></td>
-                          </tr>
-                        ))}
-                      </>
-                    ) : attendanceData.length === 0 ? (
-                      <tr>
-                        <td colSpan={9} className="text-center py-6 text-muted-foreground text-sm">
-                          No attendance records found
+          {/* Actions */}
+          <div className="flex w-full md:w-auto gap-2 shrink-0">
+            <Button 
+              onClick={handleManualRefresh}
+              title="Refresh"
+              className="shrink-0 bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90"
+              disabled={loading}
+            >
+              <RotateCcw className={cn("w-4 h-4", loading && "animate-spin")} />
+            </Button>
+            
+            <Link href="/attendance/list/import" className="flex-1 md:flex-none">
+              <Button variant="outline" className="w-full border-gray-300 bg-white whitespace-nowrap">
+                <Download className="mr-2 h-4 w-4" />
+                Import
+              </Button>
+            </Link>
+            
+            <Link href="/attendance/list/add" className="flex-1 md:flex-none">
+              <Button className="w-full bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 whitespace-nowrap">
+                <Plus className="mr-2 h-4 w-4" />
+                Entry
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Selected Actions Bar */}
+        <AnimatePresence>
+          {selectedIds.size > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1,
+              y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2"
+            >
+              <span className="text-sm font-medium">{selectedIds.size} selected</span>
+              <Separator orientation="vertical" className="h-6" />
+              <Button variant="ghost" size="sm" disabled={selectedIds.size !== 1}>
+                <Edit className="mr-2 h-4 w-4" />
+                {selectedIds.size === 1 ? "Edit" : "Bulk Edit"}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteMultiple}
+                disabled={isSubmitting}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Selected
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedIds(new Set())}
+                className="ml-auto"
+              >
+                Clear Selection
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Table */}
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full min-w-[880px]">
+                <thead className="sticky top-0 z-10 border-b bg-muted/50">
+                  <tr>
+                    <th className="p-3 text-left">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.size === data.items.length && data.items.length > 0}
+                        onChange={(e) => selectAll()}
+                        className="rounded border-gray-300"
+                      />
+                    </th>
+                    <th className="p-3 text-left text-xs font-medium">Member</th>
+                    <th className="p-3 text-left text-xs font-medium">Group</th>
+                    <th className="p-3 text-left text-xs font-medium">Check In</th>
+                    <th className="p-3 text-left text-xs font-medium">Check Out</th>
+                    <th className="p-3 text-left text-xs font-medium">Break In</th>
+                    <th className="p-3 text-left text-xs font-medium">Break Out</th>
+                    <th className="p-3 text-left text-xs font-medium">Work Hours</th>
+                    <th className="p-3 text-left text-xs font-medium">Status</th>
+                    {SHOW_LOCATION && <th className="p-3 text-left text-xs font-medium">Location</th>}
+                    <th className="p-3 text-left text-xs font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="[&>tr:nth-child(even)]:bg-muted/50">
+                  {loading ? (
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <tr key={`skel-${i}`} className="border-b">
+                        <td className="p-3"><Skeleton className="h-3 w-3 rounded" /></td>
+                        <td className="p-3">
+                          <div className="flex items-center gap-3">
+                            <Skeleton className="h-8 w-8 rounded-full" />
+                            <div className="space-y-2">
+                              <Skeleton className="h-3 w-40" />
+                              <Skeleton className="h-2.5 w-24" />
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3"><Skeleton className="h-3 w-24" /></td>
+                        <td className="p-3"><Skeleton className="h-3 w-16" /></td>
+                        <td className="p-3"><Skeleton className="h-3 w-16" /></td>
+                        <td className="p-3"><Skeleton className="h-3 w-20" /></td>
+                        <td className="p-3"><Skeleton className="h-5 w-20 rounded-full" /></td>
+                        <td className="p-3"><Skeleton className="h-3 w-24" /></td>
+                        <td className="p-3"><Skeleton className="h-3 w-24" /></td>
+                        {SHOW_LOCATION && <td className="p-3"><Skeleton className="h-3 w-28" /></td>}
+                        <td className="p-3">
+                          <div className="flex items-center gap-1">
+                            <Skeleton className="h-8 w-8 rounded" />
+                            <Skeleton className="h-8 w-8 rounded" />
+                          </div>
                         </td>
                       </tr>
-                    ) : (
-                      attendanceData.map((record: AttendanceListItem, index: number) => (
-                        <tr
-                          key={`table-${record.id}-${index}`}
-                          style={{ backgroundColor: index % 2 === 1 ? '#f3f4f6' : '#ffffff' }}
-                          className={cn("border-b transition-colors cursor-pointer custom-hover-row")}
-                        >
-                          <td className="p-3">
-                            <input
-                              type="checkbox"
-                              checked={selectedRecords.includes(record.id)}
-                              onChange={(e) => {
-                                if (e.target.checked) setSelectedRecords([...selectedRecords, record.id])
-                                else setSelectedRecords(selectedRecords.filter(id => id !== record.id))
-                              }}
-                              className="rounded border-gray-300"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <div className="flex items-center gap-3">
-                              <UserAvatar
-                                name={record.member.name}
-                                photoUrl={record.member.avatar}
-                                userId={record.member.userId}
-                                size={8}
-                              />
-                              <div>
-                                <p className="font-medium text-sm">
-                                  <Link href={`/members/${record.member.id ?? ""}`} className="hover:underline">
-                                    {record.member.name}
-                                  </Link>
-                                </p>
-                                <p className="text-xs text-muted-foreground">{record.member.department}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            {(() => {
-                              const formatted = record.checkIn ? formatLocalTime(record.checkIn, userTimezone, "24h", true) : "-"
-                              if (formatted === "-") return <span className="text-xs font-mono">-</span>
-                              const [datePart, timePart] = formatted.split(', ')
-                              return (
-                                <div className="flex flex-col text-xs font-mono">
-                                  <span className="font-medium whitespace-nowrap">{datePart}</span>
-                                  <span className="text-muted-foreground">{timePart}</span>
-                                  {record.checkInMethod && (
-                                    <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
-                                      {record.checkInMethod}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })()}
-                          </td>
-                          <td className="p-3">
-                            {(() => {
-                              const formatted = record.checkOut ? formatLocalTime(record.checkOut, userTimezone, "24h", true) : "-"
-                              if (formatted === "-") return <span className="text-xs font-mono">-</span>
-                              const [datePart, timePart] = formatted.split(', ')
-                              return (
-                                <div className="flex flex-col text-xs font-mono">
-                                  <span className="font-medium whitespace-nowrap">{datePart}</span>
-                                  <span className="text-muted-foreground">{timePart}</span>
-                                  {record.checkOutMethod && (
-                                    <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
-                                      {record.checkOutMethod}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })()}
-                          </td>
-                          <td className="p-3">
-                            {(() => {
-                              const formatted = record.actualBreakStart ? formatLocalTime(record.actualBreakStart, userTimezone, "24h", true) : "-"
-                              if (formatted === "-") return <span className="text-xs font-mono">-</span>
-                              const [datePart, timePart] = formatted.split(', ')
-                              return (
-                                <div className="flex flex-col text-xs font-mono">
-                                  <span className="font-medium whitespace-nowrap">{datePart}</span>
-                                  <span className="text-muted-foreground">{timePart}</span>
-                                  {record.breakInMethod && (
-                                    <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
-                                      {record.breakInMethod}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })()}
-                          </td>
-                          <td className="p-3">
-                            {(() => {
-                              const formatted = record.actualBreakEnd ? formatLocalTime(record.actualBreakEnd, userTimezone, "24h", true) : "-"
-                              if (formatted === "-") return <span className="text-xs font-mono">-</span>
-                              const [datePart, timePart] = formatted.split(', ')
-                              return (
-                                <div className="flex flex-col text-xs font-mono">
-                                  <span className="font-medium whitespace-nowrap">{datePart}</span>
-                                  <span className="text-muted-foreground">{timePart}</span>
-                                  {record.breakOutMethod && (
-                                    <span className="text-[10px] text-muted-foreground uppercase font-semibold mt-0.5">
-                                      {record.breakOutMethod}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })()}
-                          </td>
-                          <td className="p-3">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-medium text-xs">{record.workHours}</span>
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <Badge className={cn("gap-1 px-2 py-0.5 text-xs", getStatusColor(record.status))}>
-                              {getStatusIcon(record.status)}
-                              <span className="capitalize">{record.status.charAt(0).toUpperCase() + record.status.slice(1)}</span>
-                            </Badge>
-                          </td>
-                          {
-                            SHOW_LOCATION ? (
-                              <td className="p-3" >
-                                <LocationDisplay checkInLocationName={record.checkInLocationName} checkOutLocationName={record.checkOutLocationName} />
-                              </td>
-                            ) : null}
-                          <td className="p-3">
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="icon" title="Edit" onClick={() => handleEditSingle(record)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" title="Delete" onClick={() => handleDeleteClick(record.id)} className="text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    ))
+                  ) : data.items.length === 0 ? (
+                    <tr>
+                      <td colSpan={SHOW_LOCATION ? 11 : 10} className="text-center py-6 text-muted-foreground text-sm">
+                        No attendance records found
+                      </td>
+                    </tr>
+                  ) : (
+                    visibleRows
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
-            </CardContent >
-          </Card >
+        {/* Pagination */}
+        {!loading && data.total > queryParams.limit && (
+          <PaginationFooter
+            page={queryParams.page}
+            totalPages={Math.ceil(data.total / queryParams.limit)}
+            onPageChange={(p) => updateQueryParams({ page: Math.max(1, p) })}
+            isLoading={loading}
+            from={(queryParams.page - 1) * queryParams.limit + 1}
+            to={Math.min(queryParams.page * queryParams.limit, data.total)}
+            total={data.total}
+            pageSize={queryParams.limit}
+            onPageSizeChange={(size) => updateQueryParams({ limit: size, page: 1 })}
+            pageSizeOptions={[10, 20, 50]}
+          />
+        )}
+      </div>
 
-          {/* Pagination Footer */}
-          {
-            !loading && (
-              <PaginationFooter
-                page={currentPage}
-                totalPages={Math.max(1, Math.ceil((Math.max(totalItems, attendanceData.length) || 0) / itemsPerPage))}
-                onPageChange={(p) => setCurrentPage(Math.max(1, p))}
-                isLoading={loading}
-                from={(Math.max(totalItems, attendanceData.length) > 0) ? (currentPage - 1) * itemsPerPage + 1 : 0}
-                to={(Math.max(totalItems, attendanceData.length) > 0) ? Math.min(currentPage * itemsPerPage, Math.max(totalItems, attendanceData.length)) : 0}
-                total={Math.max(totalItems, attendanceData.length)}
-                pageSize={itemsPerPage}
-                onPageSizeChange={(size) => { setItemsPerPage(size); setCurrentPage(1); }}
-                pageSizeOptions={[10, 20, 50]}
-              />
-            )
-          }
-        </div >
-      )
-      }
       {/* Confirm Dialog */}
       <ConfirmDialog
         open={confirmOpen}
@@ -856,7 +835,7 @@ function ModernAttendanceListCloned() {
         title={confirmState?.mode === "bulk" ? "Delete selected records" : "Delete attendance record"}
         description={
           confirmState?.mode === "bulk"
-            ? `This will delete ${selectedRecords.length} selected record(s). This action cannot be undone.`
+            ? `This will delete ${selectedIds.size} selected record(s). This action cannot be undone.`
             : "This will delete the selected attendance record. This action cannot be undone."
         }
         confirmText="Delete"
@@ -867,96 +846,81 @@ function ModernAttendanceListCloned() {
           try {
             setIsSubmitting(true)
             if (confirmState.mode === "bulk") {
-              const res = await deleteMultipleAttendanceRecords(selectedRecords)
-              if (!res.success) {
+              const ids = Array.from(selectedIds)
+              const res = await deleteMultipleAttendanceRecords(ids)
+              if (res.success) {
+                toast.success("Selected records deleted")
+                setSelectedIds(new Set())
+                fetchData()
+              } else {
                 toast.error(res.message || "Failed to delete selected records")
-                return
               }
-              setAttendanceData(prev => {
-                const next = prev.filter(r => !selectedRecords.includes(r.id))
-                const removed = prev.length - next.length
-                setTotalItems(t => Math.max(0, t - removed))
-                return next
-              })
-              setSelectedRecords([])
-              toast.success("Selected records deleted")
             } else if (confirmState.mode === "single" && confirmState.id) {
-              const id = confirmState.id
-              const res = await deleteAttendanceRecord(id)
-              if (!res.success) {
+              const res = await deleteAttendanceRecord(confirmState.id)
+              if (res.success) {
+                toast.success("Record deleted")
+                fetchData()
+              } else {
                 toast.error(res.message || "Failed to delete record")
-                return
               }
-              setAttendanceData(prev => {
-                const next = prev.filter(r => r.id !== id)
-                const removed = prev.length - next.length
-                if (removed > 0) setTotalItems(t => Math.max(0, t - removed))
-                return next
-              })
-              setSelectedRecords(prev => prev.filter(x => x !== id))
-              toast.success("Record deleted")
             }
           } catch (e) {
-            const msg = e instanceof Error ? e.message : "Failed to delete"
-            toast.error(msg)
+            toast.error("Delete operation failed")
           } finally {
             setIsSubmitting(false)
             setConfirmState(null)
           }
         }}
       />
-      <Dialog open={editOpen} onOpenChange={(open) => { if (!isSubmitting) setEditOpen(open) }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit attendance record</DialogTitle>
-            <DialogDescription>
-              Perbarui waktu Check In/Out dan catatan. Biarkan kosong untuk menghapus nilai.
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="grid gap-3">
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium">Check In (ISO)</label>
-              <Input
-                value={editIn}
-                onChange={(e) => setEditIn(e.target.value)}
-                placeholder="contoh: 2026-01-15T08:30:00+07:00"
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium">Check Out (ISO)</label>
-              <Input
-                value={editOut}
-                onChange={(e) => setEditOut(e.target.value)}
-                placeholder="contoh: 2026-01-15T17:00:00+07:00"
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium">Remarks</label>
-              <Input
-                value={editRemarks}
-                onChange={(e) => setEditRemarks(e.target.value)}
-                placeholder="Catatan (opsional)"
-                disabled={isSubmitting}
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button onClick={submitEdit} disabled={isSubmitting} className="bg-black text-white hover:bg-black/90">
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
+  {/* Edit Dialog */}
+  <Dialog open={editOpen} onOpenChange={(open) => !isSubmitting && setEditOpen(open)}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Edit attendance record</DialogTitle>
+        <DialogDescription>
+          Perbarui waktu Check In/Out dan catatan. Biarkan kosong untuk menghapus nilai.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-3">
+        <div className="grid gap-1.5">
+          <label className="text-sm font-medium">Check In (ISO)</label>
+          <Input
+            value={editIn}
+            onChange={(e) => setEditIn(e.target.value)}
+            placeholder="contoh: 2026-01-15T08:30:00+07:00"
+            disabled={isSubmitting}
+          />
+        </div>
+        <div className="grid gap-1.5">
+          <label className="text-sm font-medium">Check Out (ISO)</label>
+          <Input
+            value={editOut}
+            onChange={(e) => setEditOut(e.target.value)}
+            placeholder="contoh: 2026-01-15T17:00:00+07:00"
+            disabled={isSubmitting}
+          />
+        </div>
+        <div className="grid gap-1.5">
+          <label className="text-sm font-medium">Remarks</label>
+          <Input
+            value={editRemarks}
+            onChange={(e) => setEditRemarks(e.target.value)}
+            placeholder="Catatan (opsional)"
+            disabled={isSubmitting}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => setEditOpen(false)} disabled={isSubmitting}>
+          Cancel
+        </Button>
+        <Button onClick={submitEdit} disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Changes"}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
     </>
   )
 }

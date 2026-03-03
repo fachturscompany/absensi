@@ -184,6 +184,7 @@ export type AttendanceListItem = {
     avatar?: string;
     position: string;
     department: string;
+    email?: string | null;
   };
   date: string;
   checkIn: string | null;
@@ -323,7 +324,7 @@ export const getAllAttendance = async (params: GetAttendanceParams = {}): Promis
           }
         }
       } catch { }
-      return cached;
+      return cached;  
     }
   }
 
@@ -368,14 +369,6 @@ export const getAllAttendance = async (params: GetAttendanceParams = {}): Promis
   const term = hasSearch ? search!.trim().toLowerCase() : '';
   const pattern = hasSearch ? `%${term}%` : '';
 
-  // Offset variables are no longer needed when using keyset pagination
-
-  // Keyset pagination disabled for now (using offset pagination for stability)
-  // Use single-join filtering (no prefetch of memberIds)
-  // This keeps queries simple and allows PostgREST to optimize joins
-
-  // COUNT (lazy, page 1 saja)
-  // Prepare relation selection for count join (include only needed relations)
   const innerParts: string[] = ['id'];
   if (hasSearch) innerParts.push('user_profiles!organization_members_user_id_fkey!inner(search_name)');
   if (department && department !== 'all') innerParts.push('departments!organization_members_department_id_fkey(name)');
@@ -574,6 +567,7 @@ export const getAllAttendance = async (params: GetAttendanceParams = {}): Promis
         avatar: profile?.profile_photo_url || undefined,
         position: '',
         department: departmentName,
+        email: profile?.email || null,
       },
       date: item.attendance_date,
       checkIn: item.actual_check_in,
