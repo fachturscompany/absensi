@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo, useState, use, useEffect } from "react"
-import Link from "next/link"
 import { UserAvatar } from "@/components/common/user-avatar"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -93,25 +92,10 @@ export default function ProjectMembersPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-0">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold">{project?.name ?? "Project"}</h1>
-        <div className="flex gap-4 text-sm text-muted-foreground">
-          <div>Client: <span className="font-medium">{project?.clientName ?? "N/A"}</span></div>
-          <div>Status: <span className="font-medium text-green-600 capitalize">{project?.status ?? "active"}</span></div>
-          <div className="flex items-center gap-1">
-            Tasks:
-            <Link
-              href={`/projects/tasks/list?project=${encodeURIComponent(project?.name ?? "")}`}
-              className="font-medium hover:underline text-primary cursor-pointer"
-            >
-              View tasks
-            </Link>
-          </div>
-        </div>
-      </div>
+
 
       {/* Tabs */}
-      <div className="flex items-center gap-6 text-sm border-b">
+      <div className="flex items-center gap-6 text-sm">
         <button
           className={`pb-3 border-b-2 font-medium ${activeTab === "members"
             ? "border-gray-900 text-gray-900"

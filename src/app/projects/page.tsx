@@ -372,7 +372,7 @@ export default function ProjectsPage() {
                                             <TableRow
                                                 key={p.id}
                                                 className="cursor-pointer hover:bg-muted/50 transition-colors"
-                                                onClick={() => router.push(`/projects/${p.id}/member`)}
+                                                onClick={() => router.push(`/projects/${p.id}/tasks/list`)}
                                             >
                                                 <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
                                                     <input
@@ -384,7 +384,7 @@ export default function ProjectsPage() {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="min-w-0">
-                                                        <Link href={`/projects/${p.id}/member`} className="font-medium text-sm hover:underline block truncate">
+                                                        <Link href={`/projects/${p.id}/tasks/list`} className="font-medium text-sm hover:underline block truncate">
                                                             {p.name}
                                                         </Link>
                                                     </div>

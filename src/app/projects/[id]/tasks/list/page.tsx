@@ -1,6 +1,5 @@
 "use client"
 
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ChevronRight, ChevronDown, Pencil, Trash2 } from "lucide-react"
@@ -20,7 +19,7 @@ import {
     TaskNode,
     TasksViewSwitcher,
 } from "@/components/tasks/tasks-shared"
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, use } from "react"
 import { useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -45,7 +44,8 @@ import { ITask, IProject, IOrganization_member, ITaskStatus } from "@/interface"
 import { RowSelectionState } from "@tanstack/react-table"
 import { cn } from "@/lib/utils"
 
-export default function ListPage() {
+export default function ListPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: projectId } = use(params)
     const { tasks, setTasks, projects, members, taskStatuses, isLoading } = useTasksData()
     const searchParams = useSearchParams()
     const initialProject = searchParams.get("project")
@@ -67,7 +67,7 @@ export default function ListPage() {
     const [editedAssignee, setEditedAssignee] = useState<number | "">("")
     const [newTaskTitle, setNewTaskTitle] = useState("")
     const [newTaskAssignee, setNewTaskAssignee] = useState<number | "">("")
-    const [newTaskProject, setNewTaskProject] = useState<number | "">("")
+    const [newTaskProject, setNewTaskProject] = useState<number | "">(Number(projectId) || "")
     const [newTaskStatus, setNewTaskStatus] = useState<number | "">("")
     const [editedStatus, setEditedStatus] = useState<number | "">("")
 
@@ -85,6 +85,7 @@ export default function ListPage() {
 
     const baseFilteredTasks = useMemo(() => {
         return tasks.filter((task: ITask) => {
+            if (projectId && task.project_id !== Number(projectId)) return false
             if (urlClientName) {
                 const clientData = (task.project as any)?.client
                 const clientNames: string[] = Array.isArray(clientData)
@@ -162,10 +163,7 @@ export default function ListPage() {
     return (
         <div className="flex flex-col gap-4 p-4 pt-0">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
-                    <p className="text-muted-foreground text-sm mt-1">Manage and track all granular work items across projects.</p>
-                </div>
+                <div className="flex flex-1" />
                 <div className="flex items-center gap-2">
                     <Button onClick={() => { setNewTaskTitle(""); setIsNewTaskDialogOpen(true) }} className="gap-2">
                         <Plus className="h-4 w-4" />
@@ -196,7 +194,7 @@ export default function ListPage() {
                     setRowSelection={setRowSelection}
                 />
 
-                <Separator className="my-4" />
+
 
                 {/* List View */}
                 <div className="border rounded-xl overflow-hidden shadow-sm bg-white">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { List, LayoutGrid, CalendarDays } from "lucide-react"
@@ -173,6 +173,13 @@ export function AssigneeAvatar({ asgn }: { asgn: ITaskAssignee }) {
 // ─── View Switcher ────────────────────────────────────────────────────────────
 export function TasksViewSwitcher({ currentView }: { currentView: CurrentView }) {
     const router = useRouter()
+    const pathname = usePathname()
+
+    // Determine if we are in a project-specific task view
+    const projectMatch = pathname.match(/\/projects\/([^/]+)\/tasks/)
+    const projectId = projectMatch ? projectMatch[1] : null
+    const basePath = projectId ? `/projects/${projectId}/tasks` : "/projects/tasks"
+
     return (
         <div className="flex items-center p-1 bg-white rounded-lg border border-gray-200 shadow-sm">
             <Button
@@ -183,7 +190,7 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
                         ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
                         : "text-muted-foreground hover:bg-muted"
                 )}
-                onClick={() => router.push("/projects/tasks/list")}
+                onClick={() => router.push(`${basePath}/list`)}
             >
                 <List className={cn("h-4 w-4", currentView === "list" ? "text-white" : "text-gray-400")} />
                 <span className="font-semibold text-xs uppercase tracking-tight">List</span>
@@ -196,7 +203,7 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
                         ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
                         : "text-muted-foreground hover:bg-muted"
                 )}
-                onClick={() => router.push("/projects/tasks/kanban")}
+                onClick={() => router.push(`${basePath}/kanban`)}
             >
                 <LayoutGrid className={cn("h-4 w-4", currentView === "board" ? "text-white" : "text-gray-400")} />
                 <span className="font-semibold text-xs uppercase tracking-tight">Kanban</span>
@@ -209,7 +216,7 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
                         ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
                         : "text-muted-foreground hover:bg-muted"
                 )}
-                onClick={() => router.push("/projects/tasks/timeline")}
+                onClick={() => router.push(`${basePath}/timeline`)}
             >
                 <CalendarDays className={cn("h-4 w-4", currentView === "timeline" ? "text-white" : "text-gray-400")} />
                 <span className="font-semibold text-xs uppercase tracking-tight">Timeline</span>
@@ -220,12 +227,19 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
 
 // ─── Tasks Page Header ────────────────────────────────────────────────────────
 export function TasksHeader({ currentView }: { currentView: CurrentView }) {
+    const pathname = usePathname()
+    const isProjectContext = pathname.includes("/projects/") && pathname.includes("/tasks")
+
     return (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
-                <p className="text-muted-foreground text-sm mt-1">Manage and track all granular work items across projects.</p>
-            </div>
+            {!isProjectContext ? (
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
+                    <p className="text-muted-foreground text-sm mt-1">Manage and track all granular work items across projects.</p>
+                </div>
+            ) : (
+                <div className="flex-1" />
+            )}
             <div className="flex items-center gap-2">
                 <TasksViewSwitcher currentView={currentView} />
             </div>

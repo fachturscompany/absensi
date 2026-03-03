@@ -9,12 +9,16 @@ import {
 } from "@/components/tasks/tasks-shared"
 import { ITask } from "@/interface"
 
-export default function KanbanPage() {
+import { use } from "react"
+
+export default function KanbanPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: projectId } = use(params)
     const { tasks, taskStatuses, isLoading } = useTasksData()
 
     const tasksByStatus = useMemo(() => {
         const map = new Map<number, ITask[]>()
         tasks.forEach(task => {
+            if (projectId && task.project_id !== Number(projectId)) return
             if (!map.has(task.status_id)) map.set(task.status_id, [])
             map.get(task.status_id)!.push(task)
         })

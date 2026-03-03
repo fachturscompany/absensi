@@ -30,7 +30,6 @@ import {
   Gauge,
   History,
   Bell,
-  // SquareArrowOutUpRight,
   MousePointer2,
   ClockPlus,
   Notebook,
@@ -171,7 +170,6 @@ const getSidebarGroups = (): NavGroup[] => [
         icon: Folder,
         subItems: [
           { title: 'Projects', url: '/projects', icon: Folder },
-          { title: 'Tasks', url: '/projects/tasks', icon: ClipboardList },
           { title: 'Clients', url: '/projects/clients', icon: MousePointer2 }
         ]
       },

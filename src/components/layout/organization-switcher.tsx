@@ -5,6 +5,7 @@ import { ChevronsUpDown, Building2, Plus, Check, Command } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/user-store";
 import { useOrgStore } from "@/store/org-store";
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -23,27 +24,28 @@ import {
 
 export function OrganizationSwitcher() {
   const { isMobile } = useSidebar();
+  const router = useRouter()
   const { userOrganizations } = useAuthStore();
   const { organizationId, setOrganizationId } = useOrgStore();
 
-  // Find the active organization based on the store's organizationId
+  const [isSwitching, setIsSwitching] = React.useState(false);
+  const switchingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
   const activeOrg = React.useMemo(() => {
     return userOrganizations?.find(org => org.organization_id === organizationId) || userOrganizations?.[0] || null;
   }, [userOrganizations, organizationId]);
 
   const [selectedOrg, setSelectedOrg] = React.useState<typeof userOrganizations[0] | null>(activeOrg);
 
-  // Sync state when activeOrg changes (e.g. data loaded or fallback happened)
   React.useEffect(() => {
     if (activeOrg) {
       if (activeOrg.id !== selectedOrg?.id) {
         setSelectedOrg(activeOrg);
       }
       if (activeOrg.organization_id !== organizationId) {
-        // Automatically fix the global store if the ID was invalid (e.g. from an old session)
+        console.log('[ORG-SWITCHER] Auto-fixing organization ID:', activeOrg.organization_id);
         setOrganizationId(activeOrg.organization_id, activeOrg.organization_name);
 
-        // Ensure the server cookie matches as well
         fetch("/api/organization/select", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -54,13 +56,31 @@ export function OrganizationSwitcher() {
   }, [activeOrg, selectedOrg, organizationId, setOrganizationId]);
 
   // Handle switching organization
-  const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
+const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
+    // Prevent multiple rapid switches
+    if (isSwitching) {
+      console.log('[ORG-SWITCHER] Switch already in progress, ignoring click');
+      return;
+    }
+
+    // Prevent switching to same organization
+    if (org.organization_id === organizationId) {
+      console.log('[ORG-SWITCHER] Already on this organization');
+      return;
+    }
+
     try {
+      setIsSwitching(true);
+      console.log('[ORG-SWITCHER] Starting switch to:', org.organization_id);
+
+      // Step 1: Update UI immediately (optimistic update)
       setSelectedOrg(org);
-      // Update global store
+
+      // Step 2: Update global store (this will trigger page.tsx useEffect)
       setOrganizationId(org.organization_id, org.organization_name);
 
-      // Call API to set cookie (this handles setting the `org_id` correctly on the server)
+      // Step 3: Set cookie on server (wait for this to complete)
+      console.log('[ORG-SWITCHER] Setting server cookie...');
       const cookieResponse = await fetch("/api/organization/select", {
         method: "POST",
         headers: {
@@ -70,18 +90,48 @@ export function OrganizationSwitcher() {
       });
 
       if (!cookieResponse.ok) {
-        throw new Error("Failed to set organization cookie");
+        throw new Error(`Failed to set organization cookie: ${cookieResponse.statusText}`);
       }
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-      // Force reload to trigger server action to refetch data with new context
-      window.location.reload();
-    } catch (e) {
-      console.error(e);
-      document.cookie = `org_id=${org.organization_id}; path=/; max-age=31536000`; // 1 year expiry fallback
-      window.location.reload();
+      console.log('[ORG-SWITCHER] Cookie set successfully');
+
+      // Step 4: Use client-side router.refresh() instead of hard reload
+      // This refreshes data without full page reload
+      console.log('[ORG-SWITCHER] Refreshing page data...');
+      router.refresh();
+
+      // Clear switching state after a short delay to allow UI to update
+      switchingTimeoutRef.current = setTimeout(() => {
+        setIsSwitching(false);
+      }, 1000);
+
+    } catch (error) {
+      console.error('[ORG-SWITCHER] Error switching organization:', error);
+      
+      // Fallback: Try setting cookie manually if API fails
+      try {
+        document.cookie = `org_id=${org.organization_id}; path=/; max-age=31536000`;
+        console.log('[ORG-SWITCHER] Fallback: Cookie set via document.cookie');
+        router.refresh();
+        
+        switchingTimeoutRef.current = setTimeout(() => {
+          setIsSwitching(false);
+        }, 1000);
+      } catch (fallbackError) {
+        console.error('[ORG-SWITCHER] Fallback failed, doing hard reload:', fallbackError);
+        // Only hard reload if everything else fails
+        window.location.href = window.location.href;
+      }
     }
   };
+
+  React.useEffect(() => {
+    return () => {
+      if (switchingTimeoutRef.current) {
+        clearTimeout(switchingTimeoutRef.current);
+      }
+    };
+  }, []);
 
 
   return (

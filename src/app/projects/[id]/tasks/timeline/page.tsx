@@ -1,20 +1,20 @@
 "use client"
 
-import React, { useState, useMemo, useCallback } from "react"
-import { 
-    ChevronRight, 
-    ChevronDown, 
-    Users, 
-    AlignLeft, 
-    ChevronsDownUp, 
-    ChevronsUpDown 
+import React, { useState, useMemo, useCallback, use } from "react"
+import {
+    ChevronRight,
+    ChevronDown,
+    Users,
+    AlignLeft,
+    ChevronsDownUp,
+    ChevronsUpDown
 } from "lucide-react"
-import { 
-    useTasksData, 
-    TasksHeader, 
-    buildTaskTree, 
-    flattenTree, 
-    TaskNode 
+import {
+    useTasksData,
+    TasksHeader,
+    buildTaskTree,
+    flattenTree,
+    TaskNode
 } from "@/components/tasks/tasks-shared"
 import { ITask, ITaskAssignee } from "@/interface"
 import { DateRangePicker } from "@/components/insights/DateRangePicker"
@@ -94,10 +94,10 @@ function getAssigneeInfo(assignee: ITaskAssignee): { id: string; name: string; p
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: { 
-    name: string; 
-    photoUrl?: string; 
-    userId?: string; 
+function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
+    name: string;
+    photoUrl?: string;
+    userId?: string;
     size?: number;
     memberId?: string;
 }) {
@@ -113,8 +113,8 @@ function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
 
     if (memberId) {
         return (
-            <Link 
-                href={`/members/${memberId}`} 
+            <Link
+                href={`/members/${memberId}`}
                 onClick={(e) => e.stopPropagation()}
                 className="hover:scale-110 transition-transform"
             >
@@ -128,7 +128,8 @@ function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
-export default function TimelinePage() {
+export default function TimelinePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: projectId } = use(params)
     const { tasks, isLoading } = useTasksData()
     const [groupBy, setGroupBy] = useState<GroupBy>("task")
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set())
@@ -150,8 +151,11 @@ export default function TimelinePage() {
     }, [days])
 
     // ─── Tree computation ────────────────────────────────────────────────────
+    const filteredTasks = useMemo(() => {
+        return projectId ? tasks.filter(t => t.project_id === Number(projectId)) : tasks
+    }, [tasks, projectId])
 
-    const taskTree = useMemo(() => buildTaskTree(tasks), [tasks])
+    const taskTree = useMemo(() => buildTaskTree(filteredTasks), [filteredTasks])
 
     const toggleExpand = useCallback((id: number) => {
         setExpandedTaskIds(prev => {
@@ -163,8 +167,8 @@ export default function TimelinePage() {
     }, [])
 
     const expandAll = useCallback(() => {
-        setExpandedTaskIds(new Set(tasks.filter(t => !t.parent_task_id).map(t => t.id)))
-    }, [tasks])
+        setExpandedTaskIds(new Set(filteredTasks.filter(t => !t.parent_task_id).map(t => t.id)))
+    }, [filteredTasks])
 
     const collapseAll = useCallback(() => {
         setExpandedTaskIds(new Set())
@@ -187,12 +191,12 @@ export default function TimelinePage() {
             if (assignees.length > 0) {
                 assignees.forEach((a) => {
                     const info = getAssigneeInfo(a)
-                    list.push({ 
-                        assigneeId: info.id, 
-                        name: info.name, 
-                        photoUrl: info.photoUrl, 
-                        userId: info.userId, 
-                        task, 
+                    list.push({
+                        assigneeId: info.id,
+                        name: info.name,
+                        photoUrl: info.photoUrl,
+                        userId: info.userId,
+                        task,
                         parentName,
                         memberId: a.organization_member_id?.toString()
                     })
@@ -253,13 +257,13 @@ export default function TimelinePage() {
         if (bs > timelineStart) {
             startCol = colOffset + Math.round((bs.getTime() - timelineStart.getTime()) / 86400000)
         }
-        
+
         const duration = Math.round((be.getTime() - bs.getTime()) / 86400000) + 1
         let endCol = startCol + duration
 
         startCol = Math.max(colOffset, Math.min(startCol, totalCols + colOffset))
         endCol = Math.max(startCol + 1, Math.min(endCol, totalCols + colOffset))
-        
+
         return { startCol, endCol }
     }, [days])
 
@@ -348,7 +352,7 @@ export default function TimelinePage() {
                 {!isLoading && rows.map(({ node, depth, hasChildren }, rowIndex) => {
                     const isExpanded = expandedTaskIds.has(node.id)
                     const isParent = hasChildren
-                    
+
                     let barStart: Date | null = node.created_at ? startOfDay(new Date(node.created_at)) : null
                     let barEnd: Date | null = node.due_date ? startOfDay(new Date(node.due_date)) : null
 
@@ -596,4 +600,4 @@ export default function TimelinePage() {
             </Card>
         </div>
     )
- }
+}

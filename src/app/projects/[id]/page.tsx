@@ -8,8 +8,8 @@ export default function ProjectRedirect({ params }: { params: Promise<{ id: stri
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to the members page by default (or overview logic in future)
-    router.replace(`/projects/${id}/member`)
+    // Redirect to the tasks page by default
+    router.replace(`/projects/${id}/tasks/list`)
   }, [id, router])
 
   return (
