@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react"
 import { DateRangePicker } from "@/components/insights/DateRangePicker"
+export const dynamic = 'force-dynamic'
 import type { SelectedFilter, DateRange } from "@/components/insights/types"
 import { Button } from "@/components/ui/button"
 import { Download, Search, CheckCircle2, XCircle, Eye, Settings, Pencil, ListFilter, X } from "lucide-react"

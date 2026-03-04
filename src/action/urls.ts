@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import type { UrlActivityEntry } from '@/lib/data/dummy-data'
 
 export async function getUrlsActivityByMemberAndDate(
@@ -10,20 +10,21 @@ export async function getUrlsActivityByMemberAndDate(
     projectId?: string
 ): Promise<{ success: boolean; data?: UrlActivityEntry[]; message?: string }> {
     try {
-        const supabase = await createClient()
+        const supabase = createAdminClient()
 
         let query = supabase
             .from('url_visits')
             .select(`
-        id,
-        url,
-        title,
-        tracked_seconds,
-        visit_date,
-        project_id,
-        parent_id,
-        projects ( name )
-      `)
+                id,
+                url,
+                title,
+                tracked_seconds,
+                visit_date,
+                project_id,
+                parent_id,
+                is_productive,
+                projects ( name )
+            `)
             .eq('organization_member_id', Number(organizationMemberId))
             .gte('visit_date', startDate)
             .lte('visit_date', endDate)
@@ -35,7 +36,8 @@ export async function getUrlsActivityByMemberAndDate(
         const { data, error } = await query
 
         if (error) {
-            throw error
+            console.error('Supabase URL error:', error)
+            return { success: false, message: error.message }
         }
 
         if (!data || data.length === 0) {
@@ -58,7 +60,7 @@ export async function getUrlsActivityByMemberAndDate(
 
         // Step 1: Map all rows by ID for easy lookup
         const rowsMap = new Map<number, any>()
-        data.forEach(row => rowsMap.set(row.id, row))
+        data.forEach((row: any) => rowsMap.set(row.id, row))
 
         // Step 2: Build the hierarchy
         const finalResultsMap = new Map<string, UrlActivityEntry>()

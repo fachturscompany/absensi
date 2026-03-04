@@ -2,14 +2,13 @@
 
 import Link from "next/link"
 
-type SidebarItemKey = "profile-fields" | "email-notifications"
+type SidebarItemKey = "email-notifications"
 
 interface MembersSidebarProps {
     activeItem: SidebarItemKey
 }
 
 const sidebarItems: { key: SidebarItemKey; label: string; href: string }[] = [
-    { key: "profile-fields", label: "Profile fields", href: "/settings/members/custom-fields" },
     { key: "email-notifications", label: "Email notifications", href: "/settings/members/email-notifications" },
 ]
 

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { createSupabaseClient } from "@/config/supabase-config";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { IOrganization } from "@/interface";
 
 import { organizationLogger } from '@/lib/logger';
@@ -24,9 +25,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return { 
-        isValid: false, 
-        reason: "not_found" 
+      return {
+        isValid: false,
+        reason: "not_found"
       };
     }
 
@@ -38,9 +39,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       .maybeSingle();
 
     if (memberError || !member) {
-      return { 
-        isValid: false, 
-        reason: "not_found" 
+      return {
+        isValid: false,
+        reason: "not_found"
       };
     }
 
@@ -52,9 +53,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       .maybeSingle();
 
     if (orgError || !organization) {
-      return { 
-        isValid: false, 
-        reason: "not_found" 
+      return {
+        isValid: false,
+        reason: "not_found"
       };
     }
 
@@ -97,9 +98,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
 
   } catch (error) {
     organizationLogger.error("Error checking organization status:", error);
-    return { 
-      isValid: false, 
-      reason: "not_found" 
+    return {
+      isValid: false,
+      reason: "not_found"
     };
   }
 }
@@ -109,18 +110,26 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
  */
 export async function getUserOrganizationId(userId: string) {
   try {
-    const supabase = await createClient();
-    
-    const { data: member } = await supabase
+    console.log(`[getUserOrganizationId] Fetching for userId: ${userId}`);
+    const supabase = createAdminClient();
+
+    const { data: member, error } = await supabase
       .from("organization_members")
       .select("organization_id")
       .eq("user_id", userId)
       .maybeSingle();
 
-    if (!member) {
+    if (error) {
+      console.error(`[getUserOrganizationId] DB Error: ${error.message}`);
       return { organizationId: null };
     }
 
+    if (!member) {
+      console.warn(`[getUserOrganizationId] No membership found for userId: ${userId}`);
+      return { organizationId: null };
+    }
+
+    console.log(`[getUserOrganizationId] Found organizationId: ${member.organization_id}`);
     return { organizationId: String(member.organization_id) };
   } catch (error) {
     organizationLogger.error("Error getting organization ID:", error);
@@ -165,7 +174,7 @@ export const updateOrganization = async (id: string, organization: Partial<IOrga
 // For regular user operations, use getUserOrganization() instead
 export const getAllOrganization = async () => {
   const supabase = await createSupabaseClient();
-  const { data, error} = await supabase
+  const { data, error } = await supabase
     .from("organizations")
     .select("*")
     .order("created_at", { ascending: false });

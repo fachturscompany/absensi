@@ -13,6 +13,8 @@ import { InsightsHeader } from "@/components/insights/InsightsHeader"
 import type { DateRange, SelectedFilter } from "@/components/insights/types"
 import { useRouter, useSearchParams } from "next/navigation"
 
+export const dynamic = "force-dynamic"
+
 export default function UrlsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -252,10 +254,6 @@ export default function UrlsPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <h1 className="text-xl font-semibold text-gray-900">URL activity</h1>
-        {/* <a href="/activity/urls/settings" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          <Settings className="w-4 h-4" />
-          Settings
-        </a> */}
       </div>
 
       {/* Date & User Controls */}

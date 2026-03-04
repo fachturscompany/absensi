@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = 'force-dynamic'
 
 import React, { useState, useMemo, useEffect, useCallback } from "react"
 import { format } from "date-fns"
@@ -132,7 +133,9 @@ export default function ViewEditTimesheetsPage() {
         const startDate = dateRange.startDate ? format(dateRange.startDate, "yyyy-MM-dd") : undefined
         const endDate = dateRange.endDate ? format(dateRange.endDate, "yyyy-MM-dd") : undefined
         const params = { startDate, endDate, organizationId: organizationId ?? undefined }
+
         const res = await getTimeEntries(params)
+
         if (res.success) {
             setData(res.data)
         } else {

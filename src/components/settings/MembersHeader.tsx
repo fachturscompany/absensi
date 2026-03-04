@@ -17,8 +17,8 @@ interface MembersHeaderProps {
 export function MembersHeader({ activeTab }: MembersHeaderProps) {
     const tabs: Tab[] = [
         {
-            label: "CUSTOM FIELDS",
-            href: "/settings/members/custom-fields",
+            label: "EMAIL NOTIFICATIONS",
+            href: "/settings/members/email-notifications",
             active: activeTab === "custom-fields"
         },
         {
@@ -56,8 +56,8 @@ export function MembersHeader({ activeTab }: MembersHeaderProps) {
                             key={tab.label}
                             href={tab.href}
                             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab.active
-                                    ? "text-slate-900 border-slate-900"
-                                    : "text-slate-600 hover:text-slate-900 border-transparent hover:border-slate-300"
+                                ? "text-slate-900 border-slate-900"
+                                : "text-slate-600 hover:text-slate-900 border-transparent hover:border-slate-300"
                                 }`}
                         >
                             {tab.label}
