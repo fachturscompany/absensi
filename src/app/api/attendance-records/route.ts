@@ -11,7 +11,8 @@ export async function GET(req: Request) {
     const rawStatus = searchParams.get('status')
     const rawDepartment = searchParams.get('department')
     const rawSearch = searchParams.get('search')
-    const noCache = searchParams.get('noCache') === '1'
+    const noCache = searchParams.get('_t') || searchParams.get('noCache') === '1' 
+    void noCache
 
     const status = rawStatus && rawStatus.trim().toLowerCase() !== 'all' ? rawStatus.trim() : undefined
     const department = rawDepartment && rawDepartment.trim().toLowerCase() !== 'all' ? rawDepartment.trim() : undefined
@@ -28,14 +29,16 @@ export async function GET(req: Request) {
       status,
       department,
       organizationId,
-      noCache,
+      noCache: true,
     })
 
     return NextResponse.json(result, {
       status: result.success ? 200 : 400,
       headers: {
-        'Cache-Control': noCache ? 'no-store' : 'private, max-age=60, stale-while-revalidate=300',
-        'Vary': 'Cookie, Authorization',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Vary': '*',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       },
     })
   } catch (err) {

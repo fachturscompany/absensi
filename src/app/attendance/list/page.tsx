@@ -1,7 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useRef, useState, useMemo, useDeferredValue } from "react"
-import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
-import type { DateFilterState } from "@/components/analytics/date-filter-bar"
+
 import { DateFilterBar } from "@/components/analytics/date-filter-bar"
 import { useOrgStore } from "@/store/org-store"
 import { formatInTimeZone } from "date-fns-tz"
@@ -61,12 +60,16 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "present": return <CheckCircle2 className="h-3 w-3" />
-      case "late": return <Timer className="h-3 w-3" />
-      case "absent": return <XCircle className="h-3 w-3" />
-      default: return <AlertCircle className="h-3 w-3" />
+      case 'present':
+        return <CheckCircle2 className="h-3 w-3" />;
+      case 'late':
+        return <Timer className="h-3 w-3" />;
+      case 'absent':
+        return <XCircle className="h-3 w-3" />;
+      default:
+        return <AlertCircle className="h-3 w-3" />;
     }
-  }
+  };
 
   return (
     <tr className={cn(
@@ -82,7 +85,7 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           className="rounded border-gray-300"
         />
       </td>
-      
+
       {/* Member */}
       <td className="p-3">
         <div className="flex items-center gap-3">
@@ -102,12 +105,12 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           </div>
         </div>
       </td>
-      
+
       {/* Department */}
       <td className="p-3">
         <p className="font-medium text-xs">{record.member?.department || '-'}</p>
       </td>
-      
+
       {/* Check In */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
@@ -120,7 +123,7 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           )}
         </div>
       </td>
-      
+
       {/* Check Out */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
@@ -133,7 +136,7 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           )}
         </div>
       </td>
-      
+
       {/* Break In */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
@@ -146,7 +149,7 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           )}
         </div>
       </td>
-      
+
       {/* Break Out */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
@@ -159,25 +162,27 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           )}
         </div>
       </td>
-      
+
       {/* Work Hours */}
       <td className="p-3">
         <span className="font-medium text-xs">{record.workHours || '0h'}</span>
       </td>
-      
+
       {/* Status */}
       <td className="p-3">
         <Badge className={cn("gap-1 px-2 py-0.5 text-xs", getStatusColor(record.status))}>
           {getStatusIcon(record.status)}
           <span className="capitalize">
-            {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+            {record.status
+              ? record.status.charAt(0).toUpperCase() + record.status.slice(1)
+              : "Unknown"}
           </span>
         </Badge>
       </td>
-      
+
       {/* Location */}
       {showLocation && <td className="p-3">-</td>}
-      
+
       {/* Actions */}
       <td className="p-3">
         <div className="flex items-center gap-1">
@@ -195,13 +200,9 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
 
 const AttendanceRow = React.memo(AttendanceRowPure)
 
-// ============================================================================
-// ✅ MAIN COMPONENT - FULLY OPTIMIZED
-// ============================================================================
 function ModernAttendanceListCloned() {
   const orgStore = useOrgStore()
 
-  // ✅ SINGLE STATE OBJECT
   type QueryParams = {
     orgId: number | null
     page: number
@@ -218,14 +219,14 @@ function ModernAttendanceListCloned() {
     page: 1,
     limit: 10,
     dateFrom: (() => {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      return today.toISOString().slice(0, 10)
+      const now = new Date()
+      now.setHours(0, 0, 0, 0)
+      return now.toLocaleDateString('en-CA')
     })(),
     dateTo: (() => {
-      const today = new Date()
-      today.setHours(23, 59, 59, 999)
-      return today.toISOString().slice(0, 10)
+      const now = new Date()
+      now.setHours(23, 59, 59, 999)
+      return now.toLocaleDateString('en-CA')
     })(),
     search: "",
     status: "all",
@@ -251,16 +252,15 @@ function ModernAttendanceListCloned() {
   const [editRemarks, setEditRemarks] = useState("")
 
   // Performance refs
-  const latestReqIdRef = useRef(0)
-  const fetchCacheRef = useRef<Map<string, Promise<GetAttendanceResult>>>(new Map())
-  const realtimeChannelRef = useRef<any>(null)
-  const fetchDataRef = useRef<() => void>(() => {})
+
+
+  const fetchDataRef = useRef<() => void>(() => { })
   const queryParamsRef = useRef(queryParams)
   queryParamsRef.current = queryParams
   const orgIdRef = useRef(orgStore.organizationId)
   orgIdRef.current = orgStore.organizationId
   const queryKeyRef = useRef('')
-  const rafRef = useRef<number | null>(null)
+
 
   // Helper functions
   function toOrgYMD(d: Date, tz?: string): string {
@@ -276,22 +276,22 @@ function ModernAttendanceListCloned() {
     }
   }
 
-// ✅ FIXED QUERY KEY - Stable dependencies
-const orgId = useMemo(() => 
-  queryParams.orgId || orgStore.organizationId, 
-  [queryParams.orgId, orgStore.organizationId]
-)
+  // ✅ FIXED QUERY KEY - Stable dependencies
+  const orgId = useMemo(() =>
+    queryParams.orgId || orgStore.organizationId,
+    [queryParams.orgId, orgStore.organizationId]
+  )
 
-const queryKey = useMemo(() => JSON.stringify({
-  orgId,
-  page: queryParams.page,
-  limit: queryParams.limit,
-  dateFrom: queryParams.dateFrom,
-  dateTo: queryParams.dateTo,
-  status: queryParams.status,
-  department: queryParams.department,
-  search: deferredSearch?.trim() ?? "",
-}), [orgId, queryParams.page, queryParams.limit, queryParams.dateFrom, queryParams.dateTo,
+  const queryKey = useMemo(() => JSON.stringify({
+    orgId,
+    page: queryParams.page,
+    limit: queryParams.limit,
+    dateFrom: queryParams.dateFrom,
+    dateTo: queryParams.dateTo,
+    status: queryParams.status,
+    department: queryParams.department,
+    search: deferredSearch?.trim() ?? "",
+  }), [orgId, queryParams.page, queryParams.limit, queryParams.dateFrom, queryParams.dateTo,
     queryParams.status, queryParams.department, deferredSearch])
 
 
@@ -300,55 +300,41 @@ const queryKey = useMemo(() => JSON.stringify({
     setQueryParams(prev => ({ ...prev, ...updates, page: 1 }))
   }, [])
 
-  // Fetch data - cached + deduped
   const fetchData = useCallback(async () => {
     const qp = queryParamsRef.current
     const orgId = qp.orgId || orgIdRef.current
     if (!orgId) {
-      setLoading(true)
-      return
-    }
-
-    const reqId = ++latestReqIdRef.current
-    const cacheKey = `fetch_${queryKeyRef.current}`
-
-    if (fetchCacheRef.current.has(cacheKey)) {
-      const cached = await fetchCacheRef.current.get(cacheKey)!
-      if (latestReqIdRef.current === reqId) handleFetchSuccess(cached)
+      setLoading(false)
       return
     }
 
     setLoading(true)
-    const promise = (async () => {
-      const params = new URLSearchParams({
-        page: qp.page.toString(),
-        limit: qp.limit.toString(),
-        dateFrom: qp.dateFrom,
-        dateTo: qp.dateTo,
-        organizationId: orgId.toString(),
-        ...(qp.status !== "all" && { status: qp.status }),
-        ...(qp.department !== "all" && { department: qp.department }),
-        ...(qp.search?.trim().length >= 2 && { search: qp.search.trim() })
-      })
 
-      const res = await fetch(`/api/attendance-records?${params}`, {
-        credentials: "same-origin",
-      })
-      return res.json() as Promise<GetAttendanceResult>
-    })()
+    // ✅ NO CACHE - Langsung fetch fresh
+    const params = new URLSearchParams({
+      page: qp.page.toString(),
+      limit: qp.limit.toString(),
+      dateFrom: qp.dateFrom,
+      dateTo: qp.dateTo,
+      organizationId: orgId.toString(),
+      _cb: Date.now().toString(),  // ✅ Cache buster
+      ...(qp.status !== "all" && { status: qp.status }),
+      ...(qp.department !== "all" && { department: qp.department }),
+      ...(qp.search?.trim().length >= 2 && { search: qp.search.trim() })
+    })
 
-    fetchCacheRef.current.set(cacheKey, promise)
-    
-    try {
-      const result = await promise
-      if (latestReqIdRef.current === reqId) {
-        handleFetchSuccess(result)
+    const res = await fetch(`/api/attendance-records?${params}`, {
+      cache: 'no-store',  // ✅ No browser cache
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       }
-    } finally {
-      fetchCacheRef.current.delete(cacheKey)
-      if (latestReqIdRef.current === reqId) setLoading(false)
-    }
-  }, []) // No deps — reads everything from refs (queryParamsRef, orgIdRef, queryKeyRef)
+    })
+
+    const result = await res.json() as GetAttendanceResult
+    handleFetchSuccess(result)
+    setLoading(false)
+  }, [])
 
   // Keep ref in sync so the realtime callback always calls the latest fetchData
   // without being a useEffect dependency (prevents infinite re-subscription loop)
@@ -380,41 +366,33 @@ const queryKey = useMemo(() => JSON.stringify({
     }
   }, [])
 
-  // Realtime subscription - single effect, stable channel name with orgId
   useEffect(() => {
     if (!orgId) return
+    console.log('🔍 NO FILTER TEST - orgId:', orgId)
 
     const supabase = createClient()
-    // Use orgId in channel name to avoid collisions across orgs/tabs
-    const channelName = `attendance_records:org_${orgId}`
-    const channel = supabase.channel(channelName)
+    const channel = supabase.channel('test_no_filter')
 
+    // ❌ NO FILTER - dengar SEMUA changes
     channel
-      .on(
-        'postgres_changes',
+      .on('postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'attendance_records',
+          table: 'attendance_records'
+          // NO FILTER!
         },
-        (_payload: RealtimePostgresChangesPayload<{ organization_member_id: number }>) => {
-          // Clear cache and fetch fresh — does NOT change queryKey so won't
-          // trigger the filter useEffect, preventing false re-renders
-          fetchCacheRef.current.clear()
-          fetchDataRef.current()
+        (payload: any) => {
+          console.log('🔔 NO FILTER TRIGGERED:', payload)
+          fetchData()
         }
       )
+      .subscribe((status: any) => console.log('📶 NO FILTER:', status))
 
-    realtimeChannelRef.current = channel
-
-    return () => {
-      supabase.removeChannel(channel)
-      realtimeChannelRef.current = null
-    }
-  }, [orgId]) // fetchData intentionally omitted — accessed via fetchDataRef to prevent infinite loop
+    return () => supabase.removeChannel(channel)
+  }, [orgId, fetchData])
 
 
-  // Initial fetch + re-fetch whenever queryKey changes (filters, page, org, search)
   useEffect(() => {
     if (!orgId) return
     fetchDataRef.current()
@@ -431,9 +409,9 @@ const queryKey = useMemo(() => JSON.stringify({
   }, [])
 
   const selectAll = useCallback(() => {
-    setSelectedIds(prev => 
-      prev.size === data.items.length 
-        ? new Set() 
+    setSelectedIds(prev =>
+      prev.size === data.items.length
+        ? new Set()
         : new Set(data.items.map(r => r.id))
     )
   }, [data.items.length])
@@ -447,10 +425,10 @@ const queryKey = useMemo(() => JSON.stringify({
         try {
           const formatted = formatLocalTime(record.checkIn, userTimezone, "24h", true)
           const [datePart, timePart] = formatted.split(', ')
-          return { 
-            date: datePart || '-', 
-            time: timePart || '-', 
-            method: record.checkInMethod || '' 
+          return {
+            date: datePart || '-',
+            time: timePart || '-',
+            method: record.checkInMethod || ''
           }
         } catch {
           return { date: '-', time: '-', method: '' }
@@ -462,10 +440,10 @@ const queryKey = useMemo(() => JSON.stringify({
         try {
           const formatted = formatLocalTime(record.checkOut, userTimezone, "24h", true)
           const [datePart, timePart] = formatted.split(', ')
-          return { 
-            date: datePart || '-', 
-            time: timePart || '-', 
-            method: record.checkOutMethod || '' 
+          return {
+            date: datePart || '-',
+            time: timePart || '-',
+            method: record.checkOutMethod || ''
           }
         } catch {
           return { date: '-', time: '-', method: '' }
@@ -477,10 +455,10 @@ const queryKey = useMemo(() => JSON.stringify({
         try {
           const formatted = formatLocalTime(record.actualBreakStart, userTimezone, "24h", true)
           const [datePart, timePart] = formatted.split(', ')
-          return { 
-            date: datePart || '-', 
-            time: timePart || '-', 
-            method: record.breakInMethod || '' 
+          return {
+            date: datePart || '-',
+            time: timePart || '-',
+            method: record.breakInMethod || ''
           }
         } catch {
           return { date: '-', time: '-', method: '' }
@@ -492,10 +470,10 @@ const queryKey = useMemo(() => JSON.stringify({
         try {
           const formatted = formatLocalTime(record.actualBreakEnd, userTimezone, "24h", true)
           const [datePart, timePart] = formatted.split(', ')
-          return { 
-            date: datePart || '-', 
-            time: timePart || '-', 
-            method: record.breakOutMethod || '' 
+          return {
+            date: datePart || '-',
+            time: timePart || '-',
+            method: record.breakOutMethod || ''
           }
         } catch {
           return { date: '-', time: '-', method: '' }
@@ -550,7 +528,7 @@ const queryKey = useMemo(() => JSON.stringify({
         actual_check_out: editOut.trim() === "" ? null : editOut.trim(),
         remarks: editRemarks.trim() === "" ? null : editRemarks.trim(),
       })
-      
+
       if (res.success) {
         toast.success("Record updated")
         setEditOpen(false)
@@ -610,15 +588,15 @@ const queryKey = useMemo(() => JSON.stringify({
           {/* Date Filter */}
           <div className="w-full md:w-auto shrink-0">
             <DateFilterBar
-              dateRange={{ 
-                from: new Date(queryParams.dateFrom), 
-                to: new Date(queryParams.dateTo), 
+              dateRange={{
+                from: new Date(queryParams.dateFrom),
+                to: new Date(queryParams.dateTo),
                 preset: "custom" as const
               }}
-              onDateRangeChange={({ from, to }) => 
-                updateQueryParams({ 
-                  dateFrom: toOrgYMD(from, userTimezone), 
-                  dateTo: toOrgYMD(to, userTimezone) 
+              onDateRangeChange={({ from, to }) =>
+                updateQueryParams({
+                  dateFrom: toOrgYMD(from, userTimezone),
+                  dateTo: toOrgYMD(to, userTimezone)
                 })
               }
               className="w-full justify-start"
@@ -630,8 +608,8 @@ const queryKey = useMemo(() => JSON.stringify({
             {/* Status */}
             <div className="flex-1 md:w-auto">
               {isMounted ? (
-                <Select 
-                  value={queryParams.status} 
+                <Select
+                  value={queryParams.status}
                   onValueChange={(v) => updateQueryParams({ status: v })}
                 >
                   <SelectTrigger className="w-full md:w-[140px] border-gray-300 bg-white">
@@ -653,8 +631,8 @@ const queryKey = useMemo(() => JSON.stringify({
             {/* Department */}
             <div className="flex-1 md:w-auto">
               {isMounted ? (
-                <Select 
-                  value={queryParams.department} 
+                <Select
+                  value={queryParams.department}
                   onValueChange={(v) => updateQueryParams({ department: v })}
                 >
                   <SelectTrigger className="w-full md:w-40 border-gray-300 bg-white">
@@ -675,7 +653,7 @@ const queryKey = useMemo(() => JSON.stringify({
 
           {/* Actions */}
           <div className="flex w-full md:w-auto gap-2 shrink-0">
-            <Button 
+            <Button
               onClick={handleManualRefresh}
               title="Refresh"
               className="shrink-0 bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90"
@@ -683,14 +661,14 @@ const queryKey = useMemo(() => JSON.stringify({
             >
               <RotateCcw className={cn("w-4 h-4", loading && "animate-spin")} />
             </Button>
-            
+
             <Link href="/attendance/list/import" className="flex-1 md:flex-none">
               <Button variant="outline" className="w-full border-gray-300 bg-white whitespace-nowrap">
                 <Download className="mr-2 h-4 w-4" />
                 Import
               </Button>
             </Link>
-            
+
             <Link href="/attendance/list/add" className="flex-1 md:flex-none">
               <Button className="w-full bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" />
@@ -705,8 +683,10 @@ const queryKey = useMemo(() => JSON.stringify({
           {selectedIds.size > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1,
-              y: 0 }}
+              animate={{
+                opacity: 1,
+                y: 0
+              }}
               exit={{ opacity: 0, y: -10 }}
               className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2"
             >
@@ -744,13 +724,13 @@ const queryKey = useMemo(() => JSON.stringify({
           <CardContent className="p-0">
             <div className="overflow-x-auto w-full">
               <table className="w-full min-w-[880px]">
-                <thead className="sticky top-0 z-10 border-b bg-muted/50">
+                <thead className="sticky top-0 z-10 bg-muted/50">
                   <tr>
                     <th className="p-3 text-left">
                       <input
                         type="checkbox"
                         checked={selectedIds.size === data.items.length && data.items.length > 0}
-                        onChange={(e) => selectAll()}
+                        onChange={() => selectAll()}
                         className="rounded border-gray-300"
                       />
                     </th>
@@ -849,17 +829,28 @@ const queryKey = useMemo(() => JSON.stringify({
               const ids = Array.from(selectedIds)
               const res = await deleteMultipleAttendanceRecords(ids)
               if (res.success) {
-                toast.success("Selected records deleted")
+                // Optimistically remove from UI immediately
+                setData(prev => ({
+                  items: prev.items.filter(r => !ids.includes(r.id)),
+                  total: Math.max(0, prev.total - ids.length)
+                }))
                 setSelectedIds(new Set())
-                fetchData()
+                toast.success("Selected records deleted")
+                fetchDataRef.current()
               } else {
                 toast.error(res.message || "Failed to delete selected records")
               }
             } else if (confirmState.mode === "single" && confirmState.id) {
-              const res = await deleteAttendanceRecord(confirmState.id)
-              if (res.success) {
+              const deletedId = confirmState.id
+              const res = await deleteAttendanceRecord(deletedId)
+              if (res?.success) {
+                // Optimistically remove from UI immediately
+                setData(prev => ({
+                  items: prev.items.filter(r => r.id !== deletedId),
+                  total: Math.max(0, prev.total - 1)
+                }))
                 toast.success("Record deleted")
-                fetchData()
+                fetchDataRef.current()
               } else {
                 toast.error(res.message || "Failed to delete record")
               }
@@ -873,54 +864,54 @@ const queryKey = useMemo(() => JSON.stringify({
         }}
       />
 
-  {/* Edit Dialog */}
-  <Dialog open={editOpen} onOpenChange={(open) => !isSubmitting && setEditOpen(open)}>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Edit attendance record</DialogTitle>
-        <DialogDescription>
-          Perbarui waktu Check In/Out dan catatan. Biarkan kosong untuk menghapus nilai.
-        </DialogDescription>
-      </DialogHeader>
-      <div className="grid gap-3">
-        <div className="grid gap-1.5">
-          <label className="text-sm font-medium">Check In (ISO)</label>
-          <Input
-            value={editIn}
-            onChange={(e) => setEditIn(e.target.value)}
-            placeholder="contoh: 2026-01-15T08:30:00+07:00"
-            disabled={isSubmitting}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <label className="text-sm font-medium">Check Out (ISO)</label>
-          <Input
-            value={editOut}
-            onChange={(e) => setEditOut(e.target.value)}
-            placeholder="contoh: 2026-01-15T17:00:00+07:00"
-            disabled={isSubmitting}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <label className="text-sm font-medium">Remarks</label>
-          <Input
-            value={editRemarks}
-            onChange={(e) => setEditRemarks(e.target.value)}
-            placeholder="Catatan (opsional)"
-            disabled={isSubmitting}
-          />
-        </div>
-      </div>
-      <DialogFooter>
-        <Button variant="outline" onClick={() => setEditOpen(false)} disabled={isSubmitting}>
-          Cancel
-        </Button>
-        <Button onClick={submitEdit} disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Changes"}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={(open) => !isSubmitting && setEditOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit attendance record</DialogTitle>
+            <DialogDescription>
+              Perbarui waktu Check In/Out dan catatan. Biarkan kosong untuk menghapus nilai.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <div className="grid gap-1.5">
+              <label className="text-sm font-medium">Check In (ISO)</label>
+              <Input
+                value={editIn}
+                onChange={(e) => setEditIn(e.target.value)}
+                placeholder="contoh: 2026-01-15T08:30:00+07:00"
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <label className="text-sm font-medium">Check Out (ISO)</label>
+              <Input
+                value={editOut}
+                onChange={(e) => setEditOut(e.target.value)}
+                placeholder="contoh: 2026-01-15T17:00:00+07:00"
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <label className="text-sm font-medium">Remarks</label>
+              <Input
+                value={editRemarks}
+                onChange={(e) => setEditRemarks(e.target.value)}
+                placeholder="Catatan (opsional)"
+                disabled={isSubmitting}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={submitEdit} disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
