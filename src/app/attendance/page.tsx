@@ -57,7 +57,7 @@ const COLORS = {
   excused: '#8b5cf6',
 };
 
-export default function AnalyticsPage() {
+export default function AttendanceDashboardPage() {
   const { organizationId } = useHydration();
   const [allRecords, setAllRecords] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
