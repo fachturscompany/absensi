@@ -44,17 +44,16 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
                     </p>
                 </div>
             </div>
-            {/* <Separator className="my-4" /> */}
-            <div className="flex flex-col space-y-8 md:flex-row md:space-x-8 md:space-y-0">
-                <aside className="md:w-1/4 xl:w-1/5">
+            <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+                <aside className="w-full md:w-56 shrink-0">
                     <Card className="h-fit">
                         <CardContent className="p-1">
                             <UserSettingsSidebar items={sidebarNavItems} />
                         </CardContent>
                     </Card>
                 </aside>
-                <main className="flex-1">
-                    <Card className="h-full">
+                <main className="flex-1 min-w-0">
+                    <Card>
                         <CardContent className="p-6">
                             {children}
                         </CardContent>

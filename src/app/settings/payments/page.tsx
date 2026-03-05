@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
@@ -90,7 +90,7 @@ export default function PaymentsPage() {
               {/* Process Payments Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-slate-900 uppercase tracking-tight">Process Payments</h2>
+                  <h2 className="text-lg font-normal text-slate-900 uppercase tracking-tight">Process Payments</h2>
                   <Info className="h-4 w-4 text-slate-400" />
                 </div>
                 <p className="text-sm text-slate-500 max-w-md">
@@ -123,7 +123,7 @@ export default function PaymentsPage() {
               {/* Delay payroll Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-slate-900 uppercase tracking-tight">Delay payroll</h2>
+                  <h2 className="text-lg font-normal text-slate-900 uppercase tracking-tight">Delay payroll</h2>
                   <Info className="h-4 w-4 text-slate-400" />
                 </div>
                 <p className="text-sm text-slate-500 max-w-md">
@@ -131,7 +131,7 @@ export default function PaymentsPage() {
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="delay-days" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <Label htmlFor="delay-days" className="text-[10px] font-normal text-slate-400 uppercase tracking-wider">
                       SEND PAYMENTS AFTER
                     </Label>
                     <Info className="h-3 w-3 text-slate-300" />
@@ -153,9 +153,9 @@ export default function PaymentsPage() {
               {/* Proof of Payment PDF Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-normal text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     Proof of Payment PDF
-                    <span className="px-2 py-0.5 text-[10px] uppercase font-bold text-white bg-blue-500 rounded-md">
+                    <span className="px-2 py-0.5 text-[10px] uppercase font-normal text-white bg-blue-500 rounded-md">
                       New
                     </span>
                   </h2>
@@ -196,10 +196,10 @@ export default function PaymentsPage() {
                   <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-slate-200/50 flex items-center justify-center shrink-0">
-                        <Info className="h-4 w-4 text-slate-600 font-bold" />
+                        <Info className="h-4 w-4 text-slate-600 font-normal" />
                       </div>
                       <div className="text-sm text-slate-600 leading-relaxed">
-                        <p className="font-semibold text-slate-900 mb-1">Information Details</p>
+                        <p className="font-normal text-slate-900 mb-1">Information Details</p>
                         <p className="mb-3">Member and organization details will be included in the PDF attachment.</p>
                         <ul className="space-y-2">
                           <li className="flex items-center gap-2">

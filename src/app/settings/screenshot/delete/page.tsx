@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 
@@ -128,7 +128,7 @@ export default function ScreenshotDeletePage() {
             {/* Global Settings */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-slate-900">DELETE SCREENSHOTS</h2>
+                <h2 className="text-lg font-normal text-slate-900">DELETE SCREENSHOTS</h2>
                 <Info className="h-4 w-4 text-slate-400" />
               </div>
               <p className="text-sm text-slate-600">
@@ -170,7 +170,7 @@ export default function ScreenshotDeletePage() {
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-base font-semibold text-slate-900">Individual settings</h3>
+                  <h3 className="text-base font-normal text-slate-900">Individual settings</h3>
                   <p className="text-sm text-slate-600 mt-1">
                     Override the organization default for specific members
                   </p>
@@ -192,10 +192,10 @@ export default function ScreenshotDeletePage() {
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200 hidden sm:table-header-group">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-normal text-slate-700 uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-right text-xs font-normal text-slate-700 uppercase tracking-wider">
                         Delete
                       </th>
                     </tr>

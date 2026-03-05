@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
@@ -134,8 +134,8 @@ export default function TimeOffPoliciesPage() {
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <h2 className="text-sm font-bold text-slate-500 uppercase">TIME OFF POLICIES</h2>
-                                        <div className="rounded-full border border-slate-300 w-4 h-4 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                        <h2 className="text-sm font-normal text-slate-500 uppercase">TIME OFF POLICIES</h2>
+                                        <div className="rounded-full border border-slate-300 w-4 h-4 flex items-center justify-center text-[10px] font-normal text-slate-500">
                                             i
                                         </div>
                                     </div>
@@ -160,10 +160,10 @@ export default function TimeOffPoliciesPage() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-b border-slate-100 hidden sm:table-row">
-                                            <th className="text-left py-4 font-semibold text-slate-900">Policy name</th>
-                                            <th className="text-left py-4 font-semibold text-slate-900">Members</th>
-                                            <th className="text-left py-4 font-semibold text-slate-900">Accrual schedule</th>
-                                            <th className="text-right py-4 font-semibold text-slate-900"></th>
+                                            <th className="text-left py-4 font-normal text-slate-900">Policy name</th>
+                                            <th className="text-left py-4 font-normal text-slate-900">Members</th>
+                                            <th className="text-left py-4 font-normal text-slate-900">Accrual schedule</th>
+                                            <th className="text-right py-4 font-normal text-slate-900"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -266,7 +266,7 @@ export default function TimeOffPoliciesPage() {
                                         </div>
                                     </div>
                                 </div>
-                                <h2 className="text-xl font-semibold text-slate-900 mb-2">
+                                <h2 className="text-xl font-normal text-slate-900 mb-2">
                                     No active time off policies
                                 </h2>
                                 <p className="text-slate-500 mb-8">

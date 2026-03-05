@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import { Plus, Package } from "lucide-react"
@@ -48,14 +48,14 @@ export default function GlobalTodosPage() {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8">
                         <div>
-                            <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                            <h2 className="text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">
                                 GLOBAL TO-DOS
                             </h2>
                             <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
-                                Global to-dos can be added to any project. Once added to a project, all members of the project can track time to them, and they cannot be marked as complete so they'll always be visible. Data from these shared to-dos can be viewed across projects in <span className="text-slate-900 font-semibold">'Time & activity'</span> report.
+                                Global to-dos can be added to any project. Once added to a project, all members of the project can track time to them, and they cannot be marked as complete so they'll always be visible. Data from these shared to-dos can be viewed across projects in <span className="text-slate-900 font-normal">'Time & activity'</span> report.
                             </p>
                         </div>
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white h-11 px-8 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-slate-100 w-full sm:w-auto shrink-0">
+                        <Button className="bg-slate-900 hover:bg-slate-800 text-white h-11 px-8 rounded-xl font-normal transition-all active:scale-95 shadow-lg shadow-slate-100 w-full sm:w-auto shrink-0">
                             <Plus className="w-4 h-4 mr-2" />
                             Add a global to-do
                         </Button>
@@ -65,8 +65,8 @@ export default function GlobalTodosPage() {
                     <div className="mt-8">
                         {/* Table Header - Hidden on mobile */}
                         <div className="hidden sm:grid grid-cols-2 py-3 border-b border-slate-100 px-2">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Name</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Projects</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Name</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Projects</span>
                         </div>
 
                         {/* Table Body - Empty State */}
@@ -75,7 +75,7 @@ export default function GlobalTodosPage() {
                                 <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 border border-slate-100">
                                     <Package className="w-12 h-12 text-slate-200" />
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                                <h3 className="text-xl font-normal text-slate-900 mb-2">
                                     Add global to-dos
                                 </h3>
                                 <p className="text-sm text-slate-500 text-center max-w-xs leading-relaxed">

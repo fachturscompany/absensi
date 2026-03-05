@@ -243,7 +243,7 @@ export async function getMemberInsightsSummary(
         let totalWorkedSeconds = 0
         let totalFocusSeconds = 0
         let totalUnusualCount = 0
-        let avgActivitySum = 0
+        const avgActivitySum = 0
 
         if (timesheetsData && timesheetsData.length > 0) {
             const ts = timesheetsData[0]

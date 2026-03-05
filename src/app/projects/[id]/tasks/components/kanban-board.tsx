@@ -325,33 +325,34 @@ export default function KanbanBoard() {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const filterTasks = React.useCallback(() => {
-    let filtered: Record<string, Task[]> = { ...columns };
+    const filtered: Record<string, Task[]> = Object.fromEntries(
+      Object.keys(columns).map((columnKey) => [
+        columnKey,
+        (columns[columnKey] || []).filter((task) => {
+          const searchMatch =
+            searchQuery === "" ||
+            task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+            task.assignee?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    Object.keys(filtered).forEach((columnKey) => {
-      filtered[columnKey] = (columns[columnKey] || []).filter((task) => {
-        const searchMatch =
-          searchQuery === "" ||
-          task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-          task.assignee?.toLowerCase().includes(searchQuery.toLowerCase());
+          const statusMatch =
+            !filterStatus ||
+            (filterStatus === "completed"
+              ? task.progress === 100
+              : filterStatus === "inProgress"
+                ? task.progress > 0 && task.progress < 100
+                : filterStatus === "notStarted"
+                  ? task.progress === 0
+                  : true);
 
-        const statusMatch =
-          !filterStatus ||
-          (filterStatus === "completed"
-            ? task.progress === 100
-            : filterStatus === "inProgress"
-              ? task.progress > 0 && task.progress < 100
-              : filterStatus === "notStarted"
-                ? task.progress === 0
-                : true);
+          const priorityMatch = !filterPriority || task.priority === filterPriority;
 
-        const priorityMatch = !filterPriority || task.priority === filterPriority;
+          const userMatch = !filterUser || task.users.some((user) => user.name === filterUser);
 
-        const userMatch = !filterUser || task.users.some((user) => user.name === filterUser);
-
-        return searchMatch && statusMatch && priorityMatch && userMatch;
-      });
-    });
+          return searchMatch && statusMatch && priorityMatch && userMatch;
+        })
+      ])
+    );
 
     setFilteredColumns(filtered);
   }, [columns, searchQuery, filterStatus, filterPriority, filterUser]);

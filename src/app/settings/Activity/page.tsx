@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 
@@ -65,7 +65,7 @@ export default function ActivityPage() {
                 <div className="flex-1 p-4 md:p-8 w-full overflow-y-auto">
                     {/* Section Title */}
                     <div className="flex items-center gap-1 mb-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">
                             APPS & URLS TRACKING
                         </span>
                         <Info className="h-3.5 w-3.5 text-slate-300" />
@@ -78,7 +78,7 @@ export default function ActivityPage() {
 
                     {/* Global Setting */}
                     <div className="flex items-center gap-1 mb-4">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">
                             GLOBAL SETTING:
                         </span>
                         <Info className="h-3.5 w-3.5 text-slate-300" />
@@ -88,7 +88,7 @@ export default function ActivityPage() {
                     <div className="flex flex-wrap items-center bg-slate-100 rounded-2xl p-1.5 w-full sm:w-fit mb-12 gap-1 shadow-inner">
                         <button
                             onClick={() => handleGlobalTrackAppsChange("all")}
-                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all ${globalTrackApps === "all"
+                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-normal rounded-xl transition-all ${globalTrackApps === "all"
                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                 : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
                                 }`}
@@ -97,7 +97,7 @@ export default function ActivityPage() {
                         </button>
                         <button
                             onClick={() => handleGlobalTrackAppsChange("time-tracking")}
-                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all ${globalTrackApps === "time-tracking"
+                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-normal rounded-xl transition-all ${globalTrackApps === "time-tracking"
                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                 : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
                                 }`}
@@ -106,7 +106,7 @@ export default function ActivityPage() {
                         </button>
                         <button
                             onClick={() => handleGlobalTrackAppsChange("off")}
-                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold rounded-xl transition-all ${globalTrackApps === "off"
+                            className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-normal rounded-xl transition-all ${globalTrackApps === "off"
                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                 : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
                                 }`}
@@ -118,7 +118,7 @@ export default function ActivityPage() {
                     {/* Individual Settings Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
                         <div>
-                            <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-1">Individual settings</h3>
+                            <h3 className="text-lg font-normal text-slate-900 tracking-tight mb-1">Individual settings</h3>
                             <p className="text-sm text-slate-500 leading-relaxed">Override the organization default for specific members</p>
                         </div>
                         <div className="relative w-full sm:w-auto">
@@ -137,8 +137,8 @@ export default function ActivityPage() {
                     <div className="mt-8">
                         {/* Table Header - Hidden on mobile */}
                         <div className="hidden sm:grid grid-cols-3 py-3 border-b border-slate-100 px-2">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Name</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tracking Mode</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Name</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Tracking Mode</span>
                         </div>
 
                         {/* Table Body */}
@@ -146,15 +146,15 @@ export default function ActivityPage() {
                             {filteredMembers.map((member) => (
                                 <div key={member.id} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-2 rounded-xl transition-colors group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors text-slate-400 font-bold text-xs uppercase">
+                                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors text-slate-400 font-normal text-xs uppercase">
                                             {member.name.charAt(0)}
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{member.name}</span>
+                                        <span className="text-sm font-normal text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{member.name}</span>
                                     </div>
                                     <div className="flex flex-wrap gap-1.5 bg-slate-100 sm:bg-slate-50 rounded-2xl p-1 w-full sm:w-fit shadow-inner">
                                         <button
                                             onClick={() => handleMemberTrackAppsChange(member.id, "all")}
-                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-bold rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "all"
+                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-normal rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "all"
                                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                                 : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                                 }`}
@@ -163,7 +163,7 @@ export default function ActivityPage() {
                                         </button>
                                         <button
                                             onClick={() => handleMemberTrackAppsChange(member.id, "time-tracking")}
-                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-bold rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "time-tracking"
+                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-normal rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "time-tracking"
                                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                                 : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                                 }`}
@@ -172,7 +172,7 @@ export default function ActivityPage() {
                                         </button>
                                         <button
                                             onClick={() => handleMemberTrackAppsChange(member.id, "off")}
-                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-bold rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "off"
+                                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[10px] font-normal rounded-xl transition-all uppercase tracking-widest ${getMemberTrackApps(member.id) === "off"
                                                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                                 : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                                 }`}

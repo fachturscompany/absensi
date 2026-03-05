@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react"
 import { Info } from "lucide-react"
@@ -135,7 +135,7 @@ export default function WorkTimeLimitPage() {
             <div className="flex-1 p-4 md:p-6">
                 {/* Default Settings Header */}
                 <div className="flex flex-wrap items-center gap-4 mb-8">
-                    <h2 className="text-lg font-semibold text-gray-900">Default settings</h2>
+                    <h2 className="text-lg font-normal text-gray-900">Default settings</h2>
                     <div className="flex items-center gap-4">
                         <Button
                             onClick={handleSave}
@@ -157,7 +157,7 @@ export default function WorkTimeLimitPage() {
                     {/* Left Column - Weekly Work Days */}
                     <div>
                         <div className="mb-6">
-                            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                                 WEEKLY WORK DAYS
                             </span>
                         </div>
@@ -203,7 +203,7 @@ export default function WorkTimeLimitPage() {
                         {/* Expected Weekly Work Hours */}
                         <div>
                             <div className="flex items-center gap-1 mb-2">
-                                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                                     EXPECTED WEEKLY WORK HOURS
                                 </span>
                             </div>
@@ -239,7 +239,7 @@ export default function WorkTimeLimitPage() {
                         {/* Weekly Limit */}
                         <div>
                             <div className="flex items-center gap-1 mb-2">
-                                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                                     WEEKLY LIMIT
                                 </span>
                                 <Info className="w-3.5 h-3.5 text-gray-400" />
@@ -263,7 +263,7 @@ export default function WorkTimeLimitPage() {
                         {/* Daily Limit */}
                         <div>
                             <div className="flex items-center gap-1 mb-2">
-                                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                                     DAILY LIMIT
                                 </span>
                                 <Info className="w-3.5 h-3.5 text-gray-400" />

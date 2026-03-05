@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
@@ -75,7 +75,7 @@ export default function OvertimePage() {
                     {/* Header with Add button */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="text-2xl font-semibold text-slate-900">Overtime policies</h1>
+                            <h1 className="text-2xl font-normal text-slate-900">Overtime policies</h1>
                             <p className="text-slate-500 text-sm mt-1">Set up automatic overtime policies</p>
                         </div>
                         {displayedPolicies.length > 0 && (
@@ -236,7 +236,7 @@ export default function OvertimePage() {
                             <div className="w-64 h-64 mb-6 bg-slate-50 rounded-full flex items-center justify-center">
                                 <Clock className="w-24 h-24 text-slate-300" />
                             </div>
-                            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+                            <h2 className="text-xl font-normal text-slate-900 mb-2">
                                 {activeTab === "ACTIVE" ? "No active overtime policies" : "No archived policies"}
                             </h2>
                             <p className="text-slate-500 mb-8">

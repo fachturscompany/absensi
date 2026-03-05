@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 
@@ -68,7 +68,7 @@ export default function RecordActivityPage() {
                         {/* Global Settings */}
                         <div className="space-y-6 pt-4">
                             <div className="flex items-center gap-2">
-                                <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">RECORD ACTIVITY</h2>
+                                <h2 className="text-[10px] font-normal text-slate-400 uppercase tracking-[0.2em]">RECORD ACTIVITY</h2>
                                 <Info className="h-3.5 w-3.5 text-slate-300" />
                             </div>
                             <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
@@ -78,7 +78,7 @@ export default function RecordActivityPage() {
                             <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl inline-block w-full sm:w-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">GLOBAL SETTING:</span>
+                                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest whitespace-nowrap">GLOBAL SETTING:</span>
                                         <Info className="h-3.5 w-3.5 text-slate-300" />
                                     </div>
 
@@ -87,7 +87,7 @@ export default function RecordActivityPage() {
                                         <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 shadow-inner">
                                             <button
                                                 onClick={() => handleGlobalRecordActivityChange("off")}
-                                                className={`px-5 py-1.5 text-xs font-bold rounded-xl transition-all ${globalRecordActivity === "off"
+                                                className={`px-5 py-1.5 text-xs font-normal rounded-xl transition-all ${globalRecordActivity === "off"
                                                     ? "bg-white text-slate-900 shadow-sm"
                                                     : "bg-transparent text-slate-400"
                                                     }`}
@@ -96,7 +96,7 @@ export default function RecordActivityPage() {
                                             </button>
                                             <button
                                                 onClick={() => handleGlobalRecordActivityChange("on")}
-                                                className={`px-5 py-1.5 text-xs font-bold rounded-full transition-all ${globalRecordActivity === "on"
+                                                className={`px-5 py-1.5 text-xs font-normal rounded-full transition-all ${globalRecordActivity === "on"
                                                     ? "bg-white text-slate-900 shadow-sm"
                                                     : "bg-transparent text-slate-400"
                                                     }`}
@@ -118,7 +118,7 @@ export default function RecordActivityPage() {
                             <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl inline-block w-full sm:w-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">GLOBAL SETTING:</span>
+                                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest whitespace-nowrap">GLOBAL SETTING:</span>
                                         <Info className="h-3.5 w-3.5 text-slate-300" />
                                     </div>
 
@@ -127,7 +127,7 @@ export default function RecordActivityPage() {
                                         <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 shadow-inner">
                                             <button
                                                 onClick={() => handleGlobalRecordActivityChange("off")}
-                                                className={`px-5 py-1.5 text-xs font-bold rounded-xl transition-all ${globalRecordActivity === "off"
+                                                className={`px-5 py-1.5 text-xs font-normal rounded-xl transition-all ${globalRecordActivity === "off"
                                                     ? "bg-white text-slate-900 shadow-sm"
                                                     : "bg-transparent text-slate-400"
                                                     }`}
@@ -136,7 +136,7 @@ export default function RecordActivityPage() {
                                             </button>
                                             <button
                                                 onClick={() => handleGlobalRecordActivityChange("on")}
-                                                className={`px-5 py-1.5 text-xs font-bold rounded-full transition-all ${globalRecordActivity === "on"
+                                                className={`px-5 py-1.5 text-xs font-normal rounded-full transition-all ${globalRecordActivity === "on"
                                                     ? "bg-white text-slate-900 shadow-sm"
                                                     : "bg-transparent text-slate-400"
                                                     }`}
@@ -153,7 +153,7 @@ export default function RecordActivityPage() {
                         <div className="space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-1">Individual settings</h3>
+                                    <h3 className="text-lg font-normal text-slate-900 tracking-tight mb-1">Individual settings</h3>
                                     <p className="text-sm text-slate-500 leading-relaxed">
                                         Override the organization default for specific members
                                     </p>
@@ -174,8 +174,8 @@ export default function RecordActivityPage() {
                             <div className="mt-8">
                                 {/* Table Header - Hidden on mobile */}
                                 <div className="hidden sm:grid grid-cols-2 py-3 border-b border-slate-100 px-2">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Name</span>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Activity Mode</span>
+                                    <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Name</span>
+                                    <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest text-right">Activity Mode</span>
                                 </div>
 
                                 {/* Table Body */}
@@ -190,18 +190,18 @@ export default function RecordActivityPage() {
                                             return (
                                                 <div key={member.id} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-2 rounded-xl transition-colors group">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors text-slate-400 font-bold text-xs uppercase">
+                                                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors text-slate-400 font-normal text-xs uppercase">
                                                             {member.name.charAt(0)}
                                                         </div>
-                                                        <span className="text-sm font-semibold text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{member.name}</span>
+                                                        <span className="text-sm font-normal text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{member.name}</span>
                                                     </div>
 
                                                     <div className="flex items-center justify-between sm:justify-end gap-6 bg-slate-100 sm:bg-slate-50 rounded-2xl p-1 w-full sm:w-fit shadow-inner">
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest sm:hidden pl-3">Record:</span>
+                                                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest sm:hidden pl-3">Record:</span>
                                                         <div className="flex items-center gap-1">
                                                             <button
                                                                 onClick={() => handleMemberRecordActivityChange(member.id, "off")}
-                                                                className={`px-5 py-1.5 text-[10px] font-bold rounded-xl transition-all uppercase tracking-widest ${memberRecordActivityValue === "off"
+                                                                className={`px-5 py-1.5 text-[10px] font-normal rounded-xl transition-all uppercase tracking-widest ${memberRecordActivityValue === "off"
                                                                     ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                                                     : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                                                     }`}
@@ -210,7 +210,7 @@ export default function RecordActivityPage() {
                                                             </button>
                                                             <button
                                                                 onClick={() => handleMemberRecordActivityChange(member.id, "on")}
-                                                                className={`px-5 py-1.5 text-[10px] font-bold rounded-xl transition-all uppercase tracking-widest ${memberRecordActivityValue === "on"
+                                                                className={`px-5 py-1.5 text-[10px] font-normal rounded-xl transition-all uppercase tracking-widest ${memberRecordActivityValue === "on"
                                                                     ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                                                                     : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                                                     }`}

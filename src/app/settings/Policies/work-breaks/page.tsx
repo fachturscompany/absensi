@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
@@ -148,7 +148,7 @@ export default function WorkBreaksPage() {
                                     <Coffee className="w-24 h-24 text-slate-300" />
                                 </div>
                             </div>
-                            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+                            <h2 className="text-xl font-normal text-slate-900 mb-2">
                                 No active break policies
                             </h2>
                             <p className="text-slate-500 mb-8">
@@ -166,7 +166,7 @@ export default function WorkBreaksPage() {
                         <div className="space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">BREAK POLICIES</h2>
+                                    <h2 className="text-sm font-normal text-slate-500 uppercase tracking-wider mb-1">BREAK POLICIES</h2>
                                     <p className="text-slate-500 text-sm">Set up automatic break policies</p>
                                 </div>
                                 <Button
@@ -181,9 +181,9 @@ export default function WorkBreaksPage() {
                                 <Table>
                                     <TableHeader className="bg-white">
                                         <TableRow className="hover:bg-transparent border-b-slate-100">
-                                            <TableHead className="w-[300px] font-bold text-slate-900">Policy name</TableHead>
-                                            <TableHead className="font-bold text-slate-900 hidden sm:table-cell">Members</TableHead>
-                                            <TableHead className="font-bold text-slate-900 hidden sm:table-cell">Type</TableHead>
+                                            <TableHead className="w-[300px] font-normal text-slate-900">Policy name</TableHead>
+                                            <TableHead className="font-normal text-slate-900 hidden sm:table-cell">Members</TableHead>
+                                            <TableHead className="font-normal text-slate-900 hidden sm:table-cell">Type</TableHead>
                                             <TableHead className="w-[100px]"></TableHead>
                                         </TableRow>
                                     </TableHeader>

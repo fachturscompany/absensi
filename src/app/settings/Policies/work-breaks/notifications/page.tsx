@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
@@ -72,7 +72,7 @@ export default function WorkBreakNotificationsPage() {
                     {/* Header Section */}
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-2">
-                            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                            <h2 className="text-sm font-normal text-slate-500 uppercase tracking-wider">
                                 WORK BREAK NOTIFICATIONS
                             </h2>
                             <TooltipProvider>
@@ -117,7 +117,7 @@ export default function WorkBreakNotificationsPage() {
                     <div>
                         <div className="flex items-start justify-between mb-6">
                             <div>
-                                <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                                <h3 className="text-lg font-normal text-slate-900 mb-1">
                                     Individual settings
                                 </h3>
                                 <p className="text-sm text-slate-500">
@@ -140,7 +140,7 @@ export default function WorkBreakNotificationsPage() {
                         <div className="border-t border-slate-200">
                             {/* Table Header */}
                             <div className="py-3 border-b border-slate-200">
-                                <span className="text-sm font-semibold text-slate-900">Name</span>
+                                <span className="text-sm font-normal text-slate-900">Name</span>
                             </div>
 
                             {/* Members */}

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -43,7 +43,7 @@ function SettingsCard({ title, icon: Icon, items, badge, searchQuery = '' }: Set
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-3 mb-4">
         <Icon className="h-5 w-5 text-slate-700" />
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <h3 className="text-lg font-normal text-slate-900">{title}</h3>
         {badge && (
           <span className="ml-auto px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-slate-700 rounded-full">
             {badge}
@@ -176,7 +176,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h1 className="text-xl font-semibold text-slate-900">Settings</h1>
+          <h1 className="text-xl font-normal text-slate-900">Settings</h1>
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input

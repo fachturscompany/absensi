@@ -151,9 +151,7 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
         setPhotoUploading(true);
         const toastId = toast.loading("Uploading profile photo...");
         try {
-            // Client-side compression
-            // If it's just a Blob, we need a File object for browser-image-compression if possible,
-            // but it usually works with Blobs too. Let's wrap it.
+            // Compress the CROPPED image (will become the thumbnail)
             const imageFile = new File([croppedBlob], selectedFile?.name || 'profile.png', {
                 type: 'image/png',
                 lastModified: Date.now(),
@@ -168,6 +166,23 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
 
             const compressedFile = await imageCompression(imageFile, options);
 
+            // Read the ORIGINAL file (pre-crop) as base64 too
+            const readOriginalAsBase64 = (): Promise<{ base64: string; fileType: string } | null> => {
+                if (!selectedFile) return Promise.resolve(null);
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const result = reader.result?.toString();
+                        if (!result) { resolve(null); return; }
+                        const base64 = (result.includes('base64,') ? result.split('base64,')[1] : result) || "";
+                        resolve({ base64, fileType: selectedFile.type });
+                    };
+                    reader.readAsDataURL(selectedFile);
+                });
+            };
+
+            const [originalData] = await Promise.all([readOriginalAsBase64()]);
+
             const reader = new FileReader();
             reader.readAsDataURL(compressedFile);
             reader.onloadend = async () => {
@@ -180,16 +195,17 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
 
                 const base64Data = (base64.includes('base64,') ? base64.split('base64,')[1] : base64) || "";
                 const result = await uploadProfilePhotoBase64({
-                    base64Data,
+                    base64Data,                            // cropped+compressed → thumb
                     fileName: compressedFile.name,
                     fileType: compressedFile.type,
                     fileSize: compressedFile.size,
+                    originalBase64Data: originalData?.base64,      // full original → original/
+                    originalFileType: originalData?.fileType,
                 });
 
                 if (result.success && result.url) {
                     toast.success("Profile photo updated successfully", { id: toastId });
 
-                    // Update the auth store and refresh profile to sync everything
                     setUser((prev) => {
                         if (!prev) return prev;
                         return { ...prev, profile_photo_url: result.url! };
@@ -371,19 +387,6 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="middle_name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Middle Name</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder="Optional" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
                                     name="last_name"
                                     render={({ field }) => (
                                         <FormItem>
@@ -408,21 +411,19 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="col-span-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="phone"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Phone Number *</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} placeholder="e.g. +62 812 3456 7890" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="phone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Phone Number *</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder="e.g. +62 812 3456 7890" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
 

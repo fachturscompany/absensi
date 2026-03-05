@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Info, Search } from "lucide-react"
@@ -66,7 +66,7 @@ export default function AllowedAppsPage() {
             {/* Global Settings */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-slate-900">ALLOWED APPS</h2>
+                <h2 className="text-lg font-normal text-slate-900">ALLOWED APPS</h2>
                 <Info className="h-4 w-4 text-slate-400" />
               </div>
               <p className="text-sm text-slate-600">
@@ -133,10 +133,10 @@ export default function AllowedAppsPage() {
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200 hidden sm:table-header-group">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-normal text-slate-700 uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-right text-xs font-normal text-slate-700 uppercase tracking-wider">
                         Allowed apps
                       </th>
                     </tr>

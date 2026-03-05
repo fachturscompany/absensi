@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 
@@ -45,7 +45,7 @@ export default function EmailNotificationsPage() {
                   <Lock className="h-5 w-5 text-slate-600" />
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  This feature can be purchased by upgrading to the <span className="font-bold text-slate-900">Enterprise plan</span>.
+                  This feature can be purchased by upgrading to the <span className="font-normal text-slate-900">Enterprise plan</span>.
                 </p>
               </div>
               <Button
@@ -59,7 +59,7 @@ export default function EmailNotificationsPage() {
             {/* Email Notifications Section */}
             <div className="space-y-6 pt-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">EMAIL NOTIFICATIONS</h2>
+                <h2 className="text-[10px] font-normal text-slate-400 uppercase tracking-[0.2em]">EMAIL NOTIFICATIONS</h2>
               </div>
               <div className="space-y-4 text-sm text-slate-500 leading-relaxed max-w-2xl">
                 <p>
@@ -73,7 +73,7 @@ export default function EmailNotificationsPage() {
               <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl inline-block w-full sm:w-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">DEFAULT SETTING:</span>
+                    <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest whitespace-nowrap">DEFAULT SETTING:</span>
                     <Info className="h-3.5 w-3.5 text-slate-300" />
                   </div>
 
@@ -82,7 +82,7 @@ export default function EmailNotificationsPage() {
                     <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 shadow-inner">
                       <button
                         onClick={() => setDefaultEmailNotifications(false)}
-                        className={`px-5 py-1.5 text-xs font-bold rounded-full transition-all ${!defaultEmailNotifications
+                        className={`px-5 py-1.5 text-xs font-normal rounded-full transition-all ${!defaultEmailNotifications
                           ? "bg-white text-slate-900 shadow-sm"
                           : "bg-transparent text-slate-400"
                           }`}
@@ -91,7 +91,7 @@ export default function EmailNotificationsPage() {
                       </button>
                       <button
                         onClick={() => setDefaultEmailNotifications(true)}
-                        className={`px-5 py-1.5 text-xs font-bold rounded-full transition-all ${defaultEmailNotifications
+                        className={`px-5 py-1.5 text-xs font-normal rounded-full transition-all ${defaultEmailNotifications
                           ? "bg-white text-slate-900 shadow-sm"
                           : "bg-transparent text-slate-400"
                           }`}

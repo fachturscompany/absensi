@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import { ChevronDown, Plus } from "lucide-react"
@@ -78,7 +78,7 @@ export default function ReasonsPage() {
                 <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                     {/* Header Row */}
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             REASONS
                         </span>
                         <Button
@@ -99,7 +99,7 @@ export default function ReasonsPage() {
                     <div className="mt-6">
                         {/* Table Header */}
                         <div className="py-3 border-b border-gray-200">
-                            <span className="text-sm font-semibold text-gray-900">Reason</span>
+                            <span className="text-sm font-normal text-gray-900">Reason</span>
                         </div>
 
                         {/* Table Body */}

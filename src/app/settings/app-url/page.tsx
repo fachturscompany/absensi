@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useCallback } from "react"
 import { Search, Lightbulb, Info, Globe, Monitor } from "lucide-react"
@@ -210,7 +210,7 @@ export default function AppUrlPage() {
                 <div className="flex-1 p-4 md:p-6 w-full overflow-x-hidden">
                     {/* Section Title */}
                     <div className="mb-2">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             APP/URL CLASSIFICATION
                         </span>
                     </div>
@@ -247,7 +247,7 @@ export default function AppUrlPage() {
                         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
                             {/* Job Type Filter */}
                             <div className="flex flex-col w-full sm:w-auto">
-                                <span className="text-[10px] font-semibold text-gray-400 uppercase mb-1.5 flex items-center gap-1">
+                                <span className="text-[10px] font-normal text-gray-400 uppercase mb-1.5 flex items-center gap-1">
                                     JOB TYPE
                                     <Info className="w-3 h-3" />
                                 </span>
@@ -266,7 +266,7 @@ export default function AppUrlPage() {
 
                             {/* Sort By Filter */}
                             <div className="flex flex-col w-full sm:w-auto">
-                                <span className="text-[10px] font-semibold text-gray-400 uppercase mb-1.5">
+                                <span className="text-[10px] font-normal text-gray-400 uppercase mb-1.5">
                                     SORT BY
                                 </span>
                                 <Select value={sortBy} onValueChange={setSortBy}>
@@ -295,13 +295,13 @@ export default function AppUrlPage() {
                             </SheetTrigger>
                             <SheetContent side="right" className="w-[300px] sm:w-[500px] p-6">
                                 <SheetHeader className="mb-6">
-                                    <SheetTitle className="text-sm font-semibold text-gray-400 uppercase tracking-wider text-left">FILTERS</SheetTitle>
+                                    <SheetTitle className="text-sm font-normal text-gray-400 uppercase tracking-wider text-left">FILTERS</SheetTitle>
                                     <div className="w-16 h-0.5 bg-gray-400"></div>
                                 </SheetHeader>
 
                                 {/* Classification Filter */}
                                 <div className="mb-6">
-                                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider block mb-2">
                                         CLASSIFICATION
                                     </span>
                                     <Select value={filterClassification} onValueChange={setFilterClassification}>
@@ -318,7 +318,7 @@ export default function AppUrlPage() {
 
                                 {/* Type of Items Filter */}
                                 <div className="mb-8">
-                                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider block mb-2">
                                         TYPE OF ITEMS
                                     </span>
                                     <Select value={filterTypeOfItems} onValueChange={setFilterTypeOfItems}>
@@ -350,9 +350,9 @@ export default function AppUrlPage() {
 
                     {/* Table Header - Hidden on mobile */}
                     <div className="hidden sm:grid grid-cols-3 gap-4 py-3 border-b border-gray-200">
-                        <span className="text-xs font-semibold text-gray-600 uppercase">App/URL</span>
-                        <span className="text-xs font-semibold text-gray-600 uppercase text-center">Classification</span>
-                        <span className="text-xs font-semibold text-gray-600 uppercase text-right flex items-center justify-end gap-1">
+                        <span className="text-xs font-normal text-gray-600 uppercase">App/URL</span>
+                        <span className="text-xs font-normal text-gray-600 uppercase text-center">Classification</span>
+                        <span className="text-xs font-normal text-gray-600 uppercase text-right flex items-center justify-end gap-1">
                             Category
                             <Info className="w-3 h-3 text-gray-400" />
                         </span>

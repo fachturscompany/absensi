@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
 import { ShieldCheck } from "lucide-react"
@@ -111,12 +111,12 @@ export default function HolidaysPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <h2 className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">
                                     HOLIDAYS
                                 </h2>
                                 <Info className="w-3.5 h-3.5 text-slate-300" />
                             </div>
-                            <p className="text-xl font-bold text-slate-900 tracking-tight">
+                            <p className="text-xl font-normal text-slate-900 tracking-tight">
                                 Set up holidays for time off
                             </p>
                         </div>
@@ -176,7 +176,7 @@ export default function HolidaysPage() {
                                             <td className="px-0 py-2 sm:py-5 text-right sm:table-cell">
                                                 <div className="flex justify-between items-center sm:justify-end gap-2">
                                                     <div className="sm:hidden flex flex-col items-start gap-1">
-                                                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Recurring</span>
+                                                        <span className="text-[11px] font-normal text-slate-400 uppercase tracking-wider">Recurring</span>
                                                         <span className="text-xs text-slate-600">{holiday.occursAnnually ? "Yes" : "No"}</span>
                                                     </div>
                                                     <DropdownMenu>
@@ -219,7 +219,7 @@ export default function HolidaysPage() {
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center bg-slate-50/30 rounded-lg border border-dashed border-slate-200">
                             <Gift className="w-16 h-16 text-slate-200 mb-4" />
-                            <h2 className="text-lg font-semibold text-slate-900 mb-1">
+                            <h2 className="text-lg font-normal text-slate-900 mb-1">
                                 No holidays added
                             </h2>
                             <p className="text-slate-500 mb-6 max-w-xs">

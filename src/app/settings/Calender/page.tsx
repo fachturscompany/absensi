@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import { Info } from "lucide-react"
@@ -37,7 +37,7 @@ export default function SchedulePage() {
                 <div className="flex-1 p-4 md:p-6 w-full overflow-x-hidden">
                     {/* Section Title */}
                     <div className="flex items-center gap-1 mb-2">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             CALENDAR TYPE
                         </span>
                         <Info className="w-3.5 h-3.5 text-gray-400" />
@@ -50,7 +50,7 @@ export default function SchedulePage() {
 
                     {/* All Users Label */}
                     <div className="flex items-center gap-1 mb-3">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             ALL USERS
                         </span>
                         <Info className="w-3.5 h-3.5 text-gray-400" />

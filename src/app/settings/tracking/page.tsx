@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Info, Search, Loader2, ChevronLeft, ChevronRight, Activity } from "lucide-react"
@@ -80,7 +80,7 @@ export default function TrackingPage() {
                 <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                     {/* Section Title */}
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-normal text-slate-500 uppercase tracking-wider">
                             KEEP IDLE TIME
                         </span>
                         <Info className="h-4 w-4 text-slate-400" />
@@ -93,7 +93,7 @@ export default function TrackingPage() {
 
                     {/* Global Setting */}
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-normal text-slate-500 uppercase tracking-wider">
                             GLOBAL:
                         </span>
                         <Info className="h-4 w-4 text-slate-400" />
@@ -133,7 +133,7 @@ export default function TrackingPage() {
                     {/* Individual Settings Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">Individual settings</h3>
+                            <h3 className="text-lg font-normal text-slate-900">Individual settings</h3>
                             <p className="text-sm text-slate-500">Override the organization default for specific members</p>
                         </div>
                         <div className="relative">
@@ -151,7 +151,7 @@ export default function TrackingPage() {
                     {/* Members Table */}
                     <div className="border-t border-slate-200">
                         <div className="py-3 border-b border-slate-200">
-                            <span className="text-sm font-semibold text-slate-900">Name</span>
+                            <span className="text-sm font-normal text-slate-900">Name</span>
                         </div>
                         {loading ? (
                             <div className="py-8 text-center text-sm text-slate-500">

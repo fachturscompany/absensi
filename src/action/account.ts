@@ -17,10 +17,12 @@ interface AccountData {
 }
 
 interface Base64UploadData {
-  base64Data: string;
+  base64Data: string;       // Cropped+compressed → goes to mass-profile/thumb/
   fileName: string;
   fileType: string;
   fileSize: number;
+  originalBase64Data?: string; // Full original photo (pre-crop) → goes to mass-profile/original/
+  originalFileType?: string;
 }
 
 // Get current user account data
@@ -318,6 +320,7 @@ export async function uploadProfilePhotoBase64(uploadData: Base64UploadData): Pr
   success: boolean;
   message: string;
   url?: string;
+  thumbUrl?: string;
   oldPhotoDeleted?: boolean;
 }> {
   try {
@@ -331,7 +334,7 @@ export async function uploadProfilePhotoBase64(uploadData: Base64UploadData): Pr
       return { success: false, message: "User not authenticated" };
     }
 
-    const { base64Data, fileName, fileType, fileSize } = uploadData;
+    const { base64Data, fileName, fileType, fileSize, originalBase64Data } = uploadData;
 
     // Validate input
     if (!base64Data || !fileName || !fileType) {
@@ -343,6 +346,7 @@ export async function uploadProfilePhotoBase64(uploadData: Base64UploadData): Pr
       fileType,
       fileSize,
       base64Length: base64Data.length,
+      hasOriginal: !!originalBase64Data,
       userId: user.id
     });
 
@@ -367,126 +371,147 @@ export async function uploadProfilePhotoBase64(uploadData: Base64UploadData): Pr
       accountLogger.error('Profile fetch error:', profileError);
     }
 
-    // Folder structure: mass-profile/ (users/ folder is deprecated)
-    const userFolder = `mass-profile`;
-
-    // Create unique filename (we may change extension after compression)
     const origExt = fileName.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/gi, '') || 'jpg';
     const timestamp = Date.now();
-    const baseFileName = `profile_${timestamp}`;
+    const baseFileName = `profile_${user.id}_${timestamp}`;
 
     try {
       if (typeof Buffer === "undefined") {
         throw new Error("File uploads are not supported in this deployment environment");
       }
 
-      // Convert base64 to buffer
-      const originalBuffer = Buffer.from(base64Data, 'base64');
-      accountLogger.debug('Buffer created:', { size: originalBuffer.length });
+      // base64Data = cropped+compressed blob from client → will become thumb
+      const croppedBuffer = Buffer.from(base64Data, 'base64');
+      accountLogger.debug('Cropped buffer created:', { size: croppedBuffer.length });
 
-      // Try server-side compression using sharp
-      let finalBuffer = originalBuffer;
-      let finalContentType = 'image/webp';
-      let finalExt = 'webp';
+      let thumbBuffer: Buffer | null = null;
+      let originalUploadBuffer: Buffer | null = null;
+      let originalContentType = 'image/webp';
+      let originalExt = 'webp';
 
-      // Skip compression for GIF to preserve animation
+      // GIF: skip all processing to preserve animation
       if (fileType === 'image/gif') {
-        finalBuffer = originalBuffer;
-        finalContentType = fileType;
-        finalExt = 'gif';
-        accountLogger.debug('GIF detected, skipping compression to preserve animation');
+        originalContentType = 'image/gif';
+        originalExt = 'gif';
+        accountLogger.debug('GIF detected, skipping compression');
       } else {
         try {
           const sharp = (await import('sharp')).default;
-          const compressed = await sharp(originalBuffer)
+
+          // Process the ORIGINAL photo (pre-crop) for mass-profile/original/
+          // If client sent original base64, use it. Otherwise fall back to croppedBuffer.
+          const sourceBufferForOriginal = originalBase64Data
+            ? Buffer.from(originalBase64Data, 'base64')
+            : croppedBuffer;
+
+          const originalProcessed = await sharp(sourceBufferForOriginal)
             .rotate()
-            .resize(400, 400, { fit: 'cover', withoutEnlargement: true })
+            .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 90 })
+            .toBuffer();
+          originalUploadBuffer = Buffer.from(originalProcessed);
+
+          // Process the CROPPED photo for mass-profile/thumb/ (already cropped on client)
+          const thumbProcessed = await sharp(croppedBuffer)
+            .rotate()
+            .resize(150, 150, { fit: 'cover', position: 'center' })
             .webp({ quality: 85 })
             .toBuffer();
+          thumbBuffer = Buffer.from(thumbProcessed);
 
-          // Only use compressed if it's actually smaller
-          if (compressed.length < originalBuffer.length) {
-            finalBuffer = Buffer.from(compressed);
-            accountLogger.debug('Compression applied:', { originalSize: originalBuffer.length, compressedSize: compressed.length });
-          } else {
-            finalBuffer = originalBuffer;
-            // If not smaller, use original type/ext
-            finalContentType = fileType;
-            finalExt = origExt;
-            accountLogger.debug('Compression skipped (no size benefit).');
-          }
+          accountLogger.debug('Sharp processing done:', {
+            original: originalUploadBuffer.length,
+            thumb: thumbBuffer.length,
+          });
         } catch (e) {
-          // If sharp fails (e.g., not installed), fall back to original
-          finalBuffer = originalBuffer;
-          finalContentType = fileType;
-          finalExt = origExt;
-          accountLogger.warn('Image compression unavailable, uploading original buffer:', e instanceof Error ? e.message : e);
+          // Fallback: upload croppedBuffer for both
+          originalUploadBuffer = croppedBuffer;
+          originalContentType = fileType;
+          originalExt = origExt;
+          accountLogger.warn('Sharp unavailable, fallback to original:', e instanceof Error ? e.message : e);
         }
       }
 
-      const newFileName = `${baseFileName}.${finalExt}`;
-      const filePath = `${userFolder}/${newFileName}`;
+      // --- Upload Original (pre-crop full photo) ---
+      const originalFileName = `${baseFileName}_original.${originalExt}`;
+      const originalPath = `mass-profile/original/${originalFileName}`;
 
-      accountLogger.debug('Upload path:', filePath);
-      accountLogger.debug('User folder:', userFolder);
-
-      // Upload buffer to Supabase Storage
-      const { error: uploadError, data: uploadResult } = await supabase.storage
+      const { error: origUploadError } = await supabase.storage
         .from('profile-photos')
-        .upload(filePath, finalBuffer, {
+        .upload(originalPath, originalUploadBuffer ?? croppedBuffer, {
           cacheControl: '3600',
-          upsert: false, // Don't overwrite, create new file
-          contentType: finalContentType,
+          upsert: false,
+          contentType: originalContentType,
         });
 
-      if (uploadError) {
-        accountLogger.error('Supabase upload error:', uploadError);
-        return {
-          success: false,
-          message: `Upload failed: ${uploadError.message}`,
-        };
+      if (origUploadError) {
+        accountLogger.error('Original upload error:', origUploadError);
+        return { success: false, message: `Upload failed: ${origUploadError.message}` };
       }
 
-      accountLogger.debug('Upload successful:', uploadResult);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl: originalPublicUrl } } = supabase.storage
         .from('profile-photos')
-        .getPublicUrl(filePath);
+        .getPublicUrl(originalPath);
 
-      accountLogger.debug('Public URL:', publicUrl);
+      // --- Upload Thumbnail (cropped version) ---
+      let thumbPublicUrl: string | null = null;
+      if (thumbBuffer) {
+        const thumbFileName = `${baseFileName}_thumb.webp`;
+        const thumbPath = `mass-profile/thumb/${thumbFileName}`;
 
-      // Delete old photo if exists
+        const { error: thumbUploadError } = await supabase.storage
+          .from('profile-photos')
+          .upload(thumbPath, thumbBuffer, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: 'image/webp',
+          });
+
+        if (thumbUploadError) {
+          accountLogger.warn('Thumbnail upload error (non-fatal):', thumbUploadError);
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('profile-photos')
+            .getPublicUrl(thumbPath);
+          thumbPublicUrl = publicUrl;
+        }
+      }
+
+      accountLogger.debug('Both versions uploaded:', { originalPublicUrl, thumbPublicUrl });
+
+      // --- Delete old photos (best-effort) ---
       let oldPhotoDeleted = false;
       if (currentProfile?.profile_photo_url) {
         const deleteResult = await deleteOldProfilePhoto(currentProfile.profile_photo_url);
         oldPhotoDeleted = deleteResult.success;
-
         if (!deleteResult.success) {
-          accountLogger.warn('Failed to delete old photo, but continuing with upload:', deleteResult.message);
+          accountLogger.warn('Could not delete old original photo:', deleteResult.message);
         }
       }
 
-      // Update user profile with new photo URL
-      const updateResult = await updateProfilePhoto(publicUrl);
+      // --- Update database with both URLs ---
+      const { error: dbError } = await supabase
+        .from('user_profiles')
+        .update({
+          profile_photo_url: originalPublicUrl,
+          ...(thumbPublicUrl ? { profile_photo_thumb_url: thumbPublicUrl } : {}),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
 
-      if (!updateResult.success) {
-        accountLogger.error('Profile update error:', updateResult.message);
-
-        // If profile update fails, delete the uploaded file to maintain consistency
-        try {
-          await supabase.storage.from('profile-photos').remove([filePath]);
-        } catch (cleanupError) {
-          accountLogger.error('Cleanup error:', cleanupError);
-        }
-
-        return updateResult;
+      if (dbError) {
+        accountLogger.error('DB update error:', dbError);
+        await supabase.storage.from('profile-photos').remove([originalPath]);
+        return { success: false, message: `DB update failed: ${dbError.message}` };
       }
+
+      revalidatePath('/account');
 
       return {
         success: true,
-        message: 'Profile photo uploaded successfully',
-        url: publicUrl,
+        message: 'Profile photo uploaded successfully (2 versions)',
+        url: originalPublicUrl,
+        thumbUrl: thumbPublicUrl ?? undefined,
         oldPhotoDeleted,
       };
     } catch (bufferError: unknown) {
@@ -496,6 +521,8 @@ export async function uploadProfilePhotoBase64(uploadData: Base64UploadData): Pr
         message: `Failed to process image data: ${bufferError instanceof Error ? bufferError.message : 'Unknown error'}`,
       };
     }
+
+
   } catch (error: unknown) {
     accountLogger.error('Upload profile photo base64 error:', error);
     return {

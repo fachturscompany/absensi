@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import {
@@ -45,6 +45,9 @@ export default function AllowProjectTrackingPage() {
     ]
 
     const sidebarItems: SidebarItem[] = [
+        { id: "default-roles", label: "Default project role", href: "/settings/project&task" },
+        { id: "complete-todos", label: "Complete to-dos", href: "/settings/project&task/complete-todos" },
+        { id: "manage-todos", label: "Manage to-dos", href: "/settings/project&task/manage-todos" },
         { id: "allow-project-tracking", label: "Allow project tracking", href: "/settings/project&task/allow-project-tracking" },
         { id: "global-todos", label: "Global to-dos", href: "/settings/project&task/global-todos" },
     ]
@@ -65,7 +68,7 @@ export default function AllowProjectTrackingPage() {
                 <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                     {/* Section Title */}
                     <div className="flex items-center gap-1 mb-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">
                             ALLOW PROJECT TRACKING
                         </span>
                         <Info className="w-3.5 h-3.5 text-slate-300" />
@@ -78,7 +81,7 @@ export default function AllowProjectTrackingPage() {
 
                     {/* Global Setting */}
                     <div className="flex items-center gap-1 mb-4">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">
                             GLOBAL SETTING:
                         </span>
                         <Info className="w-3.5 h-3.5 text-slate-300" />
@@ -91,14 +94,14 @@ export default function AllowProjectTrackingPage() {
                                 onCheckedChange={setGlobalEnabled}
                                 className="data-[state=checked]:bg-slate-900"
                             />
-                            <span className="text-sm font-bold text-slate-900 uppercase tracking-tight">Enable tracking for all projects</span>
+                            <span className="text-sm font-normal text-slate-900 uppercase tracking-tight">Enable tracking for all projects</span>
                         </div>
                     </div>
 
                     {/* Individual Settings Section */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
                         <div>
-                            <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-1">Individual settings</h3>
+                            <h3 className="text-lg font-normal text-slate-900 tracking-tight mb-1">Individual settings</h3>
                             <p className="text-sm text-slate-500 leading-relaxed">Override the organization default for specific projects</p>
                         </div>
                         <div className="relative w-full sm:w-auto">
@@ -117,22 +120,22 @@ export default function AllowProjectTrackingPage() {
                     <div className="mt-8">
                         {/* Table Header - Hidden on mobile */}
                         <div className="hidden sm:grid grid-cols-3 py-3 border-b border-slate-100 px-2">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Project</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tasks</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Tracking</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Project</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Tasks</span>
+                            <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest text-right">Tracking</span>
                         </div>
 
                         {/* Table Body */}
                         <div className="divide-y divide-slate-100">
                             {filteredProjects.map((project) => (
                                 <div key={project.id} className="flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:items-center py-5 hover:bg-slate-50/50 px-2 rounded-xl transition-colors group">
-                                    <span className="text-sm font-semibold text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{project.name}</span>
+                                    <span className="text-sm font-normal text-slate-900 group-hover:text-slate-950 transition-colors uppercase tracking-tight">{project.name}</span>
                                     <div className="flex items-center justify-between sm:justify-start gap-4">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest sm:hidden">Tasks:</span>
-                                        <span className="text-sm font-bold text-slate-500 bg-slate-100/50 px-2.5 py-0.5 rounded-full border border-slate-200/50">{project.tasks}</span>
+                                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest sm:hidden">Tasks:</span>
+                                        <span className="text-sm font-normal text-slate-500 bg-slate-100/50 px-2.5 py-0.5 rounded-full border border-slate-200/50">{project.tasks}</span>
                                     </div>
                                     <div className="flex items-center justify-between sm:justify-end gap-4">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest sm:hidden">Tracking:</span>
+                                        <span className="text-[10px] font-normal text-slate-400 uppercase tracking-widest sm:hidden">Tracking:</span>
                                         <Switch
                                             checked={project.trackingEnabled}
                                             onCheckedChange={(checked) => handleProjectTrackingChange(project.id, checked)}

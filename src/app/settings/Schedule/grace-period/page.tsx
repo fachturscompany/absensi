@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useMemo } from "react"
 import { Calendar, Search, Info, User } from "lucide-react"
@@ -85,7 +85,7 @@ export default function GracePeriodPage() {
                 <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                     {/* Section Title */}
                     <div className="flex items-center gap-1 mb-2">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             GRACE PERIOD
                         </span>
                         <Info className="w-3.5 h-3.5 text-gray-400" />
@@ -98,7 +98,7 @@ export default function GracePeriodPage() {
 
                     {/* Global Label */}
                     <div className="flex items-center gap-1 mb-3">
-                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[11px] font-normal text-gray-500 uppercase tracking-wider">
                             GLOBAL:
                         </span>
                         <Info className="w-3.5 h-3.5 text-gray-400" />
@@ -129,7 +129,7 @@ export default function GracePeriodPage() {
                     {/* Individual Settings Section */}
                     <div className="flex items-center justify-between mb-2">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">Individual settings</h3>
+                            <h3 className="text-lg font-normal text-gray-900 mb-1">Individual settings</h3>
                             <p className="text-sm text-gray-500">Override the organization default for specific members</p>
                         </div>
                         <div className="relative">
@@ -148,7 +148,7 @@ export default function GracePeriodPage() {
                     <div className="mt-6">
                         {/* Table Header */}
                         <div className="py-3 border-b border-gray-200">
-                            <span className="text-sm font-semibold text-gray-900">Name</span>
+                            <span className="text-sm font-normal text-gray-900">Name</span>
                         </div>
 
                         {/* Table Body */}
