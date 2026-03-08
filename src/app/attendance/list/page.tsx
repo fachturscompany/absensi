@@ -54,6 +54,8 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
       late: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
       absent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
       leave: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      early_leave: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+      excused: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     }
     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400"
   }
@@ -66,6 +68,10 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         return <Timer className="h-3 w-3" />;
       case 'absent':
         return <XCircle className="h-3 w-3" />;
+      case 'leave':
+      case 'excused':
+      case 'early_leave':
+        return <AlertCircle className="h-3 w-3" />;
       default:
         return <AlertCircle className="h-3 w-3" />;
     }
@@ -174,7 +180,7 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
           {getStatusIcon(record.status)}
           <span className="capitalize">
             {record.status
-              ? record.status.charAt(0).toUpperCase() + record.status.slice(1)
+              ? record.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
               : "Unknown"}
           </span>
         </Badge>

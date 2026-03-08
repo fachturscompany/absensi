@@ -697,33 +697,17 @@ export async function createManualAttendance(payload: ManualAttendancePayload) {
       check_in: payload.actual_check_in,
     });
 
-    // Compute status based on schedule rule
-    const memberIdNum = Number(payload.organization_member_id);
-    const rule = Number.isFinite(memberIdNum)
-      ? await resolveScheduleRuleForMemberDate(supabase, memberIdNum, payload.attendance_date)
-      : null;
-    let computedStatus = 'absent' as string;
-    let lateMinutes: number | null = null;
-    let earlyLeaveMinutes: number | null = null;
-    let overtimeMinutes: number | null = null;
-    if (rule) {
-      const result = calculateAttendanceStatus(payload.actual_check_in ?? null, payload.actual_check_out ?? null, rule);
-      computedStatus = result.status;
-      lateMinutes = result.details.lateMinutes ?? null;
-      earlyLeaveMinutes = result.details.earlyLeaveMinutes ?? null;
-      overtimeMinutes = result.details.overtimeMinutes ?? null;
-    }
-
     const insertPayload: ManualAttendancePayload & {
       late_minutes?: number | null;
       early_leave_minutes?: number | null;
       overtime_minutes?: number | null;
     } = {
       ...payload,
-      status: computedStatus,
-      late_minutes: lateMinutes,
-      early_leave_minutes: earlyLeaveMinutes,
-      overtime_minutes: overtimeMinutes,
+      // Use the status provided from the client payload instead of computing it
+      status: payload.status,
+      late_minutes: null,
+      early_leave_minutes: null,
+      overtime_minutes: null,
     };
 
     const { error } = await supabase.from("attendance_records").insert([insertPayload]);
