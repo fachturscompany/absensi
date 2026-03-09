@@ -189,6 +189,7 @@ export type AttendanceListItem = {
   actualBreakEnd: string | null;
   breakInMethod: string | null;
   breakOutMethod: string | null;
+  work_duration_minutes: number | null
   notes: string;
   timezone: string;
   time_format: string;
@@ -510,6 +511,7 @@ export const getAllAttendance = async (params: GetAttendanceParams = {}): Promis
       breakInMethod: inMethod ? String(inMethod) : null,
       breakOutMethod: inMethod ? String(inMethod) : null,
       notes: '',
+      work_duration_minutes: item.work_duration_minutes,
       timezone: orgInfo?.timezone || 'Asia/Jakarta',
       time_format: orgInfo?.time_format || '24h',
     };
