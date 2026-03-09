@@ -12,7 +12,7 @@ import {
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { useProfilePhotoUrl } from "@/hooks/use-profile"
 import {

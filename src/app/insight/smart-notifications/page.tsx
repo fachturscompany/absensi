@@ -6,7 +6,7 @@ import { NOTIFICATION_TEMPLATES, DUMMY_NOTIFICATIONS } from "@/lib/data/dummy-da
 
 
 // Dialog Components
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { AddNotificationChoiceDialog } from "@/components/insights/smart-notifications/AddNotificationChoiceDialog"
 import { CustomNotificationDialog } from "@/components/insights/smart-notifications/CustomNotificationDialog"
 import { TemplateSelectionDialog } from "@/components/insights/smart-notifications/TemplateSelectionDialog"

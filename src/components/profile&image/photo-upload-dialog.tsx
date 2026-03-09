@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
@@ -42,7 +42,7 @@ export function PhotoUploadDialog({
     compressionRatio: number;
   } | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  
+
   const {
     compressImage,
     isCompressing,
@@ -87,7 +87,7 @@ export function PhotoUploadDialog({
       // Use original file without compression
       setSelectedFile(file);
       setCompressionStats(null);
-      
+
       // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -139,20 +139,20 @@ export function PhotoUploadDialog({
             Choose a new profile photo. {useCompression ? 'Images will be automatically compressed and optimized.' : 'The image should be less than 2MB.'}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Current/Preview Photo */}
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-24 w-24">
-              <AvatarImage 
-                src={previewUrl || currentPhotoUrl || ""} 
-                alt="Profile preview" 
+              <AvatarImage
+                src={previewUrl || currentPhotoUrl || ""}
+                alt="Profile preview"
               />
               <AvatarFallback className="text-lg">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            
+
             {selectedFile && (
               <div className="text-sm text-muted-foreground text-center space-y-2">
                 <p className="font-medium">{selectedFile.name}</p>
@@ -204,8 +204,8 @@ export function PhotoUploadDialog({
               disabled={loading || isCompressing}
             />
             <label htmlFor="photo-upload">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full cursor-pointer"
                 type="button"
                 asChild
@@ -223,8 +223,8 @@ export function PhotoUploadDialog({
           <div className="flex gap-2">
             {selectedFile && (
               <>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleCancel}
                   className="flex-1"
                   disabled={loading || isCompressing}
@@ -232,7 +232,7 @@ export function PhotoUploadDialog({
                   <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   onClick={handleUpload}
                   className="flex-1"
                   disabled={loading || isCompressing}

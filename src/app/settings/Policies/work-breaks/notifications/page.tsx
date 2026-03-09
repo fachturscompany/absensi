@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react"
 import { SidebarItem } from "@/components/settings/SettingsSidebar"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { Search, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 

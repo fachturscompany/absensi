@@ -28,7 +28,7 @@ import { Switch } from "@/components/ui/switch"
 
 import { IOrganization } from "@/interface"
 import { addOrganization, updateOrganization } from "@/action/organization"
-import ProfilePhotoDialog from "@/components/user/change-foto"
+import ProfilePhotoDialog from "@/components/profile&image/change-foto"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries"
 

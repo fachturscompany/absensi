@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 
@@ -9,7 +9,7 @@ import { getScreenshotSettings, upsertScreenshotSetting } from "@/action/screens
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
 import { Activity } from "lucide-react"
 import type { SidebarItem } from "@/components/settings/SettingsSidebar"
-import { MemberAvatar } from "@/components/MemberAvatar"
+import { MemberAvatar } from "@/components/profile&image/MemberAvatar"
 
 export default function ScreenshotDeletePage() {
   const { organizationId } = useOrgStore()

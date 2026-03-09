@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/profile&image/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,25 +60,25 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
   // Filter members
   const filteredMembers = members.filter((member: any) => {
     const user = member.user;
-    
+
     // Get name from user_profiles
     const fullName = user
       ? [user.first_name, user.user.last_name]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
       : '';
-    
+
     // Get email from user_profiles
     const email = (user?.email || '').toLowerCase();
-    
+
     const matchesSearch = fullName.includes(searchQuery.toLowerCase()) ||
-                         email.includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = filterStatus === 'all' || 
-                         (filterStatus === 'active' && member.is_active) ||
-                         (filterStatus === 'inactive' && !member.is_active);
-    
+      email.includes(searchQuery.toLowerCase());
+
+    const matchesStatus = filterStatus === 'all' ||
+      (filterStatus === 'active' && member.is_active) ||
+      (filterStatus === 'inactive' && !member.is_active);
+
     const memberDept = member.groupName || member.departments?.name;
     const matchesDepartment = filterDepartment === 'all' || memberDept === filterDepartment;
 
@@ -99,10 +99,10 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
     const user = (member as any).user;
     const fullName = user
       ? [user.first_name, user.user.last_name]
-          .filter(Boolean)
-          .join(' ') || user.display_name || (user.email && !user.email.toLowerCase().endsWith('@dummy.local') ? user.email : null)
+        .filter(Boolean)
+        .join(' ') || user.display_name || (user.email && !user.email.toLowerCase().endsWith('@dummy.local') ? user.email : null)
       : 'No Name';
-    
+
     const stats = getMemberStats(member);
     const department = (member as any).groupName || member.departments?.name || 'No Department';
     const position = member.positions?.title || 'No Position';
@@ -123,9 +123,9 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
             <div className="absolute top-3 right-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 bg-white/20 hover:bg-white/30 text-white border-0"
                   >
                     <MoreVertical className="h-4 w-4" />
@@ -141,7 +141,7 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
                     Edit Member
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => onDelete?.(member)}
                     className="text-red-600 focus:text-red-600"
                   >
@@ -219,18 +219,18 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
 
               {/* Actions */}
               <div className="w-full mt-4 flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
                   onClick={() => onView?.(member)}
                 >
                   <Eye className="h-3.5 w-3.5 mr-1" />
                   View
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
                   onClick={() => onEdit?.(member)}
                 >

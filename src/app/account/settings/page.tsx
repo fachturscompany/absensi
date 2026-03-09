@@ -1,5 +1,5 @@
 // import { Separator } from "@/components/ui/separator"
-import { ProfileSettingsForm } from "@/components/settings/profile-settings-form"
+import { ProfileSettingsForm } from "@/components/profile&image/profile-settings-form"
 import { createClient } from "@/utils/supabase/server"
 import { getAccountData } from "@/action/account"
 import { redirect } from "next/navigation"

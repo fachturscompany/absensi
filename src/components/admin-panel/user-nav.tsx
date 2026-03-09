@@ -5,7 +5,7 @@ import { LayoutGrid, User } from "lucide-react"
 import React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar"
 import {
   Tooltip,
   TooltipContent,

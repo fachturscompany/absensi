@@ -21,7 +21,7 @@ import { DateRangePicker } from "@/components/insights/DateRangePicker"
 import type { DateRange } from "@/components/insights/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import Link from "next/link"
 
 // ─── Types ──────────────────────────────────────────────────────────────────

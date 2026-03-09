@@ -6,7 +6,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Trash, Plus, Calendar } from "lucide-react"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import {
   Empty,
   EmptyHeader,
@@ -97,8 +97,12 @@ export default function MemberSchedulesClient({
   }
 
   const getMemberName = (schedule: IMemberSchedule) => {
-    const member = schedule.organization_member as { user?: { first_name?: string;
-last_name?: string; email?: string } }
+    const member = schedule.organization_member as {
+      user?: {
+        first_name?: string;
+        last_name?: string; email?: string
+      }
+    }
     if (!member?.user) return "Unknown Member"
     const { first_name, last_name, email } = member.user
     const parts = [first_name, last_name].filter(Boolean)

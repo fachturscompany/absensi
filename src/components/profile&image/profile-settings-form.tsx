@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { toast } from "sonner"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar"
 import {
     Form,
     FormControl,
@@ -23,7 +23,7 @@ import { useAuthStore } from "@/store/user-store"
 import { useProfilePhotoDelete, useProfilePhotoUrl } from "@/hooks/use-profile"
 import { getUserInitials, safeAvatarSrc } from "@/lib/avatar-utils"
 import { uploadProfilePhotoBase64, updateUserProfile } from "@/action/account"
-import { ImageCropperDialog } from "@/components/ui/image-cropper-dialog"
+import { ImageCropperDialog } from "@/components/profile&image/image-cropper-dialog"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Trash2 } from "lucide-react"
 import {

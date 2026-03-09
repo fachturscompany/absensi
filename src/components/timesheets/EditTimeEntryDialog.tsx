@@ -14,7 +14,7 @@ import { Calendar as CalendarIcon, Clock, Plus, Trash2, Coffee } from "lucide-re
 import { cn } from "@/lib/utils"
 import { DUMMY_PROJECTS, DUMMY_MEMBERS, DUMMY_TASKS } from "@/lib/data/dummy-data"
 import type { TimeEntry, Break } from "@/lib/data/dummy-data"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { SplitTimeEntryDialog } from "./SplitTimeEntryDialog"

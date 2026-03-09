@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/profile&image/avatar';
 import { cn } from '@/lib/utils';
 
 interface AttendanceStats {
@@ -88,7 +88,7 @@ export default function ModernCheckIn() {
 
   const handleCheckIn = async () => {
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsCheckedIn(true);
@@ -105,7 +105,7 @@ export default function ModernCheckIn() {
 
   const handleCheckOut = async () => {
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsCheckedIn(false);
@@ -152,7 +152,7 @@ export default function ModernCheckIn() {
         <Card className="relative overflow-hidden">
           {/* Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-          
+
           <CardHeader className="relative">
             <div className="flex items-center justify-between">
               <div>

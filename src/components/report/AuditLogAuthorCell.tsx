@@ -1,6 +1,6 @@
 "use client"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { cn } from "@/lib/utils"
 
 interface AuthorData {

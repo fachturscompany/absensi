@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { Info, Search, Loader2, ChevronLeft, ChevronRight, Activity } from "lucide-react"
@@ -8,7 +8,7 @@ import { getOrgSettings, upsertOrgSetting, getAllMemberSettings, upsertMemberSet
 import { SettingsHeader, SettingTab } from "@/components/settings/SettingsHeader"
 import type { SidebarItem } from "@/components/settings/SettingsSidebar"
 import { toast } from "sonner"
-import { MemberAvatar } from "@/components/MemberAvatar"
+import { MemberAvatar } from "@/components/profile&image/MemberAvatar"
 
 type TrackAppsOption = "all" | "time-tracking" | "off"
 

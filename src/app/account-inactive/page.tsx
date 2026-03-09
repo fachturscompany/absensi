@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Mail, UserX, RefreshCw, Phone } from "lucide-react";
 import { logout } from "@/action/users";
@@ -16,7 +16,7 @@ import { useProfilePhotoUrl } from "@/hooks/use-profile";
 import { accountLogger } from '@/lib/logger';
 type UserProfile = {
   first_name: string;
-last_name: string;
+  last_name: string;
   email?: string;
   phone?: string;
   mobile?: string;

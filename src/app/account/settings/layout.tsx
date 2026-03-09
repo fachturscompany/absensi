@@ -1,5 +1,5 @@
 // import { Separator } from "@/components/ui/separator"
-import { UserSettingsSidebar } from "@/components/settings/UserSettingsSidebar"
+import { UserSettingsSidebar } from "@/components/profile&image/user-settings-sidebar"
 import {
     Card,
     CardContent,

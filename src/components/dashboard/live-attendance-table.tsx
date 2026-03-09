@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserAvatar } from '@/components/common/user-avatar';
+import { UserAvatar } from '@/components/profile&image/user-avatar';
 import { Button } from '@/components/ui/button';
 import {
   Table,

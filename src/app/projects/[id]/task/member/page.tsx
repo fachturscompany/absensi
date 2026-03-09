@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState, use, useEffect } from "react"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"

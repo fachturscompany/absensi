@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -52,7 +52,7 @@ import { useAuthStore } from "@/store/user-store";
 import { useProfileRefresh, useProfilePhotoUrl } from "@/hooks/use-profile";
 import { safeAvatarSrc, getUserInitials } from "@/lib/avatar-utils";
 import { accountLogger } from '@/lib/logger';
-import { ImageCropperDialog } from "@/components/ui/image-cropper-dialog";
+import { ImageCropperDialog } from "@/components/profile&image/image-cropper-dialog";
 
 interface UserProfile extends Partial<IUser> {
   email?: string;

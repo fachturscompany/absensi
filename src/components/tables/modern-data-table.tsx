@@ -56,7 +56,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/profile&image/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Sample data type

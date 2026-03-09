@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { InsightsHeader } from "@/components/insights/InsightsHeader"
 import { InsightsRightSidebar } from "@/components/insights/InsightsRightSidebar"
 import { DUMMY_MEMBERS, DUMMY_TEAMS } from "@/lib/data/dummy-data"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { DUMMY_UNUSUAL_ACTIVITIES, getActivityStats } from "@/lib/data/dummy-data"
 import type { SelectedFilter, DateRange } from "@/components/insights/types"
 

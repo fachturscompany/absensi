@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/profile&image/avatar';
 import {
   Dialog,
   DialogContent,
@@ -24,10 +24,10 @@ interface AttendanceCalendarViewProps {
   employeePhoto?: string;
 }
 
-export function AttendanceCalendarView({ 
-  attendanceData, 
+export function AttendanceCalendarView({
+  attendanceData,
   employeeName = 'Employee',
-  employeePhoto 
+  employeePhoto
 }: AttendanceCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -97,7 +97,7 @@ export function AttendanceCalendarView({
     const late = attendanceData.filter(a => a.status === 'late').length;
     const absent = attendanceData.filter(a => a.status === 'absent').length;
     const avgDuration = attendanceData.reduce((sum, a) => sum + (a.work_duration_minutes || 0), 0) / total || 0;
-    
+
     return { total, present, late, absent, avgDuration };
   }, [attendanceData]);
 
@@ -253,8 +253,8 @@ export function AttendanceCalendarView({
                       !hasAttendance && 'bg-muted/30 border-muted',
                     )}
                     style={{
-                      backgroundColor: hasAttendance 
-                        ? `rgba(34, 197, 94, ${intensity})` 
+                      backgroundColor: hasAttendance
+                        ? `rgba(34, 197, 94, ${intensity})`
                         : undefined,
                       borderColor: hasAttendance
                         ? `rgba(34, 197, 94, ${Math.min(intensity + 0.3, 1)})`
@@ -328,9 +328,9 @@ export function AttendanceCalendarView({
                 {/* Status Badge */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge 
-                    variant={selectedAttendance.status === 'present' ? 'default' : 
-                            selectedAttendance.status === 'late' ? 'secondary' : 'destructive'}
+                  <Badge
+                    variant={selectedAttendance.status === 'present' ? 'default' :
+                      selectedAttendance.status === 'late' ? 'secondary' : 'destructive'}
                     className="text-base px-4 py-1"
                   >
                     {selectedAttendance.status?.toUpperCase()}
@@ -343,7 +343,7 @@ export function AttendanceCalendarView({
                     <Clock className="h-4 w-4" />
                     Work Timeline
                   </h4>
-                  
+
                   {/* Timeline Bar */}
                   <div className="relative h-16 bg-muted rounded-lg overflow-hidden">
                     {/* Hour markers */}
@@ -367,7 +367,7 @@ export function AttendanceCalendarView({
                             right: `${100 - (checkOutHour / 24) * 100}%`
                           }}
                         >
-                          {selectedAttendance.work_duration_minutes && 
+                          {selectedAttendance.work_duration_minutes &&
                             `${Math.floor(selectedAttendance.work_duration_minutes / 60)}h ${selectedAttendance.work_duration_minutes % 60}m`
                           }
                         </motion.div>
@@ -404,7 +404,7 @@ export function AttendanceCalendarView({
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Work Duration</p>
                     <p className="text-lg font-semibold">
-                      {selectedAttendance.work_duration_minutes 
+                      {selectedAttendance.work_duration_minutes
                         ? `${Math.floor(selectedAttendance.work_duration_minutes / 60)}h ${selectedAttendance.work_duration_minutes % 60}m`
                         : (selectedAttendance.actual_check_in ? '8h' : 'N/A')
                       }
@@ -413,7 +413,7 @@ export function AttendanceCalendarView({
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Overtime</p>
                     <p className="text-lg font-semibold">
-                      {selectedAttendance.overtime_minutes 
+                      {selectedAttendance.overtime_minutes
                         ? `${selectedAttendance.overtime_minutes}m`
                         : '0m'
                       }

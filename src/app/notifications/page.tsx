@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import type { CheckedState } from "@radix-ui/react-checkbox";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -102,7 +102,7 @@ export default function NotificationsPage() {
   const transformedNotifications = useMemo(() => {
     return apiNotifications.map((apiNotif, index) => {
       const relativeTime = formatRelativeTime(apiNotif.timestamp);
-      
+
       let sender = "System";
       let subject = "";
       let snippet = "";

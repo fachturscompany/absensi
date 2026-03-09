@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { Info, Search, Loader2 } from "lucide-react"
@@ -9,7 +9,7 @@ import { useOrgStore } from "@/store/org-store"
 import { getMembersForScreenshot } from "@/action/screenshots"
 import { getOrgSettings, upsertOrgSetting, getAllMemberSettings, upsertMemberSetting } from "@/action/organization-settings"
 import { toast } from "sonner"
-import { MemberAvatar } from "@/components/MemberAvatar"
+import { MemberAvatar } from "@/components/profile&image/MemberAvatar"
 
 interface MemberWithSetting {
   id: string

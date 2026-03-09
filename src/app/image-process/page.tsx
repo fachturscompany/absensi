@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import ClientCompression from "@/components/client-side/ClientCompression";
-import ServerResize from "@/components/server-side/ServerResize";
+import ServerResize from "@/components/profile&image/ServerResize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowDown } from "lucide-react";

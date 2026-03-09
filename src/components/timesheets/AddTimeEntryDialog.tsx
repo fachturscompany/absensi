@@ -14,7 +14,7 @@ import { Calendar as CalendarIcon, Clock, HelpCircle, Plus, Trash2, Coffee } fro
 import { cn } from "@/lib/utils"
 import type { TimeEntry, Break } from "@/lib/data/dummy-data"
 import type { TimesheetMember, TimesheetProject, TimesheetTask } from "@/action/timesheets"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 

@@ -4,7 +4,7 @@ import React from "react"
 import { IOrganization_member } from "@/interface"
 import { Button } from "@/components/ui/button"
 import { Trash, Pencil, Eye, Check, X } from "lucide-react"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import { useRouter } from "next/navigation"
 
 import {

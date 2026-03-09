@@ -24,7 +24,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import {
   Search, RotateCcw, Plus, Download, Edit, Trash2, CheckCircle2, Timer, XCircle, AlertCircle,
 } from "lucide-react"
-import { UserAvatar } from "@/components/common/user-avatar"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PaginationFooter } from "@/components/tables/pagination-footer"

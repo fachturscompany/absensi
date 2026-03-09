@@ -17,7 +17,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar";
 import { Button } from "@/components/ui/button";
 
 const users = [

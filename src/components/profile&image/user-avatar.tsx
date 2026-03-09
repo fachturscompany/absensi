@@ -1,6 +1,7 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/profile&image/avatar";
 import { useProfilePhotoUrl } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
 
@@ -21,11 +22,19 @@ function initialsFromName(name: string): string {
 
 export function UserAvatar({ name, photoUrl: rawPhotoUrl, userId, className, size }: UserAvatarProps) {
     const photoUrl = useProfilePhotoUrl(rawPhotoUrl ?? undefined, userId);
+    const [hasError, setHasError] = useState(false);
     const sz = size ? `h-${size} w-${size}` : "h-8 w-8";
 
     return (
         <Avatar className={cn(sz, className)}>
-            {photoUrl && <AvatarImage src={photoUrl} alt={name} className="object-cover" />}
+            {photoUrl && !hasError && (
+                <AvatarImage
+                    src={photoUrl}
+                    alt={name}
+                    className="object-cover"
+                    onError={() => setHasError(true)}
+                />
+            )}
             <AvatarFallback className="text-[10px] bg-gray-100 text-gray-700">
                 {initialsFromName(name)}
             </AvatarFallback>

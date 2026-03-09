@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { getAccountData } from "@/action/account"
 import { redirect } from "next/navigation"
-import { AccountSettingsForm } from "@/components/settings/account-settings-form"
+import { AccountSettingsForm } from "@/components/profile&image/account-settings-form"
 import { Card, CardContent } from "@/components/ui/card"
 
 export default async function SettingsAccountPage() {

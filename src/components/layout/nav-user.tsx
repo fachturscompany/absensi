@@ -2,7 +2,7 @@
 
 import { useEffect, useState, memo } from 'react';
 import { EllipsisVertical, CircleUser, LogOut } from 'lucide-react';
-import { UserAvatar } from '@/components/common/user-avatar';
+import { UserAvatar } from '@/components/profile&image/user-avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,

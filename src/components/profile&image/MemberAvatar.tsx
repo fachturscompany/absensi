@@ -1,8 +1,8 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { User } from "lucide-react"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/profile&image/avatar"
 import { cn } from "@/lib/utils"
 
 interface MemberAvatarProps {
@@ -13,13 +13,18 @@ interface MemberAvatarProps {
 }
 
 export function MemberAvatar({ src, name, className, fallbackClassName }: MemberAvatarProps) {
+    const [hasError, setHasError] = useState(false)
+
     return (
         <Avatar className={cn("w-8 h-8 rounded-full border border-gray-200 shrink-0", className)}>
-            <AvatarImage
-                src={src || undefined}
-                alt={name || "Member"}
-                className="object-cover"
-            />
+            {src && !hasError && (
+                <AvatarImage
+                    src={src}
+                    alt={name || "Member"}
+                    className="object-cover"
+                    onError={() => setHasError(true)}
+                />
+            )}
             <AvatarFallback className={cn("bg-gray-100", fallbackClassName)}>
                 <User className="w-4 h-4 text-gray-500" />
             </AvatarFallback>
