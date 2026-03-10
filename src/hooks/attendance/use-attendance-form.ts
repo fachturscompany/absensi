@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import { useEffect, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
@@ -22,8 +22,7 @@ export function useAttendanceForm() {
     },
   })
 
-  // Initialize current date/time on mount
-  React.useEffect(() => {
+  useEffect(() => {  
     const now = new Date()
     const date = format(now, 'yyyy-MM-dd')
     const time = format(now, 'HH:mm')
@@ -38,14 +37,29 @@ export function useAttendanceForm() {
     })
   }, [])
 
-  // Sync checkOutDate with checkInDate
   const singleCheckInDate = form.watch('checkInDate')
-  React.useEffect(() => {
+  useEffect(() => {
     form.setValue('checkOutDate', singleCheckInDate || '')
-  }, [singleCheckInDate, form.setValue])
+  }, [singleCheckInDate, form]) 
+
+  const resetForm = useCallback(() => {
+    const now = new Date()
+    const date = format(now, 'yyyy-MM-dd')
+    const time = format(now, 'HH:mm')
+    form.reset({
+      memberId: "",
+      checkInDate: date,
+      checkInTime: time,
+      checkOutDate: date,
+      checkOutTime: time,
+      status: "present",
+      remarks: "",
+    })
+  }, [form])
 
   return {
     form,
     singleCheckInDate,
+    resetForm,
   }
 }

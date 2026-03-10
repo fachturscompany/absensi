@@ -1,9 +1,8 @@
-// hooks/attendance/use-members.ts
 import { useQuery } from "@tanstack/react-query"
 import { IOrganization_member } from "@/interface"
 import { useOrganizationId } from "../use-organization-id"
 import { memberLogger } from '@/lib/logger';
-import { type MemberOption } from "@/types/attendance"  // TAMBAH INI
+import { type MemberOption } from "@/types/attendance"
 
 export function useMembers() {
   const { data: organizationId } = useOrganizationId()
@@ -15,7 +14,7 @@ export function useMembers() {
       const url = new URL('/api/members', window.location.origin)
       if (organizationId) {
         url.searchParams.append('organizationId', organizationId.toString())
-        url.searchParams.set('limit', '1000')  // Ubah ke 1000
+        url.searchParams.set('limit', '1000')
         url.searchParams.set('page', '1')
         url.searchParams.set('active', 'all')
         url.searchParams.set('countMode', 'planned')

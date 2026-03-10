@@ -8,7 +8,6 @@ import { AttendanceEntry } from "@/types/attendance";
 import { attendanceLogger } from '@/lib/logger';
 import { getJSON, setJSON } from '@/lib/cache';
 import { calculateAttendanceStatus, getDayOfWeek, type ScheduleRule } from '@/lib/attendance-status-calculator';
-import { supabase } from "@/config/supabase-config";
 async function getSupabase() {
   return await createClient();
 }
@@ -807,13 +806,41 @@ export async function deleteMultipleAttendanceRecords(ids: string[]) {
   }
 }
 
-export async function bulkCreateAttendance(entries: AttendanceEntry[]) {
-  if (entries.length === 0) return { success: false, message: 'No entries' }
+export async function bulkCreateAttendance(
+  entries: AttendanceEntry[]
+): Promise<{ success: boolean; message?: string; count?: number }> {
+  if (entries.length === 0) {
+    return { success: false, message: 'No entries' }
+  }
 
-  const { data, error } = await supabase
-    .from('attendances')
-    .insert(entries)
+  try {
+    const supabase = await getSupabase();
+    
+    // ✅ TypeScript happy: destructure properly
+    const result = await supabase
+      .from('attendance_records')
+      .insert(entries)
+      .select();
 
-  if (error) return { success: false, message: error.message }
-  return { success: true, count: data?.length || 0 }
+    const data = result.data;
+    const error = result.error;
+
+    if (error) {
+      attendanceLogger.error('Bulk insert error:', error);
+      if (error.code === '23505') {
+        return { success: false, message: 'Some records already exist for these dates' };
+      }
+      return { success: false, message: error.message };
+    }
+
+    revalidatePath('/attendance', 'layout');
+    
+    return { 
+      success: true,
+      count: Number(data?.length || entries.length)
+    };
+  } catch (err) {
+    attendanceLogger.error('Bulk create exception:', err);
+    return { success: false, message: err instanceof Error ? err.message : 'Server error' };
+  }
 }
