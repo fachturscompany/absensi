@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { DUMMY_MEMBERS } from "@/lib/data/dummy-data"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Check, Info, Search, CloudUpload } from "lucide-react"
+import { Check, Info, CloudUpload } from "lucide-react"
 import { MemberSelectionModal } from "@/components/settings/MemberSelectionModal"
 
 interface AddTimeOffPolicyDialogProps {
@@ -488,7 +487,7 @@ export function AddTimeOffPolicyDialog({ open, onOpenChange, onSave, initialData
                                         <Checkbox
                                             id="allowNegative"
                                             checked={allowNegative}
-                                            onCheckedChange={(checked) => setAllowNegative(checked as boolean)}
+                                            onCheckedChange={(checked: boolean | 'indeterminate') => setAllowNegative(checked as boolean)}
                                             className="mt-1"
                                         />
                                         <div className="space-y-1">
@@ -508,7 +507,7 @@ export function AddTimeOffPolicyDialog({ open, onOpenChange, onSave, initialData
                                         <Checkbox
                                             id="rollover"
                                             checked={rollover}
-                                            onCheckedChange={(checked) => setRollover(checked as boolean)}
+                                            onCheckedChange={(checked: boolean | 'indeterminate') => setRollover(checked as boolean)}
                                             className="mt-1"
                                         />
                                         <div className="space-y-1">
@@ -528,7 +527,7 @@ export function AddTimeOffPolicyDialog({ open, onOpenChange, onSave, initialData
                                         <Checkbox
                                             id="requireApproval"
                                             checked={requireApproval}
-                                            onCheckedChange={(checked) => setRequireApproval(checked as boolean)}
+                                            onCheckedChange={(checked: boolean | 'indeterminate') => setRequireApproval(checked as boolean)}
                                             className="mt-1"
                                         />
                                         <div className="space-y-1">
@@ -650,7 +649,7 @@ export function AddTimeOffPolicyDialog({ open, onOpenChange, onSave, initialData
                                         <Checkbox
                                             id="autoAdd"
                                             checked={autoAdd}
-                                            onCheckedChange={(checked) => setAutoAdd(checked as boolean)}
+                                            onCheckedChange={(checked: boolean | 'indeterminate') => setAutoAdd(checked as boolean)}
                                         />
                                         <Label htmlFor="autoAdd" className="text-sm font-normal text-slate-700 cursor-pointer">
                                             Automatically add all new members to this policy

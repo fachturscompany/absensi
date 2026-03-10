@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 import { Calendar, Info, MapPin } from "lucide-react"
 import { SettingsHeader, SettingTab, SettingsContentLayout } from "@/components/settings/SettingsHeader"
 import type { SidebarItem } from "@/components/settings/SettingsSidebar"

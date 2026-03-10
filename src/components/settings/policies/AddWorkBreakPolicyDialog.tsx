@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DUMMY_MEMBERS } from "@/lib/data/dummy-data"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -369,7 +368,7 @@ export function AddWorkBreakPolicyDialog({ open, onOpenChange, onSave, initialDa
                         <Checkbox
                             id="notify"
                             checked={notifyMembers}
-                            onCheckedChange={(checked) => setNotifyMembers(checked as boolean)}
+                            onCheckedChange={(checked: boolean | 'indeterminate') => setNotifyMembers(checked as boolean)}
                             className="w-5 h-5 border-indigo-200 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 text-white"
                         />
                         <div className="flex items-center gap-1.5 flex-1">
