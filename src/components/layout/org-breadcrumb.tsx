@@ -94,7 +94,6 @@ export function OrgBreadcrumb() {
     '/attendance/locations': 'Locations',
     '/attendance/devices': 'Devices',
     '/analytics': 'Analytics',
-    '/attendance/list/add': 'Add',
 
     // Schedules
     '/schedule': 'Schedules',
@@ -122,7 +121,6 @@ export function OrgBreadcrumb() {
   // Parent mapping untuk nested pages
   const parentMapping: Record<string, string> = {
     '/attendance/list': '/attendance',
-    '/attendance/list/add': '/attendance/list',
     '/attendance/add': '/attendance',
     '/attendance/locations': '/attendance',
     '/attendance/devices': '/attendance',

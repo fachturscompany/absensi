@@ -10,7 +10,7 @@ import type { UseFormReturn } from "react-hook-form"
 import type { SingleFormValues, MemberOption } from "@/types/attendance"
 import { QUICK_STATUSES } from "@/types/attendance"
 import { useRouter } from "next/navigation"
-import type { DialogHandlers } from "@/components/attendance/list/add/dialogs/member-dialog"
+import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
 
 interface SingleFormProps {
   activeTab: "single" | "batch"

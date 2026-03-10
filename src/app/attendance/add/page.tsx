@@ -4,9 +4,9 @@ import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SingleForm } from "@/components/attendance/list/add/single-form"
-import { BatchForm } from "@/components/attendance/list/add/batch-form"
-import { MemberDialog } from "@/components/attendance/list/add/dialogs/member-dialog"  // ✅ FIXED path
+import { SingleForm } from "@/components/attendance/add/single-form"
+import { BatchForm } from "@/components/attendance/add/batch-form"
+import { MemberDialog } from "@/components/attendance/add/dialogs/member-dialog"  // ✅ FIXED path
 import {
   singleFormSchema,
   type SingleFormValues,

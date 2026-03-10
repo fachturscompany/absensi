@@ -1,4 +1,3 @@
-// src/components/attendance/list/add/tab-switcher.tsx
 import { TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface TabSwitcherProps {
