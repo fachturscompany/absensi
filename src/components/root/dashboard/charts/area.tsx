@@ -1,10 +1,10 @@
 'use client'
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip as RechartsTooltip
 } from 'recharts'
@@ -48,8 +48,8 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         <p className="font-semibold text-sm mb-3 text-foreground">{label}</p>
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center gap-2 text-xs mb-1 last:mb-0">
-            <div 
-              className="w-3 h-3 rounded-full" 
+            <div
+              className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color || COLORS.success }}
             />
             <span className="text-muted-foreground capitalize">{entry.name}:</span>
@@ -62,10 +62,10 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null
 }
 
-export function ChartsArea({ 
-  chartData, 
-  dateRange, 
-  maxAttendance, 
+export function ChartsArea({
+  chartData,
+  dateRange,
+  maxAttendance,
 }: Props) {
   const isToday = dateRange.preset === 'today'
 
@@ -100,14 +100,14 @@ export function ChartsArea({
                   <stop offset="95%" stopColor={COLORS.warning} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="currentColor" 
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="currentColor"
                 opacity={0.1}
                 vertical={false}
               />
-              
+
               <XAxis
                 dataKey="label"
                 stroke="currentColor"
@@ -119,33 +119,33 @@ export function ChartsArea({
                 tickLine={false}
                 axisLine={false}
               />
-              
+
               <YAxis
                 type="number"
-                domain={[0, (maxAttendance || 10) * 1]}
+                domain={[0, maxAttendance > 5 ? 'auto' : Math.max(maxAttendance, 1) + 1]}
+                allowDecimals={false}
                 stroke="currentColor"
                 opacity={0.5}
                 fontSize={12}
-                tickFormatter={(value) => Math.floor(value as number).toString()}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
               />
-              
+
               <RechartsTooltip content={<CustomTooltip />} />
-              
-              <Area 
-                type="monotone" 
-                dataKey="present" 
-                stroke={COLORS.success} 
-                fillOpacity={1} 
+
+              <Area
+                type="monotone"
+                dataKey="present"
+                stroke={COLORS.success}
+                fillOpacity={1}
                 fill="url(#colorPresent)"
               />
-              <Area 
-                type="monotone" 
-                dataKey="late" 
-                stroke={COLORS.warning} 
-                fillOpacity={1} 
+              <Area
+                type="monotone"
+                dataKey="late"
+                stroke={COLORS.warning}
+                fillOpacity={1}
                 fill="url(#colorLate)"
               />
             </AreaChart>

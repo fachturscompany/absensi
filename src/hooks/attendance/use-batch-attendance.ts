@@ -35,6 +35,8 @@ export function useBatchAttendance() {
   const [batchCheckOutTime, setBatchCheckOutTime] = useState("")
   const [batchStatus, setBatchStatus] = useState<"present" | "late" | "absent" | "excused">("present")
   const [batchRemarks, setBatchRemarks] = useState("")
+  const [batchBreakStartTime, setBatchBreakStartTime] = useState("")
+  const [batchBreakEndTime, setBatchBreakEndTime] = useState("")
 
   // Batch entries management
   const [batchEntries, setBatchEntries] = useState<BatchEntry[]>([])
@@ -115,6 +117,8 @@ export function useBatchAttendance() {
       checkOutTime: batchCheckOutTime,
       status: batchStatus,
       remarks: batchRemarks,
+      breakStartTime: batchBreakStartTime,
+      breakEndTime: batchBreakEndTime,
     }
     setBatchEntries(prev => [...prev, newEntry])
     toast.success("Entry added")
@@ -165,6 +169,12 @@ export function useBatchAttendance() {
         remarks: (entry.remarks || batchRemarks || undefined) as string | undefined,
         check_in_method: "MANUAL" as const,
         check_out_method: entry.checkOutDate && entry.checkOutTime ? "MANUAL" as const : undefined,
+        actual_break_start: entry.breakStartTime && entry.checkInDate
+          ? toTimestampWithTimezone(parseDateTime(entry.checkInDate, entry.breakStartTime))
+          : null,
+        actual_break_end: entry.breakEndTime && entry.checkInDate
+          ? toTimestampWithTimezone(parseDateTime(entry.checkInDate, entry.breakEndTime))
+          : null,
       }))
 
       const res = await bulkCreateAttendance(payload)
@@ -223,6 +233,8 @@ export function useBatchAttendance() {
     batchStatus,
     setBatchStatus: (status: string) => setBatchStatus(status as any),
     batchRemarks, setBatchRemarks,
+    batchBreakStartTime, setBatchBreakStartTime,
+    batchBreakEndTime, setBatchBreakEndTime,
 
     // Submit
     submitBatch,

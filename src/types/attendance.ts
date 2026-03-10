@@ -9,6 +9,8 @@ export const singleFormSchema = z.object({
   checkOutTime: z.string().optional(),
   status: z.string().min(1, "Status is required"),
   remarks: z.string().max(500).optional(),
+  breakStartTime: z.string().optional(),
+  breakEndTime: z.string().optional(),
 })
 
 export type SingleFormValues = z.infer<typeof singleFormSchema>
@@ -49,6 +51,8 @@ export interface AttendanceEntry {
   remarks?: string
   check_in_method?: string
   check_out_method?: string
+  actual_break_start?: string | null
+  actual_break_end?: string | null
 }
 
 export interface MemberOption {
@@ -77,6 +81,8 @@ export interface BatchEntry {
   checkOutTime?: string
   status: string
   remarks?: string
+  breakStartTime?: string
+  breakEndTime?: string
 }
 
 export interface BatchAttendanceReturn {
@@ -99,6 +105,10 @@ export interface BatchAttendanceReturn {
   setBatchStatus: (status: string) => void
   batchRemarks: string
   setBatchRemarks: (remarks: string) => void
+  batchBreakStartTime: string
+  setBatchBreakStartTime: (time: string) => void
+  batchBreakEndTime: string
+  setBatchBreakEndTime: (time: string) => void
   isSubmitting: boolean
   setIsSubmitting: (submitting: boolean) => void
   departmentFilter: string

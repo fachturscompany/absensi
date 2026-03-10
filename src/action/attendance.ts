@@ -43,7 +43,7 @@ async function resolveScheduleRuleForMemberDate(
 
   const { data: det, error: detErr } = await supabase
     .from('work_schedule_details')
-    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,grace_in_minutes,grace_out_minutes,is_active')
+    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,grace_in_minutes,grace_out_minutes,is_active,break_start,break_end')
     .eq('work_schedule_id', workScheduleId)
     .eq('day_of_week', dayOfWeek)
     .maybeSingle();
@@ -60,12 +60,25 @@ async function resolveScheduleRuleForMemberDate(
     core_hours_end: det.core_hours_end || '',
     grace_in_minutes: det.grace_in_minutes ?? 0,
     grace_out_minutes: det.grace_out_minutes ?? 0,
+    break_start: det.break_start,
+    break_end: det.break_end,
   };
   // Basic guard: empty strings mean invalid rule
   if (!rule.start_time || !rule.end_time || !rule.core_hours_start || !rule.core_hours_end) {
     return null;
   }
   return rule;
+}
+
+export async function getMemberSchedule(organizationMemberId: string | number, dateISO: string) {
+  try {
+    const supabase = await getSupabase();
+    const rule = await resolveScheduleRuleForMemberDate(supabase, Number(organizationMemberId), dateISO);
+    return { success: true, data: rule };
+  } catch (error) {
+    console.error("[getMemberSchedule] Error:", error);
+    return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
+  }
 }
 
 // Update check-in/check-out times and remarks for a single attendance record
@@ -554,6 +567,8 @@ type ManualAttendancePayload = {
   remarks?: string;
   check_in_method?: string;
   check_out_method?: string;
+  actual_break_start?: string | null;
+  actual_break_end?: string | null;
 };
 
 export async function checkExistingAttendance(
@@ -815,7 +830,7 @@ export async function bulkCreateAttendance(
 
   try {
     const supabase = await getSupabase();
-    
+
     // ✅ TypeScript happy: destructure properly
     const result = await supabase
       .from('attendance_records')
@@ -834,8 +849,8 @@ export async function bulkCreateAttendance(
     }
 
     revalidatePath('/attendance', 'layout');
-    
-    return { 
+
+    return {
       success: true,
       count: Number(data?.length || entries.length)
     };

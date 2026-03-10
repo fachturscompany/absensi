@@ -47,19 +47,21 @@ export interface ScheduleRule {
     core_hours_end: string; // HH:MM - Core hours end
     grace_in_minutes: number; // Tolerance for late arrival
     grace_out_minutes: number; // Tolerance for early departure
+    break_start?: string | null;
+    break_end?: string | null;
 }
 
 // Day classification and auxiliary enums for international standards
 export type DayType = 'working_day' | 'off_day' | 'public_holiday' | 'leave_day';
 export type ExcusedReasonCode =
-  | 'vacation'
-  | 'sick'
-  | 'maternity'
-  | 'paternity'
-  | 'bereavement'
-  | 'unpaid'
-  | 'training'
-  | 'business_trip';
+    | 'vacation'
+    | 'sick'
+    | 'maternity'
+    | 'paternity'
+    | 'bereavement'
+    | 'unpaid'
+    | 'training'
+    | 'business_trip';
 export type WorkMode = 'onsite' | 'remote' | 'on_duty';
 export type PunchException = 'none' | 'missing_check_in' | 'missing_check_out' | 'missing_both' | 'outside_window';
 export type HalfDayType = 'none' | 'half_day_am' | 'half_day_pm';

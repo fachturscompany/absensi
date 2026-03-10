@@ -11,6 +11,8 @@ import type { SingleFormValues, MemberOption } from "@/types/attendance"
 import { QUICK_STATUSES } from "@/types/attendance"
 import { useRouter } from "next/navigation"
 import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
+import { getMemberSchedule } from "@/action/attendance"
+import { toast } from "sonner"
 
 interface SingleFormProps {
   activeTab: "single" | "batch"
@@ -67,6 +69,85 @@ export function SingleForm({
                         {selectedMember ? `${selectedMember.label} (${selectedMember.department})` : "Choose a member..."}
                         <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
+
+                      <div className="grid grid-cols-4 gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="text-[10px] h-8 px-1"
+                          disabled={!field.value}
+                          onClick={async () => {
+                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
+                            if (res.success && res.data) {
+                              form.setValue("checkInTime", res.data.start_time.slice(0, 5))
+                              toast.success("Applied check-in time")
+                            } else {
+                              toast.error("Schedule not found")
+                            }
+                          }}
+                        >
+                          Check-in
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="text-[10px] h-8 px-1"
+                          disabled={!field.value}
+                          onClick={async () => {
+                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
+                            if (res.success && res.data) {
+                              form.setValue("checkOutTime", res.data.end_time.slice(0, 5))
+                              if (!form.getValues("checkOutDate")) {
+                                form.setValue("checkOutDate", form.getValues("checkInDate"))
+                              }
+                              toast.success("Applied check-out time")
+                            } else {
+                              toast.error("Schedule not found")
+                            }
+                          }}
+                        >
+                          Check-out
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="text-[10px] h-8 px-1"
+                          disabled={!field.value}
+                          onClick={async () => {
+                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
+                            if (res.success && res.data?.break_start) {
+                              form.setValue("breakStartTime", res.data.break_start.slice(0, 5))
+                              toast.success("Applied break start")
+                            } else {
+                              toast.error("Break schedule not found")
+                            }
+                          }}
+                        >
+                          Break In
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="text-[10px] h-8 px-1"
+                          disabled={!field.value}
+                          onClick={async () => {
+                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
+                            if (res.success && res.data?.break_end) {
+                              form.setValue("breakEndTime", res.data.break_end.slice(0, 5))
+                              toast.success("Applied break end")
+                            } else {
+                              toast.error("Break schedule not found")
+                            }
+                          }}
+                        >
+                          Break Out
+                        </Button>
+                      </div>
+
                       <FormMessage />
                     </FormItem>
                   )
@@ -112,7 +193,7 @@ export function SingleForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
-                    name="checkOutDate"  // ✅ CORRECT!
+                    name="checkOutDate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm">Date</FormLabel>
@@ -125,7 +206,7 @@ export function SingleForm({
                   />
                   <FormField
                     control={form.control}
-                    name="checkOutTime"  // ✅ CORRECT!
+                    name="checkOutTime"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm">Time</FormLabel>
@@ -138,6 +219,40 @@ export function SingleForm({
                   />
                 </div>
               </div>
+
+              {/* ✅ BREAK TIMES */}
+              <div className="space-y-3">
+                <FormLabel>Break Times (Optional)</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="breakStartTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Break Start</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="breakEndTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Break End</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
 
               {/* Status + Remarks - IDENTICAL (sudah benar) */}
               <FormField

@@ -9,19 +9,15 @@ import { useRouter } from "next/navigation";
 export default function NotFound() {
   const router = useRouter();
 
-  // Hide sidebar and navbar on mount
   useEffect(() => {
-    // Hide any existing sidebar/navbar elements
     const sidebar = document.querySelector('[data-sidebar]') || document.querySelector('aside');
     const navbar = document.querySelector('[data-navbar]') || document.querySelector('nav');
     
     if (sidebar instanceof HTMLElement) sidebar.style.display = 'none';
     if (navbar instanceof HTMLElement) navbar.style.display = 'none';
     
-    // Reset body margin if needed
     document.body.style.marginLeft = '0';
     
-    // Cleanup on unmount
     return () => {
       if (sidebar instanceof HTMLElement) sidebar.style.display = '';
       if (navbar instanceof HTMLElement) navbar.style.display = '';
@@ -42,7 +38,6 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* Error Message */}
         <div className="space-y-4">
           <h1 className="text-2xl font-semibold text-foreground">
             Page Not Found
@@ -53,7 +48,6 @@ export default function NotFound() {
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button 
             onClick={() => router.back()}

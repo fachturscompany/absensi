@@ -68,7 +68,13 @@ export default function AttendancePage() {
         status: values.status,
         remarks: values.remarks,
         check_in_method: "MANUAL",
-        check_out_method: values.checkOutDate ? "MANUAL" : undefined
+        check_out_method: values.checkOutDate ? "MANUAL" : undefined,
+        actual_break_start: values.breakStartTime && values.checkInDate
+          ? parseDateTime(values.checkInDate, values.breakStartTime).toISOString()
+          : null,
+        actual_break_end: values.breakEndTime && values.checkInDate
+          ? parseDateTime(values.checkInDate, values.breakEndTime).toISOString()
+          : null,
       })
 
       if (res.success) {
@@ -90,10 +96,7 @@ export default function AttendancePage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Add Attendance</h1>
-        <p className="text-muted-foreground mt-2">
-          Add single or batch attendance records
-        </p>
+        <h1 className="text-xl font-semibold">Add Attendance</h1>
       </div>
 
       <Tabs defaultValue="single" className="w-full">
@@ -102,7 +105,6 @@ export default function AttendancePage() {
           <TabsTrigger value="batch">Batch Entry</TabsTrigger>
         </TabsList>
 
-        {/* ✅ SINGLE FORM - ALL PROPS CORRECT */}
         <SingleForm
           activeTab="single"
           form={singleForm}

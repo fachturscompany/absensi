@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Minus, Search, Loader2, X } from "lucide-react"
+import { Plus, Search, Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { QUICK_STATUSES } from "@/types/attendance"
 import { useMembers } from "@/hooks/attendance/use-members"
 import { useBatchAttendance } from "@/hooks/attendance/use-batch-attendance"
 import { type BatchAttendanceReturn } from "@/types/attendance"
+import { getMemberSchedule } from "@/action/attendance"
 
 interface BatchAttendanceFormProps {
   onSubmit: () => Promise<void>
@@ -34,7 +35,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
           {/* Batch Date & Time */}
           <div className="space-y-3">
             <label className="text-sm font-medium">Batch Date & Time</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs text-muted-foreground">Check-in Date</label>
@@ -60,9 +61,9 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                   <label className="text-xs text-muted-foreground">Check-out Date</label>
                   <Input
                     type="date"
-                    value={batch.batchCheckInDate}
-                    disabled
-                    placeholder="Follows check-in date"
+                    value={batch.batchCheckOutDate}
+                    onChange={(e) => batch.setBatchCheckOutDate(e.target.value)}
+                    disabled={batch.isSubmitting || loading}
                   />
                 </div>
                 <div>
@@ -78,18 +79,61 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
             </div>
           </div>
 
+          {/* Batch Breaks */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Batch Break Times (Default)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Break Start</label>
+                  <Input
+                    type="time"
+                    value={batch.batchBreakStartTime}
+                    onChange={(e) => batch.setBatchBreakStartTime(e.target.value)}
+                    disabled={batch.isSubmitting || loading}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Break End</label>
+                  <Input
+                    type="time"
+                    value={batch.batchBreakEndTime}
+                    onChange={(e) => batch.setBatchBreakEndTime(e.target.value)}
+                    disabled={batch.isSubmitting || loading}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-9 px-2"
+                  onClick={() => {
+                    // We don't have a single member for "Batch Default", 
+                    // but maybe we can just apply from the first member's schedule if available?
+                    // Or just leave it as is for individual presets.
+                  }}
+                  disabled={true}
+                >
+                  Load Default Schedule (Unavailable)
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Batch Status & Notes */}
           <div className="space-y-3">
             <label className="text-sm font-medium">Batch Status & Notes</label>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-muted-foreground block mb-2">Default Status</label>
+                <label className="text-xs text-muted-foreground block mb-1">Default Status</label>
                 <Select
                   disabled={batch.isSubmitting || loading}
                   value={batch.batchStatus}
                   onValueChange={(value: any) => batch.setBatchStatus(value)}
                 >
-                  <SelectTrigger className="w-full md:w-1/2">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -106,10 +150,11 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                 </Select>
               </div>
               <div>
-                <label className="text-xs text-muted-foreground block mb-2">Default Notes</label>
+                <label className="text-xs text-muted-foreground block mb-1">Default Notes</label>
                 <Textarea
                   placeholder="Notes for all records (optional)..."
-                  rows={2}
+                  rows={1}
+                  className="min-h-[38px] py-2"
                   value={batch.batchRemarks}
                   onChange={(e) => batch.setBatchRemarks(e.target.value)}
                   disabled={batch.isSubmitting || loading}
@@ -226,35 +271,112 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                 <p className="text-xs">Click "Add Empty Row" or select members above</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {batch.batchEntries.map(entry => {
                   const member = members.find(m => m.id === entry.memberId)
                   return (
-                    <div key={entry.id} className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {member?.label || 'Unknown Member'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {entry.checkInDate} {entry.checkInTime}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${entry.status === 'present' ? 'bg-green-100 text-green-800' :
-                          entry.status === 'absent' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                          {entry.status}
-                        </span>
+                    <div key={entry.id} className="p-4 border rounded-xl bg-zinc-50 dark:bg-zinc-900/40 space-y-3 relative group">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold">
+                            {member?.label?.charAt(0) || '?'}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-sm">
+                              {member?.label || 'Select Member...'}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground uppercase">{member?.department || '-'}</p>
+                          </div>
+                        </div>
                         <Button
                           type="button"
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
                           onClick={() => batch.removeBatchEntry(entry.id)}
                           disabled={batch.isSubmitting || loading}
                         >
-                          <Minus className="h-4 w-4" />
+                          <X className="h-4 w-4" />
                         </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Check-in</label>
+                          <Input
+                            type="time"
+                            className="h-8 text-xs"
+                            value={entry.checkInTime}
+                            onChange={(e) => batch.updateBatchEntry(entry.id, "checkInTime", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Check-out</label>
+                          <Input
+                            type="time"
+                            className="h-8 text-xs"
+                            value={entry.checkOutTime || ""}
+                            onChange={(e) => batch.updateBatchEntry(entry.id, "checkOutTime", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break Start</label>
+                          <Input
+                            type="time"
+                            className="h-8 text-xs"
+                            value={entry.breakStartTime || ""}
+                            onChange={(e) => batch.updateBatchEntry(entry.id, "breakStartTime", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break End</label>
+                          <Input
+                            type="time"
+                            className="h-8 text-xs"
+                            value={entry.breakEndTime || ""}
+                            onChange={(e) => batch.updateBatchEntry(entry.id, "breakEndTime", e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            className="h-6 px-2 text-[10px]"
+                            onClick={async () => {
+                              if (!entry.memberId) return toast.error("Select a member first")
+                              const res = await getMemberSchedule(entry.memberId, entry.checkInDate)
+                              if (res.success && res.data) {
+                                batch.updateBatchEntry(entry.id, "checkInTime", res.data.start_time.slice(0, 5))
+                                batch.updateBatchEntry(entry.id, "checkOutTime", res.data.end_time.slice(0, 5))
+                                if (res.data.break_start) batch.updateBatchEntry(entry.id, "breakStartTime", res.data.break_start.slice(0, 5))
+                                if (res.data.break_end) batch.updateBatchEntry(entry.id, "breakEndTime", res.data.break_end.slice(0, 5))
+                                toast.success(`Applied schedule for ${member?.label}`)
+                              } else {
+                                toast.error("Schedule not found")
+                              }
+                            }}
+                          >
+                            Auto Schedule
+                          </Button>
+                        </div>
+                        <Select
+                          value={entry.status}
+                          onValueChange={(val) => batch.updateBatchEntry(entry.id, "status", val)}
+                        >
+                          <SelectTrigger className="h-6 w-24 text-[10px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {QUICK_STATUSES.map(s => (
+                              <SelectItem key={s.value} value={s.value} className="text-[10px]">
+                                {s.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   )
