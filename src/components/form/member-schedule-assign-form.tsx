@@ -15,7 +15,7 @@ import { getAllWorkSchedules } from "@/action/schedule"
 import {
   createMemberSchedule,
   getActiveMemberScheduleMemberIds,
-} from "@/action/members_schedule"
+} from "@/action/member-schedule"
 import { IOrganization_member, IWorkSchedule } from "@/interface"
 
 import { Button } from "@/components/ui/button"
@@ -194,7 +194,7 @@ export function MemberScheduleAssignForm() {
       const result = await createMemberSchedule(payload)
       if (result?.success) {
         toast.success("Schedule assigned successfully")
-        router.push("/member-schedules")
+        router.push("/schedule/member")
         return
       }
 
@@ -248,13 +248,13 @@ export function MemberScheduleAssignForm() {
 
       if (successCount > 0 && failCount === 0) {
         toast.success(`Berhasil assign ke ${successCount} member`)
-        router.push("/member-schedules")
+        router.push("/schedule/member")
         return
       }
 
       if (successCount > 0 && failCount > 0) {
         toast.warning(`Sebagian berhasil: ${successCount} berhasil, ${failCount} gagal`)
-        router.push("/member-schedules")
+        router.push("/schedule/member")
         return
       }
 

@@ -33,7 +33,7 @@ const searchItems = [
   { group: 'Management', icon: Users, label: 'Members', url: '/members' },
   { group: 'Management', icon: ClipboardList, label: 'Attendance', url: '/attendance' },
   { group: 'Management', icon: Calendar, label: 'Work Schedules', url: '/schedule' },
-  { group: 'Management', icon: Calendar, label: 'Member Schedules', url: '/member-schedules' },
+  { group: 'Management', icon: Calendar, label: 'Member Schedules', url: '/schedule/member' },
   { group: 'Management', icon: MapPin, label: 'Locations', url: '/attendance/locations' },
   { group: 'Management', icon: FileText, label: 'Leaves', url: '/leaves' },
   { group: 'Organization', icon: Building2, label: 'Groups', url: '/group' },
@@ -49,7 +49,7 @@ export function SearchDialog() {
 
   React.useEffect(() => {
     if (!mounted) return;
-    
+
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

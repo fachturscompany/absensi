@@ -97,7 +97,7 @@ export function OrgBreadcrumb() {
 
     // Schedules
     '/schedule': 'Schedules',
-    '/member-schedules': 'Member Schedules',
+    '/schedule/member': 'Member Schedules',
 
     // Organization
     '/members': 'Members',
@@ -126,7 +126,7 @@ export function OrgBreadcrumb() {
     '/attendance/devices': '/attendance',
     '/analytics': '/attendance',
     '/group/move': '/group',
-    '/member-schedules': '/schedule',
+    '/schedule/member': '/schedule',
   }
 
   const buildBreadcrumbs = (): BreadcrumbItem[] => {

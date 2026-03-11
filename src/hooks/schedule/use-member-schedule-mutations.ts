@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { 
-  createMemberSchedule, 
+import {
+  createMemberSchedule,
   updateMemberSchedule,
-  deleteMemberSchedule 
-} from "@/action/members_schedule"
+  deleteMemberSchedule
+} from "@/action/member-schedule"
 import { IMemberSchedule } from "@/interface"
 import { toast } from "sonner"
 
@@ -14,7 +14,7 @@ export function useMemberSchedules(organizationId?: string) {
     queryKey: ["memberSchedules", organizationId],
     queryFn: async () => {
       memberLogger.debug('[React Query] Fetching member schedules via API')
-      const url = organizationId ? `/api/member-schedules?organizationId=${organizationId}` : '/api/member-schedules'
+      const url = organizationId ? `/api/schedule/member?organizationId=${organizationId}` : '/api/schedule/member'
       const response = await fetch(url, { credentials: 'same-origin' })
       const json = await response.json()
       if (!json.success) {

@@ -21,7 +21,7 @@ import {
   upsertWorkScheduleDetails,
 } from "@/action/schedule"
 import { getAllOrganization_member } from "@/action/members"
-import { createMemberSchedulesBulk } from "@/action/members_schedule"
+import { createMemberSchedulesBulk } from "@/action/member-schedule"
 
 // Day keys for iteration
 type DayIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6

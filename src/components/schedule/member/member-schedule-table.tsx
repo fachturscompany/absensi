@@ -4,8 +4,7 @@ import React from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/tables/data-table"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Trash, Plus, Calendar } from "lucide-react"
+import { Trash, Calendar, Plus } from "lucide-react"
 import { UserAvatar } from "@/components/profile&image/user-avatar"
 import {
   Empty,
@@ -15,6 +14,7 @@ import {
   EmptyContent,
   EmptyMedia,
 } from "@/components/ui/empty"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   AlertDialog,
@@ -27,75 +27,30 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
+import { IMemberSchedule } from "@/interface"
 
-import { IMemberSchedule, IOrganization_member, IWorkSchedule } from "@/interface"
-import {
-  deleteMemberSchedule
-} from "@/action/members_schedule"
-
-interface MemberSchedulesClientProps {
-  initialSchedules: IMemberSchedule[]
-  initialMembers: IOrganization_member[]
-  initialWorkSchedules: IWorkSchedule[]
-  activeMemberIds?: string[]
-  organizationTimezone?: string
+interface MemberScheduleTableProps {
+  items: IMemberSchedule[]
   isLoading?: boolean
-  pageIndex?: number
-  pageSize?: number
-  totalRecords?: number
-  onPageIndexChange?: (pageIndex: number) => void
-  onPageSizeChange?: (pageSize: number) => void
-  onRefresh?: () => void
+  pageIndex: number
+  pageSize: number
+  totalRecords: number
+  onPageIndexChange: (pageIndex: number) => void
+  onPageSizeChange: (pageSize: number) => void
+  onDelete: (id: string) => void
 }
 
-export default function MemberSchedulesClient({
-  initialSchedules,
-  initialMembers,
-  initialWorkSchedules,
-  activeMemberIds: initialActiveMemberIds,
-  organizationTimezone = "Asia/Jakarta",
+export default function MemberScheduleTable({
+  items,
   isLoading = false,
   pageIndex,
   pageSize,
   totalRecords,
   onPageIndexChange,
   onPageSizeChange,
-  onRefresh,
-}: MemberSchedulesClientProps) {
+  onDelete,
+}: MemberScheduleTableProps) {
   const router = useRouter()
-  const [schedules, setSchedules] = React.useState(initialSchedules)
-
-  void initialMembers
-  void initialWorkSchedules
-  void initialActiveMemberIds
-  void organizationTimezone
-
-  // Sync state when props change (user login/logout/switch org)
-  React.useEffect(() => {
-    setSchedules(initialSchedules)
-  }, [initialSchedules])
-
-  const handleAssign = () => {
-    router.push("/member-schedules/assign")
-  }
-
-  const handleDelete = async (id: string) => {
-    try {
-      const result = await deleteMemberSchedule(id)
-      if (result.success) {
-        toast.success("Schedule deleted successfully")
-        // Optimistic update
-        setSchedules((prev) => prev.filter((s) => s.id !== id))
-        onRefresh?.()
-      } else {
-        toast.error(result.message)
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred")
-    }
-  }
-
   const getMemberName = (schedule: IMemberSchedule) => {
     const member = schedule.organization_member as {
       user?: {
@@ -238,7 +193,7 @@ export default function MemberSchedulesClient({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleDelete(schedule.id)}>
+                  <AlertDialogAction onClick={() => onDelete(schedule.id)}>
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -254,25 +209,18 @@ export default function MemberSchedulesClient({
     <div className="w-full h-full">
       <DataTable
         columns={columns}
-        data={schedules}
+        data={items}
         isLoading={isLoading}
-        showGlobalFilter={true}
-        showFilters={true}
+        showGlobalFilter={false}
+        showFilters={false}
         showColumnToggle={false}
         layout="card"
-        globalFilterPlaceholder="Search member schedules..."
-        manualPagination={typeof pageIndex === "number" && typeof pageSize === "number"}
+        manualPagination={true}
         pageIndex={pageIndex}
         pageSize={pageSize}
         totalRecords={totalRecords}
         onPageIndexChange={onPageIndexChange}
         onPageSizeChange={onPageSizeChange}
-        toolbarRight={
-          <Button onClick={handleAssign} className="gap-2 whitespace-nowrap">
-            <Plus className="h-4 w-4" />
-            Assign
-          </Button>
-        }
         emptyState={
           <Empty>
             <EmptyHeader>
@@ -286,7 +234,7 @@ export default function MemberSchedulesClient({
             </EmptyHeader>
             <EmptyContent>
               <Button
-                onClick={handleAssign}
+                onClick={() => router.push("/schedule/member/assign")}
                 className="gap-2"
               >
                 <Plus className="h-4 w-4" />

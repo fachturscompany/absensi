@@ -162,7 +162,7 @@ const getSidebarGroups = (): NavGroup[] => [
         icon: Calendar,
         subItems: [
           { title: 'Work Schedules', url: '/schedule', icon: Calendar },
-          { title: 'Member Schedules', url: '/member-schedules', icon: Users },
+          { title: 'Member Schedules', url: '/schedule/member', icon: Users },
         ],
       },
       {

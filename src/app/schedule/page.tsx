@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState, useCallback } from "react"
 import { getWorkSchedulesPage } from "@/action/schedule"
 import ScheduleTable from "@/components/schedule/schedule-table"

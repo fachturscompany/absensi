@@ -13,7 +13,6 @@ import {
 } from "@tanstack/react-table"
 import type { RowSelectionState, OnChangeFn } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -366,7 +365,7 @@ export function DataTable<TData, TValue>({
   )
 
   const tableContent = (
-    <div className="relative w-full rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
+    <div className="relative w-full overflow-hidden">
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 pointer-events-none">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -490,14 +489,12 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       {layout === "card" ? (
         <>
-          <Card>
-            <CardContent className="p-4 space-y-4">
+            <div>
               {controls}
               <div>
                 {tableContent}
               </div>
-            </CardContent>
-          </Card>
+            </div>
           {paginationFooter}
         </>
       ) : (
