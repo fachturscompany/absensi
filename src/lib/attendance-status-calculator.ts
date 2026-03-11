@@ -3,14 +3,13 @@
  * 
  * Deterministic, auditable attendance status classification based on:
  * - Core hours (mandatory working window)
- * - Grace periods (tolerance before late/early leave)
  * - Day of week rules (0=Sunday, 1=Monday, ..., 6=Saturday)
  * 
  * Status Logic:
  * | Time Condition                           | Status  | present |
  * |------------------------------------------|---------|---------|
  * | Check-in before core_hours_start         | PRESENT | true    |
- * | Check-in within core hours (after grace) | LATE    | true    |
+ * | Check-in within core hours              | LATE    | true    |
  * | Check-out after core_hours_end           | LEAVE   | true    |
  * | Any invalid condition                    | ABSENT  | false   |
  * 
@@ -22,7 +21,7 @@
 
 // Presence-oriented status (working day)
 // Note: 'leave' is intentionally NOT used to avoid ambiguity with paid/unpaid leave.
-export type AttendanceStatus = 'on_time' | 'late' | 'early_leave' | 'late_and_early' | 'absent' | 'excused_absence';
+export type AttendanceStatus = 'present' | 'late' | 'absent' | 'excused';
 
 export interface AttendanceStatusResult {
     status: AttendanceStatus;
@@ -30,7 +29,6 @@ export interface AttendanceStatusResult {
     details: {
         lateMinutes?: number;
         earlyLeaveMinutes?: number;
-        isWithinGrace?: boolean;
         overtimeMinutes?: number;
         compliant?: boolean;
         punchException?: PunchException;
@@ -45,8 +43,6 @@ export interface ScheduleRule {
     end_time: string; // HH:MM - Check-out window closes
     core_hours_start: string; // HH:MM - Core hours begin
     core_hours_end: string; // HH:MM - Core hours end
-    grace_in_minutes: number; // Tolerance for late arrival
-    grace_out_minutes: number; // Tolerance for early departure
     break_start?: string | null;
     break_end?: string | null;
 }
@@ -139,8 +135,6 @@ export function calculateAttendanceStatus(
     const endTime = timeToMinutes(rule.end_time)!;
     const coreStart = timeToMinutes(rule.core_hours_start)!;
     const coreEnd = timeToMinutes(rule.core_hours_end)!;
-    const graceIn = rule.grace_in_minutes || 0;
-    const graceOut = rule.grace_out_minutes || 0;
 
     // Guard: Check-in must be within scheduled window [start_time, end_time]
     if (checkIn !== null && (checkIn < startTime || checkIn > endTime)) {
@@ -174,87 +168,24 @@ export function calculateAttendanceStatus(
         };
     }
 
-    // Calculate effective thresholds with grace periods
-    const lateThreshold = coreStart + graceIn;
-    const earlyLeaveThreshold = coreEnd - graceOut;
-
     // Determine check-in status
-    let lateMinutes = 0;
-    let isLate = false;
-    let isWithinGrace = false;
-
-    if (checkIn <= coreStart) {
-        // PRESENT: Checked in before or exactly at core hours start
-        isLate = false;
-    } else if (checkIn <= lateThreshold) {
-        // Within grace period - technically late but tolerated
-        isLate = false;
-        isWithinGrace = true;
-        lateMinutes = checkIn - coreStart;
-    } else {
-        // LATE: Checked in after grace period
-        isLate = true;
-        lateMinutes = checkIn - coreStart;
-    }
+    const isLate = checkIn > coreStart;
+    const lateMinutes = isLate ? checkIn - coreStart : 0;
 
     // Determine check-out status and overtime
-    let earlyLeaveMinutes = 0;
-    let isEarlyLeave = false;
-    let overtimeMinutes = 0;
-
-    if (checkOut >= coreEnd) {
-        // Checked out after core hours end - OK
-        isEarlyLeave = false;
-        overtimeMinutes = checkOut - coreEnd;
-    } else if (checkOut >= earlyLeaveThreshold) {
-        // Within grace period - technically early but tolerated
-        isEarlyLeave = false;
-        earlyLeaveMinutes = coreEnd - checkOut;
-    } else {
-        // EARLY LEAVE: Left before grace period threshold
-        isEarlyLeave = true;
-        earlyLeaveMinutes = coreEnd - checkOut;
-    }
+    const isEarlyLeave = checkOut < coreEnd;
+    const earlyLeaveMinutes = isEarlyLeave ? coreEnd - checkOut : 0;
+    const overtimeMinutes = checkOut > coreEnd ? checkOut - coreEnd : 0;
 
     // Determine final status
-    // Priority resolution among presence variants
     const compliant = !isLate && !isEarlyLeave;
-    if (isLate && isEarlyLeave) {
-        return {
-            status: 'late_and_early',
-            present: true,
-            details: {
-                lateMinutes,
-                earlyLeaveMinutes,
-                isWithinGrace,
-                overtimeMinutes,
-                compliant,
-                punchException: 'none',
-                halfDay: 'none',
-            },
-        };
-    }
-    if (isLate) {
+    if (isLate || isEarlyLeave) {
         return {
             status: 'late',
             present: true,
             details: {
                 lateMinutes,
-                isWithinGrace,
-                overtimeMinutes,
-                compliant,
-                punchException: 'none',
-                halfDay: 'none',
-            },
-        };
-    }
-    if (isEarlyLeave) {
-        return {
-            status: 'early_leave',
-            present: true,
-            details: {
                 earlyLeaveMinutes,
-                isWithinGrace,
                 overtimeMinutes,
                 compliant,
                 punchException: 'none',
@@ -263,10 +194,9 @@ export function calculateAttendanceStatus(
         };
     }
     return {
-        status: 'on_time',
+        status: 'present',
         present: true,
         details: {
-            isWithinGrace,
             overtimeMinutes,
             compliant,
             punchException: 'none',
@@ -296,6 +226,15 @@ export function getScheduleRuleForDay(
  * @returns Day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
  */
 export function getDayOfWeek(date: Date | string): number {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return d.getDay();
+    if (typeof date === 'string') {
+        const parts = date.split('-').map(Number);
+        if (parts.length >= 3) {
+            const y = parts[0] as number;
+            const m = parts[1] as number;
+            const d = parts[2] as number;
+            return new Date(y, m - 1, d).getDay();
+        }
+        return new Date(date).getDay();
+    }
+    return date.getDay();
 }

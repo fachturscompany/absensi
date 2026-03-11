@@ -13,8 +13,6 @@ const DEFAULT_RULE: ScheduleRule = {
     end_time: '17:30',
     core_hours_start: '09:00',
     core_hours_end: '17:00',
-    grace_in_minutes: 15,
-    grace_out_minutes: 15,
 };
 
 describe('validateScheduleRule', () => {
@@ -51,21 +49,14 @@ describe('calculateAttendanceStatus', () => {
             expect(result.status).toBe('present');
             expect(result.present).toBe(true);
         });
-
-        it('should return PRESENT when within grace period', () => {
-            const result = calculateAttendanceStatus('09:10', '17:30', DEFAULT_RULE);
-            expect(result.status).toBe('present');
-            expect(result.present).toBe(true);
-            expect(result.details.isWithinGrace).toBe(true);
-        });
     });
 
     describe('LATE status', () => {
-        it('should return LATE when check-in is after grace period', () => {
-            const result = calculateAttendanceStatus('09:20', '17:30', DEFAULT_RULE);
+        it('should return LATE when check-in is after core hours start', () => {
+            const result = calculateAttendanceStatus('09:01', '17:30', DEFAULT_RULE);
             expect(result.status).toBe('late');
             expect(result.present).toBe(true);
-            expect(result.details.lateMinutes).toBe(20);
+            expect(result.details.lateMinutes).toBe(1);
         });
 
         it('should return LATE when check-in is significantly after core hours', () => {
@@ -75,18 +66,12 @@ describe('calculateAttendanceStatus', () => {
         });
     });
 
-    describe('EARLY_LEAVE status', () => {
-        it('should return EARLY_LEAVE when check-out is before grace period threshold', () => {
-            const result = calculateAttendanceStatus('08:30', '16:30', DEFAULT_RULE);
-            expect(result.status).toBe('early_leave');
+    describe('EARLY_LEAVE status/LATE status variants', () => {
+        it('should return LATE (early leave variant) when check-out is before core hours end', () => {
+            const result = calculateAttendanceStatus('08:30', '16:59', DEFAULT_RULE);
+            expect(result.status).toBe('late'); // Logic returns 'late' for any non-compliance
             expect(result.present).toBe(true);
-            expect(result.details.earlyLeaveMinutes).toBe(30);
-        });
-
-        it('should return PRESENT when check-out is within grace period', () => {
-            const result = calculateAttendanceStatus('08:30', '16:50', DEFAULT_RULE);
-            expect(result.status).toBe('present');
-            expect(result.present).toBe(true);
+            expect(result.details.earlyLeaveMinutes).toBe(1);
         });
     });
 
@@ -117,13 +102,7 @@ describe('calculateAttendanceStatus', () => {
             expect(result.status).toBe('present');
         });
 
-        it('should handle zero grace periods', () => {
-            const ruleNoGrace = { ...DEFAULT_RULE, grace_in_minutes: 0, grace_out_minutes: 0 };
-            const result = calculateAttendanceStatus('09:01', '17:00', ruleNoGrace);
-            expect(result.status).toBe('late');
-        });
-
-        it('should prioritize late over early_leave when both occur', () => {
+        it('should summarize late and early_leave when both occur', () => {
             const result = calculateAttendanceStatus('09:30', '16:30', DEFAULT_RULE);
             expect(result.status).toBe('late');
             expect(result.details.lateMinutes).toBe(30);

@@ -237,7 +237,6 @@ export interface IAttendance {
     leave_reason_code?: ExcusedReasonCode; // vacation | sick | maternity | paternity | bereavement | unpaid | training | business_trip
     work_mode?: WorkMode;             // onsite | remote | on_duty
     punch_exception?: PunchException; // none | missing_check_in | missing_check_out | missing_both
-    within_grace?: boolean;
     compliant?: boolean;              // memenuhi core hours
     break_violation?: boolean;
     half_day_type?: HalfDayType;      // none | half_day_am | half_day_pm
@@ -248,8 +247,8 @@ export interface IAttendance {
 }
 
 export interface IWorkSchedule {
-    id: string;
-    organization_id: string;
+    id: number;
+    organization_id: number;
     code?: string;
     name: string;
     description?: string;
@@ -262,7 +261,7 @@ export interface IWorkSchedule {
 }
 
 export interface IWorkScheduleDetail {
-    id: string;
+    id: number;
     work_schedule_id: number;
     day_of_week: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
     is_working_day: boolean;
@@ -274,13 +273,9 @@ export interface IWorkScheduleDetail {
     core_hours_start?: string; // HH:MM:SS
     core_hours_end?: string;   // HH:MM:SS
 
-    // Grace periods (in minutes) to soften status classification
-    grace_in_minutes?: number;  // Allowed lateness before LATE status
-    grace_out_minutes?: number; // Allowed early leave before EARLY_LEAVE status
-
     break_start: string;
     break_end: string;
-    break_duration_minutes?: number;
+    break_duration_minutes?: number | null;
     flexible_hours: boolean;
     is_active: boolean;
     created_at: string;

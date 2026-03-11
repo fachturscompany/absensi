@@ -1,4 +1,5 @@
 "use client"
+import { useState, useEffect } from "react"
 
 import { TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +14,8 @@ import { useMembers } from "@/hooks/attendance/use-members"
 import { useBatchAttendance } from "@/hooks/attendance/use-batch-attendance"
 import { type BatchAttendanceReturn } from "@/types/attendance"
 import { getMemberSchedule } from "@/action/attendance"
+import { cn } from "@/lib/utils"
+import { type BatchEntry } from "@/types/attendance"
 
 interface BatchAttendanceFormProps {
   onSubmit: () => Promise<void>
@@ -24,6 +27,37 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
   const { members, departments, loading } = useMembers()
   const localBatch = useBatchAttendance()
   const batch = externalBatch || localBatch
+  const [entrySchedules, setEntrySchedules] = useState<Record<string, any>>({})
+
+  // Fetch missing schedules reactive-ly
+  useEffect(() => {
+    const fetchMissing = async () => {
+      const memberIds = batch.batchEntries
+        .map(e => e.memberId)
+        .filter(id => id && !entrySchedules[id]) as string[]
+
+      if (memberIds.length === 0) return
+
+      const updates: Record<string, any> = { ...entrySchedules }
+      await Promise.all(memberIds.map(async id => {
+        const res = await getMemberSchedule(id, batch.batchCheckInDate)
+        if (res.success) {
+          updates[id] = res.data
+        } else {
+          // Store error to show in toast later
+          updates[id] = { _error: res.message || "No schedule" }
+        }
+      }))
+      setEntrySchedules(updates)
+    }
+    fetchMissing()
+  }, [batch.batchEntries, batch.batchCheckInDate, entrySchedules])
+
+  const isMatch = (entry: BatchEntry, field: keyof BatchEntry, scheduleValue?: string | null) => {
+    if (!scheduleValue) return false
+    const val = (entry as any)[field]
+    return val === scheduleValue.slice(0, 5)
+  }
 
   return (
     <TabsContent value="batch" className="space-y-6">
@@ -45,6 +79,9 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                     onChange={(e) => batch.setBatchCheckInDate(e.target.value)}
                     disabled={batch.isSubmitting || loading}
                   />
+                  <p className="text-[9px] text-muted-foreground mt-1">
+                    * Date for all entries
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Check-in Time</label>
@@ -85,7 +122,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-muted-foreground">Break Start</label>
+                  <label className="text-xs text-muted-foreground">Break In</label>
                   <Input
                     type="time"
                     value={batch.batchBreakStartTime}
@@ -94,7 +131,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">Break End</label>
+                  <label className="text-xs text-muted-foreground">Break Out</label>
                   <Input
                     type="time"
                     value={batch.batchBreakEndTime}
@@ -274,6 +311,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {batch.batchEntries.map(entry => {
                   const member = members.find(m => m.id === entry.memberId)
+                  const sched = entry.memberId ? entrySchedules[entry.memberId] : null
                   return (
                     <div key={entry.id} className="p-4 border rounded-xl bg-zinc-50 dark:bg-zinc-900/40 space-y-3 relative group">
                       <div className="flex items-center justify-between">
@@ -286,6 +324,11 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                               {member?.label || 'Select Member...'}
                             </p>
                             <p className="text-[10px] text-muted-foreground uppercase">{member?.department || '-'}</p>
+                            {sched && (
+                              <p className="text-[9px] text-emerald-600 font-medium">
+                                📅 {sched.start_time?.slice(0, 5)} - {sched.end_time?.slice(0, 5)}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <Button
@@ -320,7 +363,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break Start</label>
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break In</label>
                           <Input
                             type="time"
                             className="h-8 text-xs"
@@ -329,7 +372,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break End</label>
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Break Out</label>
                           <Input
                             type="time"
                             className="h-8 text-xs"
@@ -340,26 +383,105 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                       </div>
 
                       <div className="flex items-center justify-between pt-1">
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 overflow-x-auto pb-1 no-scrollbar">
                           <Button
                             type="button"
-                            variant="secondary"
-                            className="h-6 px-2 text-[10px]"
-                            onClick={async () => {
-                              if (!entry.memberId) return toast.error("Select a member first")
-                              const res = await getMemberSchedule(entry.memberId, entry.checkInDate)
-                              if (res.success && res.data) {
-                                batch.updateBatchEntry(entry.id, "checkInTime", res.data.start_time.slice(0, 5))
-                                batch.updateBatchEntry(entry.id, "checkOutTime", res.data.end_time.slice(0, 5))
-                                if (res.data.break_start) batch.updateBatchEntry(entry.id, "breakStartTime", res.data.break_start.slice(0, 5))
-                                if (res.data.break_end) batch.updateBatchEntry(entry.id, "breakEndTime", res.data.break_end.slice(0, 5))
-                                toast.success(`Applied schedule for ${member?.label}`)
+                            variant={isMatch(entry, "checkInTime", sched?.start_time) ? "default" : "secondary"}
+                            className={cn(
+                              "h-6 px-2 text-[10px] whitespace-nowrap",
+                              isMatch(entry, "checkInTime", sched?.start_time) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                            )}
+                            onClick={() => {
+                              if (sched?.start_time) {
+                                const checkInTime = sched.start_time.slice(0, 5)
+                                batch.updateBatchEntry(entry.id, "checkInTime", checkInTime)
+
+                                // Auto-calculate status: if current time > schedule start time, set to late
+                                const now = new Date()
+                                const currentH = now.getHours()
+                                const currentM = now.getMinutes()
+                                const [schedH, schedM] = checkInTime.split(":").map(Number)
+
+                                if (currentH > schedH || (currentH === schedH && currentM > schedM)) {
+                                  batch.updateBatchEntry(entry.id, "status", "late")
+                                } else {
+                                  batch.updateBatchEntry(entry.id, "status", "present")
+                                }
+
+                                toast.info(`Status for ${member?.label}: ${currentH > schedH || (currentH === schedH && currentM > schedM) ? "Late" : "On-Time"}`)
+                              } else if (sched?._error) {
+                                toast.error(sched._error)
+                              } else if (!sched) {
+                                toast.error("No schedule assigned for this date")
                               } else {
-                                toast.error("Schedule not found")
+                                toast.error("Start time is not set in schedule")
                               }
                             }}
                           >
-                            Auto Schedule
+                            Check-in
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={isMatch(entry, "checkOutTime", sched?.core_hours_end) ? "default" : "secondary"}
+                            className={cn(
+                              "h-6 px-2 text-[10px] whitespace-nowrap",
+                              isMatch(entry, "checkOutTime", sched?.core_hours_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                            )}
+                            onClick={() => {
+                              if (sched?.core_hours_end) {
+                                batch.updateBatchEntry(entry.id, "checkOutTime", sched.core_hours_end.slice(0, 5))
+                              } else if (sched?._error) {
+                                toast.error(sched._error)
+                              } else if (!sched) {
+                                toast.error("No schedule assigned for this date")
+                              } else {
+                                toast.error("Core hours end is not set in schedule")
+                              }
+                            }}
+                          >
+                            Check-out
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={isMatch(entry, "breakStartTime", sched?.break_start) ? "default" : "secondary"}
+                            className={cn(
+                              "h-6 px-2 text-[10px] whitespace-nowrap",
+                              isMatch(entry, "breakStartTime", sched?.break_start) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                            )}
+                            onClick={() => {
+                              if (sched?.break_start) {
+                                batch.updateBatchEntry(entry.id, "breakStartTime", sched.break_start.slice(0, 5))
+                              } else if (sched?._error) {
+                                toast.error(sched._error)
+                              } else if (!sched) {
+                                toast.error("No schedule assigned for this date")
+                              } else {
+                                toast.error("Break start is not set in schedule")
+                              }
+                            }}
+                          >
+                            Break In
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={isMatch(entry, "breakEndTime", sched?.break_end) ? "default" : "secondary"}
+                            className={cn(
+                              "h-6 px-2 text-[10px] whitespace-nowrap",
+                              isMatch(entry, "breakEndTime", sched?.break_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                            )}
+                            onClick={() => {
+                              if (sched?.break_end) {
+                                batch.updateBatchEntry(entry.id, "breakEndTime", sched.break_end.slice(0, 5))
+                              } else if (sched?._error) {
+                                toast.error(sched._error)
+                              } else if (!sched) {
+                                toast.error("No schedule assigned for this date")
+                              } else {
+                                toast.error("Break end is not set in schedule")
+                              }
+                            }}
+                          >
+                            Break Out
                           </Button>
                         </div>
                         <Select

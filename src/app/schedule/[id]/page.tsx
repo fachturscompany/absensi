@@ -38,8 +38,6 @@ interface RuleItem {
   end_time: string
   core_hours_start: string
   core_hours_end: string
-  grace_in_minutes: number
-  grace_out_minutes: number
   break_start: string
   break_end: string
   flexible_hours: boolean
@@ -52,11 +50,11 @@ const PRESETS = {
     label: "Normal Working Hours",
     is_working_day: true,
     start_time: "07:30",
-    end_time: "19:00",
+    end_time: "17:30",
     core_hours_start: "08:00",
-    core_hours_end: "16:30",
-    break_start: "12:00",
-    break_end: "13:00",
+    core_hours_end: "17:00",
+    break_start: "09:00",
+    break_end: "10:00",
     flexible_hours: false,
     notes: "",
   },
@@ -64,9 +62,9 @@ const PRESETS = {
     label: "Morning Shift",
     is_working_day: true,
     start_time: "06:30",
-    end_time: "19:00",
+    end_time: "14:00",
     core_hours_start: "07:00",
-    core_hours_end: "13:00",
+    core_hours_end: "13:30",
     break_start: "10:00",
     break_end: "10:30",
     flexible_hours: false,
@@ -76,9 +74,9 @@ const PRESETS = {
     label: "Evening Shift",
     is_working_day: true,
     start_time: "13:00",
-    end_time: "23:00",
+    end_time: "22:00",
     core_hours_start: "13:30",
-    core_hours_end: "21:00",
+    core_hours_end: "21:30",
     break_start: "18:00",
     break_end: "18:30",
     flexible_hours: false,
@@ -87,10 +85,10 @@ const PRESETS = {
   flexible: {
     label: "Flexible Hours",
     is_working_day: true,
-    start_time: "09:00",
-    end_time: "21:00",
-    core_hours_start: "09:30",
-    core_hours_end: "17:00",
+    start_time: "08:00",
+    end_time: "20:00",
+    core_hours_start: "09:00",
+    core_hours_end: "18:00",
     break_start: "12:00",
     break_end: "13:00",
     flexible_hours: true,
@@ -117,14 +115,12 @@ const createDefaultRule = (day: DayIndex): RuleItem => {
     day_of_week: day,
     label: isWeekend ? "Day Off" : "Normal Working Hours",
     is_working_day: !isWeekend,
-    start_time: isWeekend ? "" : "08:30",
-    end_time: isWeekend ? "" : "17:00",
-    core_hours_start: isWeekend ? "" : "08:30",
-    core_hours_end: isWeekend ? "" : "17:00",
-    grace_in_minutes: 0,
-    grace_out_minutes: 0,
+    start_time: isWeekend ? "" : "06:30",
+    end_time: isWeekend ? "" : "16:30",
+    core_hours_start: isWeekend ? "" : "07:30",
+    core_hours_end: isWeekend ? "" : "18:00",
     break_start: isWeekend ? "" : "12:00",
-    break_end: isWeekend ? "" : "13:00",
+    break_end: isWeekend ? "" : "12:30",
     flexible_hours: false,
     notes: isWeekend ? "Weekend off" : "",
   }
@@ -176,8 +172,6 @@ export default function WorkScheduleDetailsPage() {
               end_time: detail.end_time || "",
               core_hours_start: detail.core_hours_start || "",
               core_hours_end: detail.core_hours_end || "",
-              grace_in_minutes: detail.grace_in_minutes || 0,
-              grace_out_minutes: detail.grace_out_minutes || 0,
               break_start: detail.break_start || "",
               break_end: detail.break_end || "",
               flexible_hours: detail.flexible_hours,
@@ -238,8 +232,10 @@ export default function WorkScheduleDetailsPage() {
           .map((m: unknown) => {
             const o = m as {
               id?: unknown
-              user?: { first_name?: string | null;
-last_name?: string | null; email?: string | null; display_name?: string | null } | null
+              user?: {
+                first_name?: string | null;
+                last_name?: string | null; email?: string | null; display_name?: string | null
+              } | null
               departments?: { name?: string | null } | null
               groups?: { name?: string | null } | null
             }
@@ -293,8 +289,6 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
           updated.end_time = ""
           updated.core_hours_start = ""
           updated.core_hours_end = ""
-          updated.grace_in_minutes = 0
-          updated.grace_out_minutes = 0
           updated.break_start = ""
           updated.break_end = ""
         }
@@ -321,8 +315,6 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
           end_time: selectedRule.end_time,
           core_hours_start: selectedRule.core_hours_start,
           core_hours_end: selectedRule.core_hours_end,
-          grace_in_minutes: selectedRule.grace_in_minutes,
-          grace_out_minutes: selectedRule.grace_out_minutes,
           break_start: selectedRule.break_start,
           break_end: selectedRule.break_end,
           flexible_hours: selectedRule.flexible_hours,
@@ -344,24 +336,19 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
       const items = rules.map((r) => ({
         day_of_week: r.day_of_week,
         is_working_day: r.is_working_day,
-        start_time: r.is_working_day ? (r.start_time || "08:30") : undefined,
-        end_time: r.is_working_day ? (r.end_time || "17:00") : undefined,
+        start_time: r.is_working_day ? (r.start_time || undefined) : undefined,
+        end_time: r.is_working_day ? (r.end_time || undefined) : undefined,
         break_start: r.is_working_day ? (r.break_start || undefined) : undefined,
         break_end: r.is_working_day ? (r.break_end || undefined) : undefined,
         core_hours_start: r.is_working_day ? (r.core_hours_start || undefined) : undefined,
         core_hours_end: r.is_working_day ? (r.core_hours_end || undefined) : undefined,
-        grace_in_minutes: r.grace_in_minutes,
-        grace_out_minutes: r.grace_out_minutes,
         flexible_hours: r.flexible_hours,
         is_active: true,
       }))
 
-      console.log('[saveAll] Saving schedule items:', items)
       const res = await upsertWorkScheduleDetails(id, items)
-      console.log('[saveAll] Response:', res)
 
       if (!res.success) {
-        console.error('[saveAll] Save failed:', res.message)
         toast.error(res.message || "Failed to save schedule")
         return
       }
@@ -387,7 +374,6 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
 
       await loadDetails() // refresh dari DB agar UI sesuai DB
     } catch (error) {
-      console.error('[saveAll] Exception:', error)
       toast.error("Failed to save schedule")
     } finally {
       setSaving(false)
@@ -470,8 +456,8 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
                   </div>
                   <button
                     className={`text-xs px-2 py-1 rounded-full font-medium transition-all hover:opacity-80 ${rule?.is_working_day
-                      ? "bg-green-500 dark:bg-green-600 text-white hover:bg-green-600"
-                      : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600"
+                      ? "bg-gray-900 dark:bg-gray-900 text-white hover:bg-gray-900"
+                      : "bg-gray-500 dark:bg-gray-600 text-white hover:bg-gray-600"
                       }`}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -499,8 +485,8 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
                   <Badge
                     variant={selectedRule.is_working_day ? "default" : "secondary"}
                     className={`${selectedRule.is_working_day
-                      ? "bg-green-500 hover:bg-green-500 text-white"
-                      : "bg-blue-500 hover:bg-blue-500 text-white"
+                      ? "bg-gray-900 hover:bg-gray-900 text-white"
+                      : "bg-gray-500 hover:bg-gray-500 text-white"
                       } cursor-default`}
                   >
                     {selectedRule.is_working_day ? "Working Day" : "Day Off"}
@@ -597,30 +583,7 @@ last_name?: string | null; email?: string | null; display_name?: string | null }
                       />
                     </label>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Grace In (Minutes)</div>
-                      <Input
-                        key={`grace-in-${selectedDay}`}
-                        type="number"
-                        min="0"
-                        value={selectedRule.grace_in_minutes}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { grace_in_minutes: Number(e.target.value) })}
-                      />
-                    </label>
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Grace Out (Minutes)</div>
-                      <Input
-                        key={`grace-out-${selectedDay}`}
-                        type="number"
-                        min="0"
-                        value={selectedRule.grace_out_minutes}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { grace_out_minutes: Number(e.target.value) })}
-                      />
-                    </label>
-                  </div>
+                  {/* Removed Grace Settings as per simplification rule */}
                 </div>
 
                 {/* Flexible Hours Toggle */}

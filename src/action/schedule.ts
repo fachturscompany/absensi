@@ -154,16 +154,24 @@ export async function getWorkScheduleDetails(workScheduleId: number) {
 
 function toMinutes(v?: string | null) {
     if (!v) return null
-    const parts = v.split(":").map((x) => Number(x))
+    // Support HH:mm or HH:mm:ss and ignore AM/PM if present
+    const clean = String(v).split(/\s/)[0] || ""
+    const parts = clean.split(":").map((x) => parseInt(x, 10))
     if (parts.some((n) => Number.isNaN(n))) return null
     const [hh = 0, mm = 0] = parts
     return hh * 60 + mm
+}
+
+function getDayNameLabel(day: number) {
+    const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return names[day] || `Day ${day}`
 }
 
 function validateDetailInput(payload: Partial<IWorkScheduleDetail>) {
     const isWorking = Boolean(payload.is_working_day)
     if (!isWorking) return { ok: true as const }
 
+    const dayLabel = getDayNameLabel(payload.day_of_week ?? -1)
     const s = toMinutes(payload.start_time as string | undefined)
     const e = toMinutes(payload.end_time as string | undefined)
     const bs = toMinutes(payload.break_start as string | undefined)
@@ -171,28 +179,28 @@ function validateDetailInput(payload: Partial<IWorkScheduleDetail>) {
     const coreStart = toMinutes(payload.core_hours_start as string | undefined)
     const coreEnd = toMinutes(payload.core_hours_end as string | undefined)
 
-    if (s == null) return { ok: false as const, message: "Start time is required" }
-    if (e == null) return { ok: false as const, message: "End time is required" }
-    if (e <= s) return { ok: false as const, message: "End time must be later than start time" }
+    if (s == null) return { ok: false as const, message: `[${dayLabel}] Start time is required` }
+    if (e == null) return { ok: false as const, message: `[${dayLabel}] End time is required` }
+    if (e <= s) return { ok: false as const, message: `[${dayLabel}] End time must be later than start time` }
 
     // Core hours validation
     if (coreStart != null && coreEnd != null && coreEnd <= coreStart) {
-        return { ok: false as const, message: "Core hours end must be later than core hours start" }
+        return { ok: false as const, message: `[${dayLabel}] Core hours end must be later than core hours start` }
     }
     if (s != null && coreStart != null && s > coreStart) {
-    return { ok: false as const, message: "Start time must be earlier than core hours start" }
+        return { ok: false as const, message: `[${dayLabel}] Start time must be earlier than core hours start` }
     }
     if (e != null && coreEnd != null && e < coreEnd) {
-    return { ok: false as const, message: "End time must be later than core hours end" }
+        return { ok: false as const, message: `[${dayLabel}] End time must be later than core hours end` }
     }
 
     const hasBs = bs != null
     const hasBe = be != null
-    if (hasBs !== hasBe) return { ok: false as const, message: "Break start and break end must both be filled" }
+    if (hasBs !== hasBe) return { ok: false as const, message: `[${dayLabel}] Break start and break end must both be filled` }
     if (!hasBs || !hasBe) return { ok: true as const }
-    if (be! <= bs!) return { ok: false as const, message: "Break end must be later than break start" }
-    if (bs! <= s) return { ok: false as const, message: "Break start must be after start time" }
-    if (be! >= e) return { ok: false as const, message: "Break end must be before end time" }
+    if (be! <= bs!) return { ok: false as const, message: `[${dayLabel}] Break end must be later than break start` }
+    if (bs! <= s) return { ok: false as const, message: `[${dayLabel}] Break start must be after start time` }
+    if (be! >= e) return { ok: false as const, message: `[${dayLabel}] Break end must be before end time` }
 
     return { ok: true as const }
 }
@@ -307,14 +315,11 @@ export async function upsertWorkScheduleDetails(
     workScheduleId: number,
     items: Array<Partial<IWorkScheduleDetail>>,
 ) {
-    console.log('[upsertWorkScheduleDetails] Starting with workScheduleId:', workScheduleId, 'items count:', items.length)
-
     const supabase = await createClient();
 
     for (const it of items) {
         const v = validateDetailInput(it)
         if (!v.ok) {
-            console.error('[upsertWorkScheduleDetails] Validation failed for day', it.day_of_week, ':', v.message)
             return { success: false, message: v.message, data: [] as IWorkScheduleDetail[] }
         }
     }
@@ -329,11 +334,11 @@ export async function upsertWorkScheduleDetails(
         core_hours_end: (it.core_hours_end ?? null) as string | null,
         break_start: (it.break_start ?? null) as string | null,
         break_end: (it.break_end ?? null) as string | null,
-        break_duration_minutes: typeof it.break_duration_minutes === 'number' ? it.break_duration_minutes : null,
+        break_duration_minutes: (it.break_start && it.break_end)
+            ? Math.round((new Date(`1970-01-01T${it.break_end}`).getTime() - new Date(`1970-01-01T${it.break_start}`).getTime()) / 60000)
+            : (typeof it.break_duration_minutes === 'number' ? it.break_duration_minutes : null),
         flexible_hours: Boolean(it.flexible_hours),
     }))
-
-    console.log('[upsertWorkScheduleDetails] Rows to upsert:', JSON.stringify(rows, null, 2))
 
     const { data, error } = await supabase
         .from("work_schedule_details")
@@ -341,14 +346,10 @@ export async function upsertWorkScheduleDetails(
         .select()
 
     if (error) {
-        console.error('[upsertWorkScheduleDetails] Database error:', error.message, error.details, error.code)
         return { success: false, message: error.message, data: [] as IWorkScheduleDetail[] }
     }
-
-    console.log('[upsertWorkScheduleDetails] Success! Saved', data?.length, 'rows')
     return { success: true, data: (data || []) as IWorkScheduleDetail[] }
 }
-
 
 // Set a single default work schedule within an organization
 export async function setDefaultWorkSchedule(id: string | number) {
@@ -391,4 +392,36 @@ export async function setDefaultWorkSchedule(id: string | number) {
 
     return { success: true as const, message: 'Default schedule set successfully', data: updated as IWorkSchedule };
 }
+
+export const deleteMultipleWorkSchedules = async (ids: (string | number)[]) => {
+    const supabase = await createClient();
+    const stringIds = ids.map(id => String(id));
+
+    const { data, error } = await supabase
+        .from("work_schedules")
+        .delete()
+        .in("id", stringIds)
+        .select();
+
+    if (error) {
+        return { success: false, message: error.message, data: null };
+    }
+    return { success: true, message: `Successfully deleted ${data?.length || 0} schedules`, data };
+};
+
+export const updateMultipleWorkSchedulesStatus = async (ids: (string | number)[], is_active: boolean) => {
+    const supabase = await createClient();
+    const stringIds = ids.map(id => String(id));
+
+    const { data, error } = await supabase
+        .from("work_schedules")
+        .update({ is_active, updated_at: new Date().toISOString() })
+        .in("id", stringIds)
+        .select();
+
+    if (error) {
+        return { success: false, message: error.message, data: null };
+    }
+    return { success: true, message: `Successfully updated ${data?.length || 0} schedules`, data };
+};
 

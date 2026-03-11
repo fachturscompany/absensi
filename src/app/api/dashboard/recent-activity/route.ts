@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         const raw = cookieStore.get('org_id')?.value
         const fromCookie = raw ? Number(raw) : NaN
         if (!Number.isNaN(fromCookie)) organizationId = fromCookie
-      } catch {}
+      } catch { }
     }
     if (!organizationId) {
       return NextResponse.json(
@@ -131,14 +131,14 @@ export async function GET(request: Request) {
         if (workScheduleId) {
           const det = await supabase
             .from('work_schedule_details')
-            .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,grace_in_minutes,grace_out_minutes,is_active')
+            .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,is_active')
             .eq('work_schedule_id', workScheduleId)
             .eq('day_of_week', dayOfWeek)
             .maybeSingle();
 
           const d = det.data as {
             day_of_week: number; is_working_day: boolean; start_time: string | null; end_time: string | null;
-            core_hours_start: string | null; core_hours_end: string | null; grace_in_minutes: number | null; grace_out_minutes: number | null; is_active: boolean | null;
+            core_hours_start: string | null; core_hours_end: string | null; is_active: boolean | null;
           } | null;
           if (d && d.is_working_day && d.is_active && d.start_time && d.end_time && d.core_hours_start && d.core_hours_end) {
             const rule: ScheduleRule = {
@@ -147,14 +147,12 @@ export async function GET(request: Request) {
               end_time: d.end_time,
               core_hours_start: d.core_hours_start,
               core_hours_end: d.core_hours_end,
-              grace_in_minutes: d.grace_in_minutes ?? 0,
-              grace_out_minutes: d.grace_out_minutes ?? 0,
             };
             const calc = calculateAttendanceStatus(record.actual_check_in, record.actual_check_out, rule);
             status = calc.status;
           }
         }
-      } catch {}
+      } catch { }
 
       const firstName = getProp<string | null>(profile, 'first_name', null) || '';
       const lastName = getProp<string | null>(profile, 'last_name', null) || '';

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,7 @@ import { useRouter } from "next/navigation"
 import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
 import { getMemberSchedule } from "@/action/attendance"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface SingleFormProps {
   activeTab: "single" | "batch"
@@ -32,6 +34,41 @@ export function SingleForm({
   dialogHandlers  // ✅ Props OK!
 }: SingleFormProps) {
   const router = useRouter()
+  const [localSchedule, setLocalSchedule] = useState<any>(null)
+  const [scheduleError, setScheduleError] = useState<string | null>(null)
+
+  const memberId = form.watch("memberId")
+  const checkInDate = form.watch("checkInDate")
+
+  // Auto-fetch schedule when member or date changes
+  useEffect(() => {
+    if (memberId && checkInDate) {
+      // Ensure date is string if it's a Date object
+      const dateStr = typeof checkInDate === 'string' ? checkInDate : (checkInDate && (checkInDate as any).toISOString ? (checkInDate as any).toISOString().split('T')[0] : String(checkInDate))
+
+      if (dateStr) {
+        getMemberSchedule(memberId, dateStr).then(res => {
+          if (res.success) {
+            setLocalSchedule(res.data)
+            setScheduleError(null)
+          } else {
+            setLocalSchedule(null)
+            setScheduleError(res.message || "Failed to fetch schedule")
+          }
+        })
+      }
+    } else {
+      setLocalSchedule(null)
+      setScheduleError(null)
+    }
+  }, [memberId, checkInDate])
+
+  // Helper to check if value matches preset
+  const isMatch = (fieldName: keyof SingleFormValues, scheduleValue?: string | null) => {
+    if (!scheduleValue) return false
+    const formValue = form.getValues(fieldName)
+    return formValue === scheduleValue.slice(0, 5)
+  }
 
   return (
     <TabsContent value="single" className="space-y-6">
@@ -73,17 +110,38 @@ export function SingleForm({
                       <div className="grid grid-cols-4 gap-2 mt-2">
                         <Button
                           type="button"
-                          variant="secondary"
+                          variant={isMatch("checkInTime", localSchedule?.start_time) ? "default" : "secondary"}
                           size="sm"
-                          className="text-[10px] h-8 px-1"
-                          disabled={!field.value}
-                          onClick={async () => {
-                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
-                            if (res.success && res.data) {
-                              form.setValue("checkInTime", res.data.start_time.slice(0, 5))
-                              toast.success("Applied check-in time")
+                          className={cn(
+                            "text-[10px] h-8 px-1",
+                            isMatch("checkInTime", localSchedule?.start_time) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                          )}
+                          disabled={loading || !field.value}
+                          onClick={() => {
+                            if (localSchedule?.start_time) {
+                              const checkInTime = localSchedule.start_time.slice(0, 5)
+                              form.setValue("checkInTime", checkInTime)
+
+                              // Auto-calculate status: if current time > schedule start time, set to late
+                              // Simplified client-side logic for manual preset
+                              const now = new Date()
+                              const currentH = now.getHours()
+                              const currentM = now.getMinutes()
+                              const [schedH, schedM] = checkInTime.split(":").map(Number)
+
+                              if (currentH > schedH || (currentH === schedH && currentM > schedM)) {
+                                form.setValue("status", "late")
+                              } else {
+                                form.setValue("status", "present")
+                              }
+
+                              toast.info(`Status set based on schedule: ${currentH > schedH || (currentH === schedH && currentM > schedM) ? "Late" : "On-Time"}`)
+                            } else if (scheduleError) {
+                              toast.error(scheduleError)
+                            } else if (!localSchedule) {
+                              toast.error("No schedule assigned for this date")
                             } else {
-                              toast.error("Schedule not found")
+                              toast.error("Start time is not set in schedule")
                             }
                           }}
                         >
@@ -91,20 +149,22 @@ export function SingleForm({
                         </Button>
                         <Button
                           type="button"
-                          variant="secondary"
+                          variant={isMatch("checkOutTime", localSchedule?.core_hours_end) ? "default" : "secondary"}
                           size="sm"
-                          className="text-[10px] h-8 px-1"
-                          disabled={!field.value}
-                          onClick={async () => {
-                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
-                            if (res.success && res.data) {
-                              form.setValue("checkOutTime", res.data.end_time.slice(0, 5))
-                              if (!form.getValues("checkOutDate")) {
-                                form.setValue("checkOutDate", form.getValues("checkInDate"))
-                              }
-                              toast.success("Applied check-out time")
+                          className={cn(
+                            "text-[10px] h-8 px-1",
+                            isMatch("checkOutTime", localSchedule?.core_hours_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                          )}
+                          disabled={loading || !field.value}
+                          onClick={() => {
+                            if (localSchedule?.core_hours_end) {
+                              form.setValue("checkOutTime", localSchedule.core_hours_end.slice(0, 5))
+                            } else if (scheduleError) {
+                              toast.error(scheduleError)
+                            } else if (!localSchedule) {
+                              toast.error("No schedule assigned for this date")
                             } else {
-                              toast.error("Schedule not found")
+                              toast.error("Core hours end is not set in schedule")
                             }
                           }}
                         >
@@ -112,17 +172,20 @@ export function SingleForm({
                         </Button>
                         <Button
                           type="button"
-                          variant="secondary"
+                          variant={isMatch("breakStartTime", localSchedule?.break_start) ? "default" : "secondary"}
                           size="sm"
-                          className="text-[10px] h-8 px-1"
-                          disabled={!field.value}
-                          onClick={async () => {
-                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
-                            if (res.success && res.data?.break_start) {
-                              form.setValue("breakStartTime", res.data.break_start.slice(0, 5))
-                              toast.success("Applied break start")
+                          className={cn(
+                            "text-[10px] h-8 px-1",
+                            isMatch("breakStartTime", localSchedule?.break_start) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                          )}
+                          disabled={loading || !field.value}
+                          onClick={() => {
+                            if (localSchedule?.break_start) {
+                              form.setValue("breakStartTime", localSchedule.break_start.slice(0, 5))
+                            } else if (!localSchedule) {
+                              toast.error("No schedule assigned for this date")
                             } else {
-                              toast.error("Break schedule not found")
+                              toast.error("Break start is not set in schedule")
                             }
                           }}
                         >
@@ -130,17 +193,20 @@ export function SingleForm({
                         </Button>
                         <Button
                           type="button"
-                          variant="secondary"
+                          variant={isMatch("breakEndTime", localSchedule?.break_end) ? "default" : "secondary"}
                           size="sm"
-                          className="text-[10px] h-8 px-1"
-                          disabled={!field.value}
-                          onClick={async () => {
-                            const res = await getMemberSchedule(field.value, form.getValues("checkInDate"))
-                            if (res.success && res.data?.break_end) {
-                              form.setValue("breakEndTime", res.data.break_end.slice(0, 5))
-                              toast.success("Applied break end")
+                          className={cn(
+                            "text-[10px] h-8 px-1",
+                            isMatch("breakEndTime", localSchedule?.break_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
+                          )}
+                          disabled={loading || !field.value}
+                          onClick={() => {
+                            if (localSchedule?.break_end) {
+                              form.setValue("breakEndTime", localSchedule.break_end.slice(0, 5))
+                            } else if (!localSchedule) {
+                              toast.error("No schedule assigned for this date")
                             } else {
-                              toast.error("Break schedule not found")
+                              toast.error("Break end is not set in schedule")
                             }
                           }}
                         >
@@ -167,6 +233,11 @@ export function SingleForm({
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
+                        {localSchedule && (
+                          <p className="text-[10px] text-emerald-600 font-medium mt-1">
+                            📅 Work Hours: {localSchedule.start_time?.slice(0, 5)} - {localSchedule.end_time?.slice(0, 5)}
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -229,7 +300,7 @@ export function SingleForm({
                     name="breakStartTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm">Break Start</FormLabel>
+                        <FormLabel className="text-sm">Break In</FormLabel>
                         <FormControl>
                           <Input type="time" {...field} />
                         </FormControl>
@@ -242,7 +313,7 @@ export function SingleForm({
                     name="breakEndTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm">Break End</FormLabel>
+                        <FormLabel className="text-sm">Break Out</FormLabel>
                         <FormControl>
                           <Input type="time" {...field} />
                         </FormControl>

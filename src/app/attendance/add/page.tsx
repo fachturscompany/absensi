@@ -94,8 +94,8 @@ export default function AttendancePage() {
 
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <div className="mb-8">
+    <div className="">
+      <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Add Attendance</h1>
       </div>
 

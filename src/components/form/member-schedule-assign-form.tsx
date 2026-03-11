@@ -94,8 +94,10 @@ export function MemberScheduleAssignForm() {
 
   const getMemberDisplayName = React.useCallback((member: IOrganization_member) => {
     const user = member.user as
-      | { first_name?: string;
-last_name?: string; email?: string }
+      | {
+        first_name?: string;
+        last_name?: string; email?: string
+      }
       | undefined
     const name = user
       ? [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email

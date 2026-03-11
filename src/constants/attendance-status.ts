@@ -6,7 +6,6 @@ export const ATTENDANCE_STATUSES = [
   { value: "absent", label: "Absent", color: "bg-gray-300 text-black", icon: X },
   { value: "late", label: "Late", color: "bg-red-500 text-white", icon: Clock },
   { value: "excused", label: "Excused", color: "bg-blue-500 text-white", icon: Info },
-  { value: "early_leave", label: "Early Leave", color: "bg-purple-500 text-white", icon: Check },
 ] as const
 
 export const TIME_FORMATS = [

@@ -17,9 +17,11 @@ async function getSupabase() {
 // Returns null if no active rule or non-working day.
 async function resolveScheduleRuleForMemberDate(
   supabase: Awaited<ReturnType<typeof getSupabase>>,
-  organizationMemberId: number,
+  organizationMemberId: string | number,
   dateISO: string,
 ): Promise<ScheduleRule | null> {
+  attendanceLogger.info(`🔍 Resolving schedule for member: ${organizationMemberId} on date: ${dateISO}`);
+
   // Find active member schedule effective for the date
   const { data: ms, error: msErr } = await supabase
     .from('member_schedules')
@@ -31,9 +33,17 @@ async function resolveScheduleRuleForMemberDate(
     .order('effective_date', { ascending: false })
     .limit(1);
 
-  if (msErr || !ms || ms.length === 0) {
+  if (msErr) {
+    attendanceLogger.error(`❌ Database error resolving schedule for member ${organizationMemberId}:`, msErr);
+    throw new Error(`Database error: ${msErr.message}`);
+  }
+
+  if (!ms || ms.length === 0) {
+    attendanceLogger.warn(`⚠️ No record found in member_schedules for member ${organizationMemberId} on date ${dateISO}`);
     return null;
   }
+
+  attendanceLogger.info(`✅ Found member schedule: work_schedule_id=${ms[0]?.work_schedule_id}`);
 
   const workScheduleId = ms[0]?.work_schedule_id as number | string | null;
   if (!workScheduleId) return null;
@@ -43,14 +53,17 @@ async function resolveScheduleRuleForMemberDate(
 
   const { data: det, error: detErr } = await supabase
     .from('work_schedule_details')
-    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,grace_in_minutes,grace_out_minutes,is_active,break_start,break_end')
+    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,is_active,break_start,break_end')
     .eq('work_schedule_id', workScheduleId)
     .eq('day_of_week', dayOfWeek)
     .maybeSingle();
 
   if (detErr || !det) return null;
-  if (!det.is_working_day) return null;
-  if (!det.is_active) return null;
+  // If it's a non-working day, we still return the record but the UI knows it's an off-day
+  if (!det.is_working_day || !det.is_active) {
+    // We can still return it, but UI buttons will fail because times are empty
+    // Or we can return a partial rule. Let's return it so the UI can toast correctly.
+  }
 
   const rule: ScheduleRule = {
     day_of_week: det.day_of_week,
@@ -58,26 +71,27 @@ async function resolveScheduleRuleForMemberDate(
     end_time: det.end_time || '',
     core_hours_start: det.core_hours_start || '',
     core_hours_end: det.core_hours_end || '',
-    grace_in_minutes: det.grace_in_minutes ?? 0,
-    grace_out_minutes: det.grace_out_minutes ?? 0,
     break_start: det.break_start,
     break_end: det.break_end,
   };
-  // Basic guard: empty strings mean invalid rule
-  if (!rule.start_time || !rule.end_time || !rule.core_hours_start || !rule.core_hours_end) {
-    return null;
-  }
+  // No strict guard here to allow partial rules (useful for form presets)
   return rule;
 }
 
 export async function getMemberSchedule(organizationMemberId: string | number, dateISO: string) {
   try {
     const supabase = await getSupabase();
-    const rule = await resolveScheduleRuleForMemberDate(supabase, Number(organizationMemberId), dateISO);
+    console.log(`[getMemberSchedule] Fetching for ${organizationMemberId} on ${dateISO}`);
+    const rule = await resolveScheduleRuleForMemberDate(supabase, organizationMemberId, dateISO);
+
+    if (!rule) {
+      return { success: false, message: "No schedule assigned for this member on this date." };
+    }
+
     return { success: true, data: rule };
   } catch (error) {
     console.error("[getMemberSchedule] Error:", error);
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" };
+    return { success: false, message: error instanceof Error ? error.message : "Failed to fetch schedule" };
   }
 }
 
@@ -101,14 +115,14 @@ export async function updateAttendanceRecord(payload: {
       // Recalculate status only if check-in/out provided
       const shouldRecalc = payload.actual_check_in !== undefined || payload.actual_check_out !== undefined;
       if (shouldRecalc && recOrg) {
-        const memberId = (recOrg as unknown as { organization_member_id: number }).organization_member_id;
+        const memberId = (recOrg as unknown as { organization_member_id: number | string }).organization_member_id;
         const attendanceDate = (recOrg as unknown as { attendance_date: string }).attendance_date;
         const currentIn = (recOrg as unknown as { actual_check_in: string | null }).actual_check_in;
         const currentOut = (recOrg as unknown as { actual_check_out: string | null }).actual_check_out;
         const nextIn = payload.actual_check_in !== undefined ? payload.actual_check_in : currentIn;
         const nextOut = payload.actual_check_out !== undefined ? payload.actual_check_out : currentOut;
 
-        const rule = await resolveScheduleRuleForMemberDate(supabase, Number(memberId), attendanceDate);
+        const rule = await resolveScheduleRuleForMemberDate(supabase, memberId, attendanceDate);
         if (rule) {
           const result = calculateAttendanceStatus(nextIn ?? null, nextOut ?? null, rule);
           // Include status in update
@@ -714,17 +728,30 @@ export async function createManualAttendance(payload: ManualAttendancePayload) {
       check_in: payload.actual_check_in,
     });
 
-    const insertPayload: ManualAttendancePayload & {
-      late_minutes?: number | null;
-      early_leave_minutes?: number | null;
-      overtime_minutes?: number | null;
-    } = {
+    // Resolve schedule to calculate minutes
+    const rule = await resolveScheduleRuleForMemberDate(supabase, payload.organization_member_id, payload.attendance_date);
+
+    const computedDetails = {
+      late_minutes: null as number | null,
+      early_leave_minutes: null as number | null,
+      overtime_minutes: null as number | null,
+    };
+
+    if (rule) {
+      const result = calculateAttendanceStatus(payload.actual_check_in, payload.actual_check_out || null, rule);
+      if (result.details) {
+        computedDetails.late_minutes = result.details.lateMinutes ?? null;
+        computedDetails.early_leave_minutes = result.details.earlyLeaveMinutes ?? null;
+        computedDetails.overtime_minutes = result.details.overtimeMinutes ?? null;
+      }
+      attendanceLogger.debug("📊 Computed details from schedule:", computedDetails);
+    }
+
+    const insertPayload = {
       ...payload,
-      // Use the status provided from the client payload instead of computing it
+      ...computedDetails,
+      // Use the status provided from the client payload (which might have been auto-set by UI)
       status: payload.status,
-      late_minutes: null,
-      early_leave_minutes: null,
-      overtime_minutes: null,
     };
 
     const { error } = await supabase.from("attendance_records").insert([insertPayload]);
