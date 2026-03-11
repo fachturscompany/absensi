@@ -1,9 +1,9 @@
 "use client"
 
 import React from "react"
-import { Search, Plus } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { SearchBar } from "@/components/customs/search-bar"
 import {
     Select,
     SelectContent,
@@ -44,12 +44,11 @@ export default function ScheduleTableToolbar({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col md:flex-row items-center gap-3 w-full md:max-w-3xl">
                 <div className="relative w-full md:max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
+                    <SearchBar
+                        initialQuery={searchQuery}
+                        onSearch={onSearchChange}
                         placeholder="Search schedules..."
-                        value={searchQuery}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        className="pl-10 bg-white"
+                        className="bg-white"
                     />
                 </div>
 

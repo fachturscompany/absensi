@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { Search, Info, Filter } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
+import { Info, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -57,13 +57,11 @@ export function ClassificationFilters({
                     </span>
                 </div>
                 <div className="relative w-full lg:w-64">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                        type="text"
+                    <SearchBar
                         placeholder="Search apps & URLs"
-                        value={searchQuery}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        className="pl-9 h-10 border-gray-300 rounded-full bg-white"
+                        initialQuery={searchQuery}
+                        onSearch={onSearchChange}
+                        className="h-10 border-gray-300 rounded-full bg-white"
                     />
                 </div>
             </div>

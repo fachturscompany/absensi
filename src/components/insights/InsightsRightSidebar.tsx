@@ -1,7 +1,7 @@
 "use client"
 import { useState, useMemo } from "react"
 import { ChevronRight } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
 import type { Member, Team } from "@/lib/data/dummy-data"
 import type { SelectedFilter } from "@/components/insights/types"
 
@@ -78,11 +78,10 @@ export function InsightsRightSidebar({ open, onOpenChange, members, teams, selec
                 </button>
                 {teamsOpen && (
                   <div id="teams-section" className="px-4 py-4 space-y-3">
-                    <Input
+                    <SearchBar
                       placeholder="Search teams"
-                      value={teamQuery}
-                      onChange={(e) => setTeamQuery(e.target.value)}
-                      className="h-8 text-xs"
+                      initialQuery={teamQuery}
+                      onSearch={setTeamQuery}
                     />
 
                     {filteredTeams.length > 0 ? (
@@ -127,11 +126,10 @@ export function InsightsRightSidebar({ open, onOpenChange, members, teams, selec
                 </button>
                 {membersOpen && (
                   <div id="members-section" className="px-4 py-4 space-y-3">
-                    <Input
+                    <SearchBar
                       placeholder="Search members"
-                      value={memberQuery}
-                      onChange={(e) => setMemberQuery(e.target.value)}
-                      className="h-8 text-xs"
+                      initialQuery={memberQuery}
+                      onSearch={setMemberQuery}
                     />
 
                     {filteredMembers.length > 0 ? (

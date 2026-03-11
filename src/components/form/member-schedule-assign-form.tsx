@@ -17,7 +17,6 @@ import {
   getActiveMemberScheduleMemberIds,
 } from "@/action/member-schedule"
 import { IOrganization_member, IWorkSchedule } from "@/interface"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -27,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { SearchBar } from "@/components/customs/search-bar"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -536,13 +536,11 @@ export function MemberScheduleAssignForm() {
               </div>
 
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                <Input
-                  value={memberSearch}
-                  onChange={(e) => setMemberSearch(e.target.value)}
+                <SearchBar
                   placeholder="Search member name or department..."
-                  className="pl-9"
-                  aria-label="Search members"
+                  initialQuery={memberSearch}
+                  onSearch={setMemberSearch}
+                  className="w-full md:w-[300px]"
                 />
               </div>
             </div>

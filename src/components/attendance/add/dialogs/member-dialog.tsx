@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search } from "lucide-react"
 import type { MemberOption, BatchEntry } from "@/types/attendance"
 import type { UseFormReturn } from "react-hook-form"
 import type { SingleFormValues } from "@/types/attendance" // Adjust path
@@ -83,12 +82,10 @@ export function MemberDialog({
 
           {/* Search - MONOLITH */}
           <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+            <SearchBar
               placeholder="Search member name or department..."
-              value={batch.memberSearch}
-              onChange={(e) => batch.setMemberSearch(e.target.value)}
-              className="pl-8"
+              initialQuery={batch.memberSearch}
+              onSearch={batch.setMemberSearch}
             />
           </div>
 

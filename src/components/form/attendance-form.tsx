@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { SearchBar } from "@/components/customs/search-bar"
 import {
   Select,
   SelectContent,
@@ -35,7 +36,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import type { IOrganization_member } from "@/interface"
 import { toast } from "sonner"
@@ -144,7 +144,7 @@ export function AttendanceForm() {
           })
           .map((member) => {
             const user = member.user
-            
+
             // Get name from user_profiles
             let resolvedLabel = "No Name"
             if (user) {
@@ -366,10 +366,10 @@ function SingleEntryForm({
               ))}
             </SelectContent>
           </Select>
-          <Input
+          <SearchBar
             placeholder="Search member name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            initialQuery={searchQuery}
+            onSearch={setSearchQuery}
             disabled={loadingMembers}
           />
         </div>
@@ -534,10 +534,10 @@ function BatchEntryForm({
               ))}
             </SelectContent>
           </Select>
-          <Input
+          <SearchBar
             placeholder="Search member name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            initialQuery={searchQuery}
+            onSearch={setSearchQuery}
             disabled={loadingMembers}
           />
         </div>
@@ -576,7 +576,7 @@ function BatchEntryForm({
                 className="flex flex-col items-start gap-1 h-auto py-2"
               >
                 <div className="flex items-center gap-1">
-                  <Plus className="h-3 w-3" /> 
+                  <Plus className="h-3 w-3" />
                   <span className="text-xs font-medium">{member.label}</span>
                 </div>
                 {member.groupName && (

@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useMemo, useState } from "react"
-import { Menu, Search, ChevronDown } from "lucide-react"
+import { Menu, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
 import type { DateRange, FilterTab, PickerItem, SelectedFilter } from "./types"
 
 interface Props {
@@ -445,20 +445,11 @@ export function InsightsHeader({
               )}
 
               <div className="mb-3 relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <SearchBar
                   placeholder="Search items"
-                  value={filterSearch}
-                  onChange={(e) => setFilterSearch(e.target.value)}
-                  className="ps-8 pl-8 pe-8 pr-8"
+                  initialQuery={filterSearch}
+                  onSearch={setFilterSearch}
                 />
-                {filterSearch && (
-                  <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600"
-                    onClick={() => setFilterSearch("")}
-                    aria-label="Clear"
-                  >×</button>
-                )}
               </div>
 
               {!hideAllOption && (

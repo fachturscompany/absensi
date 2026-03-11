@@ -9,13 +9,14 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
-import { Check, Info, CloudUpload, Search } from "lucide-react"
+import { Check, Info, CloudUpload } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import { SearchBar } from "@/components/customs/search-bar"
 
 interface AddHolidayDialogProps {
     open: boolean
@@ -508,16 +509,12 @@ function MemberSelectionModal({ open, onOpenChange, selectedMembers, onSave }: {
 
                 <div className="p-4 space-y-4 flex-1 overflow-hidden flex flex-col">
                     <div className="flex items-center gap-4">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search members"
-                                className="pl-10 pr-4 py-2 w-64 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent text-sm"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
+                        <SearchBar
+                            placeholder="Search members"
+                            initialQuery={searchQuery}
+                            onSearch={setSearchQuery}
+                            className="w-64 border-slate-300 rounded-lg"
+                        />
                         <div className="flex gap-2 text-sm">
                             <button onClick={handleSelectAll} className="text-slate-900 hover:underline font-medium" disabled={isLoading}>
                                 {isLoading ? "Loading..." : (totalMembers > 0 && localSelected.length >= totalMembers ? "Deselect all" : "Select all")}

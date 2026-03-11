@@ -3,14 +3,14 @@
 import React, { useState, useMemo } from "react"
 import { ReportPageLayout } from "@/components/report/report-page-layout"
 import { Button } from "@/components/ui/button"
-import { Download, CalendarIcon, Search } from "lucide-react"
+import { Download, CalendarIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { PaginationFooter } from "@/components/tables/pagination-footer"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
 import { exportToCSV, generateFilename } from "@/lib/export-utils"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -164,12 +164,11 @@ export function DataReportPage<T>({
                         {/* Search */}
                         {searchKeys.length > 0 && (
                             <div className="relative w-[240px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <Input
+                                <SearchBar
                                     placeholder={searchPlaceholder}
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="pl-10 bg-white"
+                                    initialQuery={search}
+                                    onSearch={setSearch}
+                                    className="bg-white"
                                 />
                             </div>
                         )}

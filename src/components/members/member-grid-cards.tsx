@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+import { SearchBar } from '@/components/customs/search-bar';
 import {
   Select,
   SelectContent,
@@ -27,7 +27,6 @@ import {
   Eye,
   Pencil,
   Trash,
-  Search,
   Filter,
   Grid3x3,
   List,
@@ -255,12 +254,10 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
       >
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
+          <SearchBar
             placeholder="Search members by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            initialQuery={searchQuery}
+            onSearch={setSearchQuery}
           />
         </div>
 

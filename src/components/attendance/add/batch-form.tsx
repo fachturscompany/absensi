@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Loader2, X } from "lucide-react"
+import { SearchBar } from "@/components/customs/search-bar"
+import { Plus, Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { QUICK_STATUSES } from "@/types/attendance"
 import { useMembers } from "@/hooks/attendance/use-members"
@@ -220,12 +221,10 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
 
             <div className="space-y-2">
               <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
+                <SearchBar
                   placeholder="Search members..."
-                  value={batch.memberSearch}
-                  onChange={(e) => batch.setMemberSearch(e.target.value)}
-                  className="pl-8"
+                  initialQuery={batch.memberSearch}
+                  onSearch={batch.setMemberSearch}
                   disabled={batch.isSubmitting || loading}
                 />
               </div>

@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table"
 import type { RowSelectionState, OnChangeFn } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/customs/search-bar"
 import {
   Table,
   TableBody,
@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import { Columns3Cog, Loader2, Filter, Search } from "lucide-react"
+import { Columns3Cog, Loader2, Filter } from "lucide-react"
 import { PaginationFooter } from "./pagination-footer"
 import {
   Select,
@@ -287,12 +287,10 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col gap-2 w-full sm:flex-row sm:flex-wrap sm:items-center md:flex-nowrap md:flex-1 md:gap-2">
         {showGlobalFilter && (
           <div className="relative w-full md:flex-1 md:min-w-[320px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
+            <SearchBar
+              initialQuery={globalFilter}
+              onSearch={setGlobalFilter}
               placeholder={globalFilterPlaceholder || "Search..."}
-              className="pl-9"
             />
           </div>
         )}
@@ -489,12 +487,12 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       {layout === "card" ? (
         <>
+          <div>
+            {controls}
             <div>
-              {controls}
-              <div>
-                {tableContent}
-              </div>
+              {tableContent}
             </div>
+          </div>
           {paginationFooter}
         </>
       ) : (

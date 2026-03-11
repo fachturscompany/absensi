@@ -1,10 +1,9 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Search } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { SearchBar } from "@/components/customs/search-bar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DUMMY_MEMBERS } from "@/lib/data/dummy-data"
@@ -100,18 +99,15 @@ export function MemberSelectionModal({
                 </div>
 
                 <div className="px-6 pt-4 pb-4 flex-shrink-0">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <Input
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value)
-                                setCurrentPage(1)
-                            }}
-                            placeholder="Search members..."
-                            className="pl-10 h-11 bg-white border-slate-200 text-slate-900 focus:ring-slate-900 rounded-lg"
-                        />
-                    </div>
+                    <SearchBar
+                        initialQuery={searchQuery}
+                        onSearch={(value) => {
+                            setSearchQuery(value)
+                            setCurrentPage(1)
+                        }}
+                        placeholder="Search members..."
+                        className="h-11 bg-white border-slate-200 text-slate-900 focus:ring-slate-900 rounded-lg"
+                    />
                 </div>
 
                 <div className="flex-1 flex flex-col overflow-hidden">

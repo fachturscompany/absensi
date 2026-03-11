@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DateFilterBar, DateFilterState } from '@/components/analytics/date-filter-bar';
 import {
-  Search,
   MapPin,
   CheckCircle2,
   XCircle,
@@ -24,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchBar } from "@/components/customs/search-bar"
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/profile&image/avatar';
 import {
@@ -73,8 +72,7 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
     };
   });
 
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
@@ -83,13 +81,13 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(searchInput);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+  // Debounce search input - No longer needed with SearchBar's internal debounce
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setSearchQuery(searchInput);
+  //   }, 500);
+  //   return () => clearTimeout(timer);
+  // }, [searchInput]);
 
   // Fetch data using Server Action with pagination
   const fetchData = useCallback(async () => {
@@ -101,7 +99,7 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
           limit: itemsPerPage,
           dateFrom: dateRange.from.toISOString().split('T')[0],
           dateTo: dateRange.to.toISOString().split('T')[0],
-          search: searchQuery || undefined,
+          search: searchTerm || undefined,
           status: statusFilter === 'all' ? undefined : statusFilter,
           department: departmentFilter === 'all' ? undefined : departmentFilter,
         })
@@ -153,11 +151,11 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
     } finally {
       setLoading(false);
     }
-  }, [currentPage, itemsPerPage, dateRange, searchQuery, statusFilter, departmentFilter]);
+  }, [currentPage, itemsPerPage, dateRange, searchTerm, statusFilter, departmentFilter]);
 
   // Trigger fetch when filters change (and initial load)
   useEffect(() => {
-    console.log('≡ƒöä Fetch triggered:', { currentPage, dateRange, searchQuery, statusFilter, departmentFilter });
+    console.log('≡ƒöä Fetch triggered:', { currentPage, dateRange, searchTerm, statusFilter, departmentFilter });
     fetchData();
   }, [fetchData]);
 
@@ -174,7 +172,7 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
   // Reset to page 1 when filters change (except pagination itself)
   useEffect(() => {
     setCurrentPage(1);
-  }, [dateRange, searchQuery, statusFilter, departmentFilter]);
+  }, [dateRange, searchTerm, statusFilter, departmentFilter]);
 
   // Auto-refresh Timer - Disabled for now to prevent errors
   // useEffect(() => {
@@ -318,13 +316,12 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
                   />
 
                   {/* Search */}
-                  <div className="relative flex-1 min-w-[200px] sm:min-w-[250px] max-w-full sm:max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
+                  <div className="relative">
+                    <SearchBar
                       placeholder="Search by name or department..."
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-9 pr-20"
+                      initialQuery={searchTerm}
+                      onSearch={setSearchTerm}
+                      className="w-full max-w-sm"
                     />
                   </div>
                 </div>
@@ -382,13 +379,12 @@ export default function ModernAttendanceList({ initialData: _initialData, initia
                 </SelectContent>
               </Select>
 
-              {(searchQuery || statusFilter !== 'all' || departmentFilter !== 'all' || dateRange.preset !== 'today') && (
+              {(searchTerm || statusFilter !== 'all' || departmentFilter !== 'all' || dateRange.preset !== 'today') && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setSearchInput('');
-                    setSearchQuery('');
+                    setSearchTerm('');
                     setStatusFilter('all');
                     setDepartmentFilter('all');
                     // Reset to today

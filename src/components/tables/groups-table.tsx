@@ -3,8 +3,8 @@
 import React from "react"
 import { IGroup } from "@/interface"
 import { Button } from "@/components/ui/button"
-import { Trash, Pencil, Search, Filter, Columns3Cog } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Trash, Pencil, Filter, Columns3Cog } from "lucide-react"
+import { SearchBar } from "@/components/customs/search-bar"
 import {
   Select,
   SelectContent,
@@ -168,12 +168,10 @@ export function GroupsTable({ groups, isLoading = false, onDelete, onEdit }: Gro
       `}</style>
       {/* Search Bar */}
       <div className="relative w-full">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" />
-        <Input
+        <SearchBar
           placeholder="Search groups..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full pl-10 pr-4 py-2"
+          initialQuery={globalFilter}
+          onSearch={setGlobalFilter}
         />
       </div>
 
