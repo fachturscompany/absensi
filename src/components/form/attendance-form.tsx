@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon, ChevronDown, Loader2, Plus, Trash2, X } from "lucide-react"

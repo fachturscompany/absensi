@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import React, { useState, useMemo } from "react"
 import { Info, Search, User } from "lucide-react"

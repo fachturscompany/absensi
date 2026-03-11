@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
 import * as XLSX from "xlsx"
@@ -320,7 +320,7 @@ export async function GET(request: NextRequest) {
         row["Group"] = String(depName)
       }
 
-      // Kolom yang tidak tersedia di user_profiles → kosongkan
+      // Kolom yang tidak tersedia di user_profiles ? kosongkan
       for (const [key, label] of Object.entries({
         nickname: "Nickname",
         nisn: "NISN",

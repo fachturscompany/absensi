@@ -6,7 +6,7 @@ import {  SettingsHeader, SettingTab , SettingsContentLayout } from "@/component
 import { Activity } from "lucide-react"
 import type { SidebarItem } from "@/components/settings/SettingsSidebar"
 import { useOrgStore } from "@/store/org-store"
-import { getMembersForScreenshot } from "@/action/screenshots"
+import { getMembersForScreenshot } from "@/action/activity/screenshot"
 import { getOrgSettings, upsertOrgSetting, getAllMemberSettings, upsertMemberSetting } from "@/action/organization-settings"
 import { toast } from "sonner"
 import { MemberAvatar } from "@/components/profile&image/MemberAvatar"

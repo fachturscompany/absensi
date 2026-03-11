@@ -1,4 +1,4 @@
-﻿import { cache } from "react"
+import { cache } from "react"
 import { createSupabaseClient } from "@/config/supabase-config"
 
 import { logger } from '@/lib/logger';

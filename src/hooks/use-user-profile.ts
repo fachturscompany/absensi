@@ -1,4 +1,4 @@
-﻿import { useAuthStore } from '@/store/user-store'
+import { useAuthStore } from '@/store/user-store'
 
 interface UserProfile {
   first_name?: string

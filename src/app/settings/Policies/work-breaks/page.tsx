@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import {  SettingsHeader, SettingTab , SettingsContentLayout } from "@/components/settings/SettingsHeader"
@@ -196,7 +196,7 @@ export default function WorkBreaksPage() {
                                                         <span>{policy.name}</span>
                                                         <div className="flex items-center gap-2 sm:hidden">
                                                             <span className="text-xs text-slate-500 capitalize">{policy.type}</span>
-                                                            <span className="text-xs text-slate-300">•</span>
+                                                            <span className="text-xs text-slate-300">�</span>
                                                             <span className="text-xs text-slate-500">{policy.members?.length || 0} members</span>
                                                         </div>
                                                     </div>

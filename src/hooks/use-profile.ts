@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useCallback } from 'react'
 import { IUser } from '@/interface'
@@ -99,7 +99,7 @@ export function useProfilePhotoUrl(profilePhotoUrl?: string, userId?: string) {
       return undefined
     }
 
-    // New uploads store the full public URL — use as-is
+    // New uploads store the full public URL � use as-is
     if (profilePhotoUrl.startsWith('http')) {
       return profilePhotoUrl
     }

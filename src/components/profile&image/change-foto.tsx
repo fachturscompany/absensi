@@ -18,11 +18,11 @@ interface ProfilePhotoDialogProps {
     useCompression?: boolean
 }
 
-export default function ProfilePhotoDialog({ 
-    organizationId, 
-    currentLogo, 
+export default function ProfilePhotoDialog({
+    organizationId,
+    currentLogo,
     onChange,
-    useCompression = true 
+    useCompression = true
 }: ProfilePhotoDialogProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
@@ -40,7 +40,7 @@ export default function ProfilePhotoDialog({
         error: compressionError
     } = useImageCompression({
         preset: 'standard', // Use standard preset for logos
-        onSuccess: (result) => {
+        onSuccess: (result: { file: File; dataUrl?: string; originalSize: number; compressedSize: number; compressionRatio: number }) => {
             setSelectedFile(result.file)
             setPreviewUrl(result.dataUrl || '')
             setCompressionStats({
@@ -49,7 +49,7 @@ export default function ProfilePhotoDialog({
                 compressionRatio: result.compressionRatio
             })
         },
-        onError: (error) => {
+        onError: (error: Error) => {
             toast.error(error.message)
         }
     })
@@ -77,7 +77,7 @@ export default function ProfilePhotoDialog({
             // Use original file without compression
             setSelectedFile(file)
             setCompressionStats(null)
-            
+
             // Create preview URL
             const reader = new FileReader()
             reader.onload = (e) => {
@@ -107,7 +107,7 @@ export default function ProfilePhotoDialog({
             await updateOrganization(organizationId, { logo_url: newLogo })
             onChange?.(newLogo ?? null)
             toast.success("Logo updated!")
-            
+
             // Reset state
             setSelectedFile(null)
             setPreviewUrl(null)
@@ -181,7 +181,7 @@ export default function ProfilePhotoDialog({
                             </div>
                             {compressionStats && (
                                 <p className="text-xs">
-                                    Original: {formatFileSize(compressionStats.originalSize)} → 
+                                    Original: {formatFileSize(compressionStats.originalSize)} →
                                     Compressed: {formatFileSize(compressionStats.compressedSize)}
                                 </p>
                             )}
@@ -217,8 +217,8 @@ export default function ProfilePhotoDialog({
                             disabled={loading || isCompressing}
                         />
                         <label htmlFor="logo-upload">
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 className="w-full cursor-pointer"
                                 type="button"
                                 asChild
@@ -235,16 +235,16 @@ export default function ProfilePhotoDialog({
                     {/* Action Buttons */}
                     <div className="flex justify-end gap-2 w-full">
                         {(currentLogo || selectedFile) && (
-                            <Button 
-                                variant="destructive" 
-                                onClick={handleDelete} 
+                            <Button
+                                variant="destructive"
+                                onClick={handleDelete}
                                 disabled={loading || isCompressing}
                             >
                                 Delete
                             </Button>
                         )}
-                        <Button 
-                            onClick={handleSave} 
+                        <Button
+                            onClick={handleSave}
                             disabled={loading || isCompressing || !selectedFile}
                         >
                             {loading ? 'Saving...' : 'Save'}

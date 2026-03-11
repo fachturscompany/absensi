@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import {  SettingsHeader, SettingTab , SettingsContentLayout } from "@/components/settings/SettingsHeader"
 import { ShieldCheck } from "lucide-react"
@@ -154,7 +154,7 @@ export default function HolidaysPage() {
                                                     </span>
                                                     <div className="flex items-center gap-2 sm:hidden text-xs text-slate-500">
                                                         <span>{holiday.date ? format(new Date(holiday.date), "MMM d, yyyy") : "-"}</span>
-                                                        <span>•</span>
+                                                        <span>�</span>
                                                         <span>{holiday.selectedMembers?.length || 0} members</span>
                                                     </div>
                                                 </div>

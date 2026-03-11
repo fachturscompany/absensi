@@ -1,20 +1,20 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { createContext, useState, useEffect, ReactNode } from "react"
 
-interface BlurSettings {
+export interface BlurSettings {
     globalBlur: boolean
     memberBlurs: Record<string, boolean>
 }
 
-interface BlurContextType {
+export interface BlurContextType {
     blurSettings: BlurSettings
     setGlobalBlur: (blur: boolean) => void
     setMemberBlur: (memberId: string, blur: boolean) => void
     getMemberBlur: (memberId: string) => boolean
 }
 
-const BlurContext = createContext<BlurContextType | undefined>(undefined)
+export const BlurContext = createContext<BlurContextType | undefined>(undefined)
 
 export function BlurProvider({ children }: { children: ReactNode }) {
     const [blurSettings, setBlurSettings] = useState<BlurSettings>(() => {
@@ -73,12 +73,4 @@ export function BlurProvider({ children }: { children: ReactNode }) {
             {children}
         </BlurContext.Provider>
     )
-}
-
-export function useBlurSettings() {
-    const context = useContext(BlurContext)
-    if (context === undefined) {
-        throw new Error("useBlurSettings must be used within a BlurProvider")
-    }
-    return context
 }

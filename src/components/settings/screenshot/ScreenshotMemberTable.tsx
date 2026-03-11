@@ -3,7 +3,7 @@
 import React from "react"
 import { Search, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { type ISimpleMember } from "@/action/screenshots"
+import { type ISimpleMember } from "@/action/activity/screenshot"
 
 interface ScreenshotMemberTableProps {
     members: ISimpleMember[]

@@ -579,40 +579,56 @@ export async function deleteWorkCard(
     const supabase = await createClient()
 
     try {
-        // 1. Delete tool_usages for this slot context
-        // We usually don't have activity_id in tool_usages (depending on schema)
-        // So we use member + time range (10 mins)
+        // 0. Ambil semua screenshot paths untuk activity ini sebelum dihapus
+        const { data: screenshotRows } = await supabase
+            .from('screenshots')
+            .select('full_url, thumb_url')
+            .eq('activity_id', activityId)
+
+        // 1. Hapus file dari bucket sebelum data DB dihapus
+        if (screenshotRows && screenshotRows.length > 0) {
+            const bucketPaths: string[] = []
+            for (const s of screenshotRows) {
+                if (s.full_url) {
+                    const parts = s.full_url.split(`/${BUCKET_NAME}/`)
+                    if (parts.length > 1) bucketPaths.push(parts[1].split('?')[0])
+                }
+                if (s.thumb_url) {
+                    const parts = s.thumb_url.split(`/${BUCKET_NAME}/`)
+                    if (parts.length > 1) bucketPaths.push(parts[1].split('?')[0])
+                }
+            }
+            if (bucketPaths.length > 0) {
+                const { error: storageErr } = await supabase.storage
+                    .from(BUCKET_NAME)
+                    .remove(bucketPaths)
+                if (storageErr) {
+                    console.warn('Storage delete warning:', storageErr.message)
+                }
+            }
+        }
+
         const startTime = new Date(timeSlot)
         const endTime = new Date(startTime.getTime() + 10 * 60 * 1000)
 
-        // Note: tool_usages might use usage_date and a time column, or just a timestamp.
-        // Assuming there is a recorded_at or similar, or we just trust the activity_id link if it exists.
-        // But if it doesn't exist, we use the time range.
-
-        // For now, let's try to delete by activity_id if the column exists, 
-        // fallback to time range if we are sure about the schema.
-        // Given the complexity of the schema, I'll try to find if activity_id is used.
-
-        // Delete screenshots first
+        // 2. Delete screenshots dari DB
         await supabase.from("screenshots").delete().eq("activity_id", activityId)
 
-        // Delete tool_usages
-        // We'll use recorded_at range if available, or usage_date + time check.
-        // Based on common patterns in this project:
+        // 3. Delete tool_usages
         await supabase.from("tool_usages")
             .delete()
             .eq("organization_member_id", memberId)
             .gte("recorded_at", startTime.toISOString())
             .lt("recorded_at", endTime.toISOString())
 
-        // Delete url_visits
+        // 4. Delete url_visits
         await supabase.from("url_visits")
             .delete()
             .eq("organization_member_id", memberId)
             .gte("recorded_at", startTime.toISOString())
             .lt("recorded_at", endTime.toISOString())
 
-        // Finally delete the activity record itself
+        // 5. Delete activity record
         const { error: actError } = await supabase.from("activities").delete().eq("id", activityId)
 
         if (actError) throw actError
@@ -625,7 +641,7 @@ export async function deleteWorkCard(
 }
 
 // ============================================================
-// Delete only the screenshot image (soft delete)
+// Delete only the screenshot image (hapus dari bucket + soft delete DB)
 // ============================================================
 
 export async function deleteScreenshotOnly(
@@ -634,6 +650,39 @@ export async function deleteScreenshotOnly(
 ): Promise<{ success: boolean; message?: string }> {
     const supabase = await createClient()
 
+    // 1. Ambil full_url dan thumb_url terlebih dahulu
+    const { data: row, error: fetchError } = await supabase
+        .from('screenshots')
+        .select('full_url, thumb_url')
+        .eq('id', screenshotId)
+        .single()
+
+    if (fetchError) {
+        return { success: false, message: fetchError.message }
+    }
+
+    // 2. Hapus file dari Supabase Storage bucket
+    if (row) {
+        const bucketPaths: string[] = []
+        if (row.full_url) {
+            const parts = row.full_url.split(`/${BUCKET_NAME}/`)
+            if (parts.length > 1) bucketPaths.push(parts[1].split('?')[0])
+        }
+        if (row.thumb_url) {
+            const parts = row.thumb_url.split(`/${BUCKET_NAME}/`)
+            if (parts.length > 1) bucketPaths.push(parts[1].split('?')[0])
+        }
+        if (bucketPaths.length > 0) {
+            const { error: storageErr } = await supabase.storage
+                .from(BUCKET_NAME)
+                .remove(bucketPaths)
+            if (storageErr) {
+                console.warn('Storage delete warning:', storageErr.message)
+            }
+        }
+    }
+
+    // 3. Soft delete di DB
     const { error } = await supabase
         .from('screenshots')
         .update({

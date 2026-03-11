@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
@@ -143,7 +143,7 @@ export default async function RootLayout({
     }
     : null;
 
-  // 🔹 Fetch timezone and organization name from the user's organization (cached)
+  // ?? Fetch timezone and organization name from the user's organization (cached)
   const timezone = user ? await getCachedOrganizationTimezone(user.id) : "UTC"
   const organizationName = user ? await getCachedOrganizationName(user.id) : null
 

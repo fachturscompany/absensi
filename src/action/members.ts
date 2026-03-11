@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { IOrganization_member } from "@/interface";
@@ -9,7 +9,7 @@ async function getSupabase() {
   return await createClient();
 }
 
-// ➕ Add MemIOrganization_member
+// ? Add MemIOrganization_member
 export const createOrganizationMember = async (Organization_member: Partial<IOrganization_member>) => {
   const supabase = await getSupabase();
   const { data, error } = await supabase.from("organization_members").insert([Organization_member]).select().single();
@@ -48,7 +48,7 @@ export const getAllOrganization_member = async (organizationId?: number) => {
     targetOrgId = member.organization_id;
   }
 
-  memberLogger.debug(`📍 Fetching members for organization: ${targetOrgId}`);
+  memberLogger.debug(`?? Fetching members for organization: ${targetOrgId}`);
 
   // 3. Fetch all members belonging to the organization
   // Note: Increase limit to 10000 to support large organizations
@@ -115,7 +115,7 @@ export const getAllOrganization_member = async (organizationId?: number) => {
       .range(from, to);
 
     if (pageError) {
-      memberLogger.error('❌ Error fetching page', currentPage, pageError);
+      memberLogger.error('? Error fetching page', currentPage, pageError);
       return { success: false, message: pageError.message, data: [] };
     }
 
@@ -135,12 +135,12 @@ export const getAllOrganization_member = async (organizationId?: number) => {
 
         // Log untuk debugging
         if (member.department_id && !member.departments) {
-          memberLogger.debug(`⚠️ Member ${member.id} has department_id ${member.department_id} but no departments from join`);
+          memberLogger.debug(`?? Member ${member.id} has department_id ${member.department_id} but no departments from join`);
         }
       });
 
       allData = allData.concat(pageData);
-      memberLogger.debug(`📄 Fetched page ${currentPage + 1}: ${pageData.length} records (total so far: ${allData.length})`);
+      memberLogger.debug(`?? Fetched page ${currentPage + 1}: ${pageData.length} records (total so far: ${allData.length})`);
 
       // If we got less than pageSize, we're done
       if (pageData.length < pageSize) {
@@ -154,7 +154,7 @@ export const getAllOrganization_member = async (organizationId?: number) => {
 
     // Safety limit: stop after 20 pages (20,000 records)
     if (currentPage >= 20) {
-      memberLogger.warn('⚠️ Reached safety limit of 20 pages (20,000 records)');
+      memberLogger.warn('?? Reached safety limit of 20 pages (20,000 records)');
       hasMore = false;
     }
   }
@@ -180,28 +180,28 @@ export const getAllOrganization_member = async (organizationId?: number) => {
           deptIds.add(deptId);
           membersWithoutDept++;
         } else {
-          memberLogger.warn(`⚠️ Invalid department_id for member ${member.id}:`, member.department_id);
+          memberLogger.warn(`?? Invalid department_id for member ${member.id}:`, member.department_id);
         }
       }
     });
 
-    memberLogger.debug(`🔍 Found ${membersWithoutDept} members without departments but with department_id`);
-    memberLogger.debug(`📋 Department IDs to fetch:`, Array.from(deptIds));
+    memberLogger.debug(`?? Found ${membersWithoutDept} members without departments but with department_id`);
+    memberLogger.debug(`?? Department IDs to fetch:`, Array.from(deptIds));
 
     // Fetch departments untuk semua member yang perlu (baik yang punya user_id maupun tidak)
     const departmentsMap = new Map();
     if (deptIds.size > 0) {
       const deptIdsArray = Array.from(deptIds);
-      memberLogger.debug(`📥 Fetching ${deptIdsArray.length} departments...`);
+      memberLogger.debug(`?? Fetching ${deptIdsArray.length} departments...`);
       const { data: deptList, error: deptError } = await adminClient
         .from("departments")
         .select("id, name, code, organization_id")
         .in("id", deptIdsArray);
 
       if (deptError) {
-        memberLogger.error('❌ Error fetching departments:', deptError);
+        memberLogger.error('? Error fetching departments:', deptError);
       } else if (deptList) {
-        memberLogger.debug(`✅ Fetched ${deptList.length} departments:`, deptList.map((d: any) => `${d.id}:${d.name}`));
+        memberLogger.debug(`? Fetched ${deptList.length} departments:`, deptList.map((d: any) => `${d.id}:${d.name}`));
         deptList.forEach((dept: any) => {
           // Ensure id is number for consistent lookup
           const deptId = typeof dept.id === 'string' ? parseInt(dept.id, 10) : dept.id;
@@ -209,9 +209,9 @@ export const getAllOrganization_member = async (organizationId?: number) => {
             departmentsMap.set(deptId, dept);
           }
         });
-        memberLogger.debug(`📊 Departments map keys:`, Array.from(departmentsMap.keys()));
+        memberLogger.debug(`?? Departments map keys:`, Array.from(departmentsMap.keys()));
       } else {
-        memberLogger.warn('⚠️ No departments returned from query');
+        memberLogger.warn('?? No departments returned from query');
       }
     }
 
@@ -244,16 +244,16 @@ export const getAllOrganization_member = async (organizationId?: number) => {
           // Fetch departments baru dari biodata jika ada
           if (newDeptIds.size > 0) {
             const newDeptIdsArray = Array.from(newDeptIds);
-            memberLogger.debug(`📥 Fetching ${newDeptIdsArray.length} additional departments from biodata:`, newDeptIdsArray);
+            memberLogger.debug(`?? Fetching ${newDeptIdsArray.length} additional departments from biodata:`, newDeptIdsArray);
             const { data: newDeptList, error: newDeptError } = await adminClient
               .from("departments")
               .select("id, name, code, organization_id")
               .in("id", newDeptIdsArray);
 
             if (newDeptError) {
-              memberLogger.error('❌ Error fetching additional departments:', newDeptError);
+              memberLogger.error('? Error fetching additional departments:', newDeptError);
             } else if (newDeptList) {
-              memberLogger.debug(`✅ Fetched ${newDeptList.length} additional departments`);
+              memberLogger.debug(`? Fetched ${newDeptList.length} additional departments`);
               newDeptList.forEach((dept: any) => {
                 const deptId = typeof dept.id === 'string' ? parseInt(dept.id, 10) : dept.id;
                 if (!isNaN(deptId)) {
@@ -293,7 +293,7 @@ export const getAllOrganization_member = async (organizationId?: number) => {
                     const dept = departmentsMap.get(biodataDeptId);
                     if (dept) {
                       member.departments = dept;
-                      memberLogger.debug(`✅ Set departments from biodata for member ${member.id} (dept_id: ${biodataDeptId}):`, dept.name);
+                      memberLogger.debug(`? Set departments from biodata for member ${member.id} (dept_id: ${biodataDeptId}):`, dept.name);
                     }
                   }
                 }
@@ -307,9 +307,9 @@ export const getAllOrganization_member = async (organizationId?: number) => {
                 const dept = departmentsMap.get(deptId);
                 if (dept) {
                   member.departments = dept;
-                  memberLogger.debug(`✅ Set departments from department_id for member ${member.id} (dept_id: ${deptId}):`, dept.name);
+                  memberLogger.debug(`? Set departments from department_id for member ${member.id} (dept_id: ${deptId}):`, dept.name);
                 } else {
-                  memberLogger.warn(`⚠️ Department ID ${deptId} not found in departments map for member ${member.id}`);
+                  memberLogger.warn(`?? Department ID ${deptId} not found in departments map for member ${member.id}`);
                 }
               }
             }
@@ -336,21 +336,21 @@ export const getAllOrganization_member = async (organizationId?: number) => {
           if (dept) {
             member.departments = dept;
             fixedCount++;
-            memberLogger.debug(`✅ Set departments from department_id for member ${member.id} (dept_id: ${deptId}):`, dept.name);
+            memberLogger.debug(`? Set departments from department_id for member ${member.id} (dept_id: ${deptId}):`, dept.name);
           } else {
-            memberLogger.warn(`⚠️ Department ID ${deptId} (type: ${typeof member.department_id}) not found in departments map for member ${member.id} (biodata_nik: ${member.biodata_nik})`);
-            memberLogger.warn(`⚠️ Available department IDs in map:`, Array.from(departmentsMap.keys()));
+            memberLogger.warn(`?? Department ID ${deptId} (type: ${typeof member.department_id}) not found in departments map for member ${member.id} (biodata_nik: ${member.biodata_nik})`);
+            memberLogger.warn(`?? Available department IDs in map:`, Array.from(departmentsMap.keys()));
           }
         } else {
-          memberLogger.warn(`⚠️ Invalid department_id for member ${member.id}:`, member.department_id);
+          memberLogger.warn(`?? Invalid department_id for member ${member.id}:`, member.department_id);
         }
       }
     });
 
-    memberLogger.info(`🔧 Fixed departments for ${fixedCount} members`);
+    memberLogger.info(`?? Fixed departments for ${fixedCount} members`);
   }
 
-  memberLogger.info(`✅ Fetched ${data?.length || 0} members for organization ${targetOrgId}`);
+  memberLogger.info(`? Fetched ${data?.length || 0} members for organization ${targetOrgId}`);
   return { success: true, data: data as IOrganization_member[] };
 };
 
@@ -428,7 +428,7 @@ export const getMemberSummary = async (): Promise<OrganizationSummary> => {
   };
 };
 
-// ✏️ Update Organization
+// ?? Update Organization
 export const updateOrganizationMember = async (id: string, organization: Partial<IOrganization_member>) => {
   const supabase = await getSupabase();
 

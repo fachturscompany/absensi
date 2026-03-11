@@ -50,7 +50,7 @@ export function PhotoUploadDialog({
     error: compressionError
   } = useImageCompression({
     preset: "avatar",
-    onSuccess: (result) => {
+    onSuccess: (result: { file: File; dataUrl?: string; originalSize: number; compressedSize: number; compressionRatio: number }) => {
       setSelectedFile(result.file);
       setPreviewUrl(result.dataUrl || '');
       setCompressionStats({
@@ -59,7 +59,7 @@ export function PhotoUploadDialog({
         compressionRatio: result.compressionRatio
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message);
     }
   });

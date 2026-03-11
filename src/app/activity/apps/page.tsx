@@ -2,146 +2,30 @@
 
 import React, { useMemo, useState, useEffect } from "react"
 import { DUMMY_TEAMS, type AppActivityEntry } from "@/lib/data/dummy-data"
-import { getMembersForScreenshot, type ISimpleMember } from "@/action/screenshots"
 import { getAppsActivityByMemberAndDate } from "@/action/apps"
-import { getAllProjects, type IProject } from "@/action/projects"
-import { useOrgStore } from "@/store/org-store"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTimezone } from "@/components/providers/timezone-provider"
 import { InsightsHeader } from "@/components/insights/InsightsHeader"
-import type { DateRange, SelectedFilter } from "@/components/insights/types"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useActivityFilter } from "@/hooks/activity/use-activity-filter"
 
 export const dynamic = "force-dynamic"
 
 export default function AppsPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const memberIdFromUrl = searchParams.get("memberId")
   const timezone = useTimezone()
-  const { organizationId } = useOrgStore()
 
-  const [realMembers, setRealMembers] = useState<ISimpleMember[]>([])
-  const [realProjects, setRealProjects] = useState<IProject[]>([])
+  const {
+    realProjects,
+    demoMembers,
+    selectedFilter,
+    selectedMemberId,
+    handleFilterChange,
+    dateRange,
+    setDateRange,
+    selectedProject,
+    setSelectedProject,
+  } = useActivityFilter({ storageKey: "appSelectedMemberId" })
+
   const [appActivities, setAppActivities] = useState<AppActivityEntry[]>([])
-
-  // Fetch real members & projects dari DB
-  useEffect(() => {
-    if (!organizationId) return
-
-    // Fetch members
-    getMembersForScreenshot(String(organizationId)).then(res => {
-      if (res.success && res.data && res.data.length > 0) {
-        setRealMembers(res.data)
-      }
-    })
-
-    // Fetch projects
-    getAllProjects(String(organizationId)).then(res => {
-      if (res.success && res.data) {
-        setRealProjects(res.data)
-      }
-    })
-  }, [organizationId])
-
-  const demoMembers = useMemo(() => realMembers.map(m => ({
-    id: String(m.id),
-    name: m.name,
-    email: "",
-    avatar: m.avatarUrl ?? undefined,
-    activityScore: 0,
-  })), [realMembers])
-
-  // Get initial memberId: URL > sessionStorage > default
-  const getInitialMemberId = (): string => {
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search)
-      const memberIdFromLocation = urlParams.get("memberId")
-      if (memberIdFromLocation) return memberIdFromLocation
-    }
-    if (memberIdFromUrl) return memberIdFromUrl
-    if (typeof window !== "undefined") {
-      const savedMemberId = sessionStorage.getItem("appSelectedMemberId")
-      if (savedMemberId) return savedMemberId
-    }
-    return realMembers[0]?.id ?? ""
-  }
-
-  const [selectedFilter, setSelectedFilter] = useState<SelectedFilter>({
-    type: "members",
-    all: false,
-    id: getInitialMemberId(),
-  })
-
-  // Update filter when memberId from URL changes
-  useEffect(() => {
-    if (memberIdFromUrl && memberIdFromUrl !== selectedFilter.id) {
-      setSelectedFilter({
-        type: "members",
-        all: false,
-        id: memberIdFromUrl,
-      })
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("appSelectedMemberId", memberIdFromUrl)
-      }
-    } else if (!memberIdFromUrl && typeof window !== "undefined") {
-      const savedMemberId = sessionStorage.getItem("appSelectedMemberId")
-      if (savedMemberId && savedMemberId !== selectedFilter.id) {
-        setSelectedFilter({
-          type: "members",
-          all: false,
-          id: savedMemberId,
-        })
-      }
-    }
-  }, [memberIdFromUrl, selectedFilter.id])
-
-  // Sync selectedFilter changes to sessionStorage and URL
-  const handleFilterChange = (filter: SelectedFilter) => {
-    // Jika all: true (tidak seharusnya terjadi karena hideAllOption), ubah ke member pertama
-    if (filter.all) {
-      const firstMemberId = realMembers[0]?.id ?? ""
-      const newFilter: SelectedFilter = {
-        type: "members",
-        all: false,
-        id: firstMemberId,
-      }
-      setSelectedFilter(newFilter)
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("appSelectedMemberId", firstMemberId)
-        const params = new URLSearchParams(searchParams.toString())
-        params.set("memberId", firstMemberId)
-        router.push(`/activity/apps?${params.toString()}`)
-      }
-      return
-    }
-
-    setSelectedFilter(filter)
-    if (!filter.all && filter.id && typeof window !== "undefined") {
-      sessionStorage.setItem("appSelectedMemberId", filter.id)
-      const params = new URLSearchParams(searchParams.toString())
-      params.set("memberId", filter.id)
-      router.push(`/activity/apps?${params.toString()}`)
-    }
-  }
-
-  const selectedMemberId = selectedFilter.all ? null : (selectedFilter.id ?? null)
-
-  const [dateRange, setDateRange] = useState<DateRange>(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const end = new Date()
-    end.setHours(23, 59, 59, 999)
-    return { startDate: today, endDate: end }
-  })
-  // Set default member ID saat data real pertama kali datang
-  useEffect(() => {
-    if (realMembers.length > 0 && !selectedFilter.id) {
-      setSelectedFilter(prev => ({ ...prev, id: realMembers[0]?.id ?? "" }))
-    }
-  }, [realMembers])
-
-  const [selectedProject, setSelectedProject] = useState<string>("all")
 
   // Fetch app activities
   useEffect(() => {

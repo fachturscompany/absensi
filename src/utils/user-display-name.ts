@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Utility functions for handling user display names
  * Provides consistent logic for displaying user names across the application
  */

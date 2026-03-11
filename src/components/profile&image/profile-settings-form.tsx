@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -194,11 +194,11 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
 
                 const base64Data = (base64.includes('base64,') ? base64.split('base64,')[1] : base64) || "";
                 const result = await uploadProfilePhotoBase64({
-                    base64Data,                            // cropped+compressed → thumb
+                    base64Data,                            // cropped+compressed ? thumb
                     fileName: compressedFile.name,
                     fileType: compressedFile.type,
                     fileSize: compressedFile.size,
-                    originalBase64Data: originalData?.base64,      // full original → original/
+                    originalBase64Data: originalData?.base64,      // full original ? original/
                     originalFileType: originalData?.fileType,
                 });
 

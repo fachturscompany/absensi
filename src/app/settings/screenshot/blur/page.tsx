@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 
 import { Info, Search, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useOrgStore } from "@/store/org-store"
-import { getMembersForScreenshot, type ISimpleMember } from "@/action/screenshots"
+import { getMembersForScreenshot, type ISimpleMember } from "@/action/activity/screenshot"
 import { getScreenshotSettings, upsertScreenshotSetting } from "@/action/screenshot-settings"
 import {  SettingsHeader, SettingTab , SettingsContentLayout } from "@/components/settings/SettingsHeader"
 import { Activity } from "lucide-react"

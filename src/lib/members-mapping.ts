@@ -1,4 +1,4 @@
-﻿export type MemberUserProfile = {
+export type MemberUserProfile = {
   id?: string
   email?: string
   first_name?: string

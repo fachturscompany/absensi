@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { createSupabaseClient } from "@/config/supabase-config"
 
 import { memberLogger } from '@/lib/logger';

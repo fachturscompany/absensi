@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -316,7 +316,7 @@ export default function AccountInactivePage() {
         {/* Additional Help */}
         <div className="pt-8 border-t border-border space-y-3">
           <p className="text-xs text-muted-foreground">
-            💡 The system automatically checks your account status every 30 seconds
+            ?? The system automatically checks your account status every 30 seconds
           </p>
           <p className="text-xs text-muted-foreground/60">
             Once reactivated, you&apos;ll be automatically redirected to the dashboard

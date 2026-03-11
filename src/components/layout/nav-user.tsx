@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, memo } from 'react';
 import { EllipsisVertical, CircleUser, LogOut } from 'lucide-react';

@@ -21,7 +21,7 @@ import {
   deleteWorkCard,
   deleteScreenshotOnly,
   type IScreenshotWithActivity
-} from "@/action/screenshots"
+} from "@/action/activity/screenshot"
 import {
   Dialog,
   DialogContent,

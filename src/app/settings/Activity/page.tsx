@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Info, Search, Loader2, ChevronLeft, ChevronRight, Activity } from "lucide-react"
 import { useOrgStore } from "@/store/org-store"
-import { getMembersForScreenshot, type ISimpleMember } from "@/action/screenshots"
+import { getMembersForScreenshot, type ISimpleMember } from "@/action/activity/screenshot"
 import { getOrgSettings, upsertOrgSetting, getAllMemberSettings, upsertMemberSetting } from "@/action/organization-settings"
 import {  SettingsHeader, SettingTab , SettingsContentLayout } from "@/components/settings/SettingsHeader"
 import type { SidebarItem } from "@/components/settings/SettingsSidebar"
