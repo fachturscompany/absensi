@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+// app/projects/[id]/tasks/layout.tsx
+
+import { useState, useEffect, useContext, createContext, use } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,46 +15,29 @@ import {
     Select, SelectContent, SelectItem,
     SelectTrigger, SelectValue,
 } from "@/components/ui/select"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 import { Plus, List, LayoutGrid, CalendarDays } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { UserAvatar } from "@/components/profile&image/user-avatar"
-import {
-    ITask, IOrganization_member,
-    ITaskAssignee, ITaskStatus,
-} from "@/interface"
+import { ITask, IOrganization_member, ITaskAssignee, ITaskStatus } from "@/interface"
+import { getTasksListPageData } from "@/action/projects/tasks/list"
+import { createTask, getTasks, assignTaskMember } from "@/action/task"
+import { toast } from "sonner"
+import { ActiveTab, CurrentView, TabCounts, TasksLayoutData } from "@/types/tasks"
 
-// ✅ Semua types dari satu sumber — tidak ada duplikasi
-import { TaskNode, CurrentView, ActiveTab, TabCounts } from "@/types/tasks"
+// ─── Context ──────────────────────────────────────────────────────────────────
 
-// ─── Tree Utilities ───────────────────────────────────────────────────────────
-
-export function buildTaskTree(tasks: ITask[]): TaskNode[] {
-    const map = new Map<number, TaskNode>()
-    tasks.forEach(t => map.set(t.id, { ...t, children: [] }))
-    const roots: TaskNode[] = []
-    map.forEach(node => {
-        if (node.parent_task_id && map.has(node.parent_task_id)) {
-            map.get(node.parent_task_id)!.children.push(node)
-        } else {
-            roots.push(node)
-        }
-    })
-    return roots
+interface TasksContextValue extends TasksLayoutData {
+    setTasks: (tasks: ITask[]) => void
+    activeTab: ActiveTab
+    isLoading: boolean
 }
 
-export function flattenTree(
-    nodes: TaskNode[],
-    expandedIds: Set<number>,
-    depth = 0,
-): { node: TaskNode; depth: number; hasChildren: boolean }[] {
-    const result: { node: TaskNode; depth: number; hasChildren: boolean }[] = []
-    for (const node of nodes) {
-        result.push({ node, depth, hasChildren: node.children.length > 0 })
-        if (expandedIds.has(node.id) && node.children.length > 0) {
-            result.push(...flattenTree(node.children, expandedIds, depth + 1))
-        }
-    }
-    return result
+const TasksContext = createContext<TasksContextValue | null>(null)
+
+export function useTasksContext() {
+    const ctx = useContext(TasksContext)
+    if (!ctx) throw new Error("useTasksContext must be used inside TasksLayout")
+    return ctx
 }
 
 // ─── Assignee Helpers ─────────────────────────────────────────────────────────
@@ -102,7 +87,6 @@ export function StackedAssignees({
                         className="ring-2 ring-white dark:ring-background rounded-full shadow-sm"
                     />
                 )
-
                 if (showLink) {
                     return (
                         <Link
@@ -116,7 +100,6 @@ export function StackedAssignees({
                         </Link>
                     )
                 }
-
                 return (
                     <div key={i} className="relative" style={{ zIndex: max - i }}>
                         {avatar}
@@ -124,12 +107,10 @@ export function StackedAssignees({
                 )
             })}
             {assignees.length > max && (
-                <div
-                    className={cn(
-                        "rounded-full bg-gray-100 dark:bg-muted border border-white dark:border-background flex items-center justify-center text-muted-foreground font-bold ring-2 ring-white dark:ring-background z-0",
-                        size === 5 ? "w-5 h-5 text-[8px]" : "w-6 h-6 text-[10px]",
-                    )}
-                >
+                <div className={cn(
+                    "rounded-full bg-gray-100 dark:bg-muted border border-white dark:border-background flex items-center justify-center text-muted-foreground font-bold ring-2 ring-white dark:ring-background z-0",
+                    size === 5 ? "w-5 h-5 text-[8px]" : "w-6 h-6 text-[10px]",
+                )}>
                     +{assignees.length - max}
                 </div>
             )}
@@ -143,7 +124,6 @@ export function AssigneeAvatar({ asgn }: { asgn: ITaskAssignee }) {
         user?.display_name ||
         `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
         "Unknown"
-
     return (
         <Link
             href={`/members/${asgn.organization_member_id}`}
@@ -163,13 +143,9 @@ export function AssigneeAvatar({ asgn }: { asgn: ITaskAssignee }) {
 
 // ─── View Switcher ────────────────────────────────────────────────────────────
 
-export function TasksViewSwitcher({ currentView }: { currentView: CurrentView }) {
+function TasksViewSwitcher({ currentView, projectId }: { currentView: CurrentView; projectId: string }) {
     const router = useRouter()
-    const pathname = usePathname()
-
-    const projectMatch = pathname.match(/\/projects\/([^/]+)\/tasks/)
-    const projectId = projectMatch ? projectMatch[1] : null
-    const basePath = projectId ? `/projects/${projectId}/tasks` : "/projects/tasks"
+    const basePath = `/projects/${projectId}/tasks`
 
     const views = [
         { key: "list",     label: "List",     icon: List,         path: "list"     },
@@ -191,12 +167,7 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
                     )}
                     onClick={() => router.push(`${basePath}/${path}`)}
                 >
-                    <Icon
-                        className={cn(
-                            "h-4 w-4",
-                            currentView === key ? "text-white" : "text-gray-400",
-                        )}
-                    />
+                    <Icon className={cn("h-4 w-4", currentView === key ? "text-white" : "text-gray-400")} />
                     <span className="font-semibold text-xs uppercase tracking-tight">{label}</span>
                 </Button>
             ))}
@@ -204,68 +175,31 @@ export function TasksViewSwitcher({ currentView }: { currentView: CurrentView })
     )
 }
 
-// ─── Tasks Header (page-level title + view switcher) ─────────────────────────
+// ─── Header ───────────────────────────────────────────────────────────────────
 
-export function TasksHeader({ currentView }: { currentView: CurrentView }) {
-    const pathname = usePathname()
-    const isProjectContext =
-        pathname.includes("/projects/") && pathname.includes("/tasks")
-
-    return (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            {!isProjectContext ? (
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
-                    <p className="text-muted-foreground text-sm mt-1">
-                        Manage and track all granular work items across projects.
-                    </p>
-                </div>
-            ) : (
-                <div className="flex-1" />
-            )}
-            <div className="flex items-center gap-2">
-                <TasksViewSwitcher currentView={currentView} />
-            </div>
-        </div>
-    )
-}
-
-// ─── Tasks Page Header (tabs + new task dialog) ───────────────────────────────
-
-interface TasksPageHeaderProps {
+interface HeaderProps {
+    projectId: string
     currentView: CurrentView
     activeTab: ActiveTab
     onTabChange: (tab: ActiveTab) => void
     tabCounts: TabCounts
     members: IOrganization_member[]
     taskStatuses: ITaskStatus[]
-    onCreateTask: (
-        title: string,
-        assigneeId: number | "",
-        statusId: number | "",
-    ) => Promise<void>
+    onCreateTask: (title: string, assigneeId: number | "", statusId: number | "") => Promise<void>
 }
 
-export function TasksPageHeader({
-    currentView,
-    activeTab,
-    onTabChange,
-    tabCounts,
-    members,
-    taskStatuses,
-    onCreateTask,
-}: TasksPageHeaderProps) {
+function TasksHeader({
+    projectId, currentView, activeTab, onTabChange,
+    tabCounts, members, taskStatuses, onCreateTask,
+}: HeaderProps) {
     const [open, setOpen] = useState(false)
     const [title, setTitle] = useState("")
     const [assigneeId, setAssigneeId] = useState<number | "">("")
     const [statusId, setStatusId] = useState<number | "">("")
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const resetForm = () => {
-        setTitle("")
-        setAssigneeId("")
-        setStatusId("")
-    }
+    const resetForm = () => { setTitle(""); setAssigneeId(""); setStatusId("") }
+    const handleClose = () => { setOpen(false); resetForm() }
 
     const handleCreate = async () => {
         if (!title.trim()) return
@@ -279,11 +213,6 @@ export function TasksPageHeader({
         }
     }
 
-    const handleClose = () => {
-        setOpen(false)
-        resetForm()
-    }
-
     return (
         <>
             {/* Top bar */}
@@ -292,7 +221,7 @@ export function TasksPageHeader({
                     <Plus className="h-4 w-4" />
                     New Task
                 </Button>
-                <TasksViewSwitcher currentView={currentView} />
+                <TasksViewSwitcher currentView={currentView} projectId={projectId} />
             </div>
 
             {/* Tabs */}
@@ -316,9 +245,7 @@ export function TasksPageHeader({
             {/* New Task Dialog */}
             <Dialog open={open} onOpenChange={open => !open && handleClose()}>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>New Task</DialogTitle>
-                    </DialogHeader>
+                    <DialogHeader><DialogTitle>New Task</DialogTitle></DialogHeader>
                     <div className="space-y-3 py-4">
                         <Input
                             placeholder="Task name"
@@ -327,13 +254,8 @@ export function TasksPageHeader({
                             onKeyDown={e => e.key === "Enter" && handleCreate()}
                             autoFocus
                         />
-                        <Select
-                            value={assigneeId.toString()}
-                            onValueChange={v => setAssigneeId(v ? Number(v) : "")}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Assign to (optional)" />
-                            </SelectTrigger>
+                        <Select value={assigneeId.toString()} onValueChange={v => setAssigneeId(v ? Number(v) : "")}>
+                            <SelectTrigger><SelectValue placeholder="Assign to (optional)" /></SelectTrigger>
                             <SelectContent>
                                 {members.map(m => (
                                     <SelectItem key={m.id} value={m.id.toString()}>
@@ -344,18 +266,11 @@ export function TasksPageHeader({
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Select
-                            value={statusId.toString()}
-                            onValueChange={v => setStatusId(v ? Number(v) : "")}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Status (optional)" />
-                            </SelectTrigger>
+                        <Select value={statusId.toString()} onValueChange={v => setStatusId(v ? Number(v) : "")}>
+                            <SelectTrigger><SelectValue placeholder="Status (optional)" /></SelectTrigger>
                             <SelectContent>
                                 {taskStatuses.map(s => (
-                                    <SelectItem key={s.id} value={s.id.toString()}>
-                                        {s.name}
-                                    </SelectItem>
+                                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -369,5 +284,86 @@ export function TasksPageHeader({
                 </DialogContent>
             </Dialog>
         </>
+    )
+}
+
+// ─── Layout (default export) ──────────────────────────────────────────────────
+
+export default function TasksLayout({
+    children,
+    params,
+}: {
+    children: React.ReactNode
+    params: Promise<{ id: string }>
+}) {
+    const { id: projectId } = use(params)
+    const pathname = usePathname()
+
+    const currentView: CurrentView = pathname.endsWith("/kanban")
+        ? "board"
+        : pathname.endsWith("/timeline")
+            ? "timeline"
+            : "list"
+
+    const [tasks, setTasks] = useState<ITask[]>([])
+    const [members, setMembers] = useState<IOrganization_member[]>([])
+    const [taskStatuses, setTaskStatuses] = useState<ITaskStatus[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState<ActiveTab>("active")
+
+    useEffect(() => {
+        setIsLoading(true)
+        getTasksListPageData()
+            .then(({ tasks, members, taskStatuses }) => {
+                setTasks(tasks)
+                setMembers(members)
+                setTaskStatuses(taskStatuses)
+            })
+            .finally(() => setIsLoading(false))
+    }, [projectId])
+
+    const projectTasks = tasks.filter(t => t.project_id === Number(projectId))
+    const tabCounts: TabCounts = {
+        all: projectTasks.length,
+        active: projectTasks.filter(t => t.task_status?.code !== "done").length,
+        completed: projectTasks.filter(t => t.task_status?.code === "done").length,
+    }
+
+    const handleCreateTask = async (
+        title: string,
+        assigneeId: number | "",
+        statusId: number | "",
+    ) => {
+        const fd = new FormData()
+        fd.append("name", title)
+        fd.append("project_id", projectId)
+        if (statusId) fd.append("status_id", statusId.toString())
+        const res = await createTask(fd)
+        if (res.success && res.data) {
+            if (assigneeId) await assignTaskMember(res.data.id, Number(assigneeId))
+            const fresh = await getTasks()
+            if (fresh.success) setTasks(fresh.data)
+            toast.success("Task created")
+        } else {
+            toast.error("Failed to create task")
+        }
+    }
+
+    return (
+        <TasksContext.Provider value={{ tasks, setTasks, members, taskStatuses, activeTab, isLoading }}>
+            <div className="flex flex-col gap-4 p-4 pt-0">
+                <TasksHeader
+                    projectId={projectId}
+                    currentView={currentView}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                    tabCounts={tabCounts}
+                    members={members}
+                    taskStatuses={taskStatuses}
+                    onCreateTask={handleCreateTask}
+                />
+                {children}
+            </div>
+        </TasksContext.Provider>
     )
 }

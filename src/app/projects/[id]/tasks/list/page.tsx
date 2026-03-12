@@ -43,10 +43,10 @@ import {
 import {
     buildTaskTree,
     flattenTree,
-    TaskNode,
     StackedAssignees,
 } from "@/components/projects/tasks/header"
-import { TasksPageHeader, ActiveTab } from "@/components/projects/tasks/header"
+import { ActiveTab, TaskNode } from "@/types/tasks"
+import { TasksPageHeader } from "@/components/projects/tasks/header"
 import { PaginationFooter } from "@/components/tables/pagination-footer"
 import { getTasksListPageData } from "@/action/projects/tasks/list"
 import { createTask, updateTask, deleteTask, getTasks, assignTaskMember } from "@/action/task"

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useCallback, use } from "react"
+import React, { useState, useMemo, useCallback, useEffect, use } from "react"
 import {
     ChevronRight,
     ChevronDown,
@@ -10,12 +10,11 @@ import {
     ChevronsUpDown
 } from "lucide-react"
 import {
-    useTasksData,
     TasksHeader,
     buildTaskTree,
-    flattenTree,
-    TaskNode
+    flattenTree
 } from "@/components/projects/tasks/header"
+import { TaskNode } from "@/types/tasks"
 import { ITask, ITaskAssignee } from "@/interface"
 import { DateRangePicker } from "@/components/insights/DateRangePicker"
 import type { DateRange } from "@/components/insights/types"
@@ -23,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/profile&image/user-avatar"
 import Link from "next/link"
+import { getTasksListPageData } from "@/action/projects/tasks/list"
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -59,7 +59,6 @@ function toDateOnly(d: Date): Date {
     return startOfDay(d)
 }
 
-/** Get rollup date range for a node (min start, max end across all descendants) */
 function getRollupDates(node: TaskNode): { start: Date | null; end: Date | null } {
     const starts: Date[] = []
     const ends: Date[] = []
@@ -77,16 +76,15 @@ function getRollupDates(node: TaskNode): { start: Date | null; end: Date | null 
     }
 }
 
-/** Get assignee display info from a task assignee object */
 function getAssigneeInfo(assignee: ITaskAssignee): { id: string; name: string; photoUrl?: string; userId?: string } {
     const user = assignee?.member?.user
     if (user) {
         const name = user.display_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Unknown"
         return {
             id: String(assignee.organization_member_id || assignee.id || "unknown"),
-            name: name,
+            name,
             photoUrl: user.profile_photo_url || undefined,
-            userId: user.id
+            userId: user.id,
         }
     }
     return { id: "unassigned", name: "Unassigned" }
@@ -95,11 +93,11 @@ function getAssigneeInfo(assignee: ITaskAssignee): { id: string; name: string; p
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
-    name: string;
-    photoUrl?: string;
-    userId?: string;
-    size?: number;
-    memberId?: string;
+    name: string
+    photoUrl?: string
+    userId?: string
+    size?: number
+    memberId?: string
 }) {
     const content = (
         <UserAvatar
@@ -115,7 +113,7 @@ function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
         return (
             <Link
                 href={`/members/${memberId}`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
                 className="hover:scale-110 transition-transform"
             >
                 {content}
@@ -130,7 +128,18 @@ function AssigneeAvatarItem({ name, photoUrl, userId, size = 6, memberId }: {
 
 export default function TimelinePage({ params }: { params: Promise<{ id: string }> }) {
     const { id: projectId } = use(params)
-    const { tasks, isLoading } = useTasksData()
+
+    // ── Data state (konsisten dengan list/page.tsx) ────────────────────────
+    const [tasks, setTasks] = useState<ITask[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        setIsLoading(true)
+        getTasksListPageData()
+            .then(({ tasks }) => setTasks(tasks))
+            .finally(() => setIsLoading(false))
+    }, [projectId])
+
     const [groupBy, setGroupBy] = useState<GroupBy>("task")
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set())
     const [dateRange, setDateRange] = useState<DateRange>(() => ({
@@ -151,6 +160,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
     }, [days])
 
     // ─── Tree computation ────────────────────────────────────────────────────
+
     const filteredTasks = useMemo(() => {
         return projectId ? tasks.filter(t => t.project_id === Number(projectId)) : tasks
     }, [tasks, projectId])
@@ -183,13 +193,21 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
     // ─── Row computation (Assignee View) ─────────────────────────────────────
 
     const assigneeViewRows = useMemo(() => {
-        const list: { assigneeId: string; name: string; photoUrl?: string; userId?: string; task: ITask; parentName?: string; memberId?: string }[] = []
+        const list: {
+            assigneeId: string
+            name: string
+            photoUrl?: string
+            userId?: string
+            task: ITask
+            parentName?: string
+            memberId?: string
+        }[] = []
 
         const processTask = (task: ITask, parentName?: string) => {
             const taskAsNode = task as TaskNode
             const assignees = task.assignees || []
             if (assignees.length > 0) {
-                assignees.forEach((a) => {
+                assignees.forEach(a => {
                     const info = getAssigneeInfo(a)
                     list.push({
                         assigneeId: info.id,
@@ -198,7 +216,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                         userId: info.userId,
                         task,
                         parentName,
-                        memberId: a.organization_member_id?.toString()
+                        memberId: a.organization_member_id?.toString(),
                     })
                 })
             } else {
@@ -315,7 +333,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                 <div className="sticky left-0 top-0 z-40 bg-white dark:bg-background border-b border-r px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center">
                     Tasks
                 </div>
-                {days.map((d) => {
+                {days.map(d => {
                     const isToday = d.getTime() === startOfDay(new Date()).getTime()
                     return (
                         <div
@@ -354,7 +372,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                     const isParent = hasChildren
 
                     let barStart: Date | null = node.created_at ? startOfDay(new Date(node.created_at)) : null
-                    let barEnd: Date | null = node.due_date ? startOfDay(new Date(node.due_date)) : null
+                    let barEnd: Date | null = (node as any).due_date ? startOfDay(new Date((node as any).due_date)) : null
 
                     if (isParent) {
                         const rollup = getRollupDates(node)
@@ -376,7 +394,9 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                                         onClick={() => toggleExpand(node.id)}
                                         className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
                                     >
-                                        {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                                        {isExpanded
+                                            ? <ChevronDown className="h-3.5 w-3.5" />
+                                            : <ChevronRight className="h-3.5 w-3.5" />}
                                     </button>
                                 ) : (
                                     <span className="w-3.5 h-3.5 shrink-0 block" />
@@ -391,7 +411,16 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                                     <div className="flex -space-x-1 shrink-0 ml-1">
                                         {assignees.slice(0, 2).map((a, i) => {
                                             const info = getAssigneeInfo(a)
-                                            return <AssigneeAvatarItem key={i} name={info.name} photoUrl={info.photoUrl} userId={info.userId} size={5} memberId={a.organization_member_id?.toString()} />
+                                            return (
+                                                <AssigneeAvatarItem
+                                                    key={i}
+                                                    name={info.name}
+                                                    photoUrl={info.photoUrl}
+                                                    userId={info.userId}
+                                                    size={5}
+                                                    memberId={a.organization_member_id?.toString()}
+                                                />
+                                            )
                                         })}
                                         {assignees.length > 2 && (
                                             <div className="w-5 h-5 rounded-full bg-muted border text-[9px] flex items-center justify-center text-muted-foreground">
@@ -421,7 +450,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
         )
     }
 
-    // ─── ASSIGNEE VIEW ──────────────────────────────────────────────────────
+    // ─── ASSIGNEE VIEW ────────────────────────────────────────────────────────
 
     const renderAssigneeView = () => {
         const ASSIGNEE_COL = 1
@@ -438,7 +467,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                 <div className="sticky left-[180px] top-0 z-40 bg-white dark:bg-background border-b border-r px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                     Task
                 </div>
-                {days.map((d) => {
+                {days.map(d => {
                     const isToday = d.getTime() === startOfDay(new Date()).getTime()
                     return (
                         <div
@@ -477,9 +506,8 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
                     const borderBottom = isLast ? "border-b" : ""
 
                     const barStart = task.created_at ? startOfDay(new Date(task.created_at)) : null
-                    const barEnd = task.due_date ? startOfDay(new Date(task.due_date)) : null
+                    const barEnd = (task as any).due_date ? startOfDay(new Date((task as any).due_date)) : null
                     const barCols = getBarCols(barStart, barEnd, DAY_OFFSET)
-
                     const rowSpan = assigneeRowSpans[rowIndex]
 
                     return (

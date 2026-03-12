@@ -1,8 +1,31 @@
 import { ITask, IProject, IOrganization_member, ITaskStatus } from "@/interface"
 import { RowSelectionState } from "@tanstack/react-table"
-import { TaskNode } from "@/components/projects/tasks/header"
 
+// ─── View & Tab ───────────────────────────────────────────────────────────────
+
+export type CurrentView = "list" | "board" | "timeline"
 export type ActiveTab = "active" | "completed" | "all"
+
+// ─── Task Tree ────────────────────────────────────────────────────────────────
+// Single source of truth — import TaskNode dari sini, bukan dari header.tsx
+
+export type TaskNode = ITask & { children: TaskNode[] }
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+
+export interface TabCounts {
+    active: number
+    completed: number
+    all: number
+}
+
+export interface TasksLayoutData {
+    tasks: ITask[]
+    members: IOrganization_member[]
+    taskStatuses: ITaskStatus[]
+}
+
+// ─── Filters ──────────────────────────────────────────────────────────────────
 
 export interface TaskFilters {
     activeTab: ActiveTab
@@ -10,6 +33,8 @@ export interface TaskFilters {
     selectedProject: string
     selectedAssignee: string
 }
+
+// ─── Dialog State ─────────────────────────────────────────────────────────────
 
 export interface TaskDialogState {
     // New task
@@ -26,6 +51,8 @@ export interface TaskDialogState {
     editedStatus: number | ""
     editedAssignee: number | ""
 }
+
+// ─── Component Props ──────────────────────────────────────────────────────────
 
 export interface ListToolbarProps {
     searchQuery: string
