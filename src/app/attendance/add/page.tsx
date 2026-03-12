@@ -12,8 +12,8 @@ import {
   type SingleFormValues,
 } from "@/types/attendance"
 import { useRouter } from "next/navigation"
-import { useMembers } from "@/hooks/attendance/use-members"
-import { useBatchAttendance } from "@/hooks/attendance/use-batch-attendance"
+import { useMembers } from "@/hooks/attendance/add/use-members"
+import { useBatchAttendance } from "@/hooks/attendance/add/use-batch-attendance"
 import { createManualAttendance } from "@/action/attendance"
 import { toast } from "sonner"
 

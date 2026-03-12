@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { IOrganization_member } from "@/interface"
-import { useOrganizationId } from "../use-organization-id"
+import { useOrganizationId } from "../../use-organization-id"
 import { memberLogger } from '@/lib/logger';
 import { type MemberOption } from "@/types/attendance"
 
