@@ -461,8 +461,9 @@ export interface ITask {
     description?: string | null;
     priority: 'low' | 'medium' | 'high' | 'urgent';
     estimated_hours?: number | null;
-    actual_hours?: number;
     due_date?: string | null;
+    completed_at?: string | null;
+    lifecycle_status?: 'active' | 'completed' | 'archived';
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;
@@ -471,9 +472,10 @@ export interface ITask {
         id: number;
         name: string;
         client?: Array<{
-            id: number;
-            name: string;
-        }>;
+            id: number; name: string
+        }> | {
+            id: number; name: string
+        } | null;
     };
     assignees?: ITaskAssignee[];
     task_status?: ITaskStatus;

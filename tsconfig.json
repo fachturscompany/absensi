@@ -52,7 +52,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "src/components/projects/tasks/list/task-table"  ],
   "exclude": [
     "node_modules",
     ".next",

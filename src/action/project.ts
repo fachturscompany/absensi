@@ -32,7 +32,7 @@ export const getProjects = async (organizationId?: string | number) => {
         .from("projects")
         .select(`
             *,
-            clients (id, name),
+            clients:clients!projects_client_id_fkey (id, name),
             tasks (id)
         `)
         .eq("organization_id", targetOrgId)

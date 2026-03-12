@@ -15,7 +15,7 @@ import {
     buildTaskTree,
     flattenTree,
     TaskNode
-} from "@/components/tasks/tasks-shared"
+} from "@/components/projects/tasks/header"
 import { ITask, ITaskAssignee } from "@/interface"
 import { DateRangePicker } from "@/components/insights/DateRangePicker"
 import type { DateRange } from "@/components/insights/types"

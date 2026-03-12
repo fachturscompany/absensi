@@ -6,7 +6,7 @@ import {
     useTasksData,
     TasksHeader,
     StackedAssignees,
-} from "@/components/tasks/tasks-shared"
+} from "@/components/projects/tasks/header"
 import { ITask } from "@/interface"
 
 import { use } from "react"

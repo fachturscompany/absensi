@@ -28,11 +28,10 @@ export const getTasks = async (organizationId?: string | number) => {
         .from("tasks")
         .select(`
             *,
-            project:projects!inner(id, name, organization_id, client:clients(id, name)),
+            project:projects(id, name, client:clients!projects_client_id_fkey(id, name)),
             assignees:task_assignees(
                 id,
                 organization_member_id,
-                role,
                 member:organization_members(
                     id,
                     user:user_profiles(id, first_name, last_name, display_name, profile_photo_url)
@@ -40,58 +39,17 @@ export const getTasks = async (organizationId?: string | number) => {
             ),
             task_status:task_statuses(*)
         `)
-        .eq("projects.organization_id", targetOrgId)
+        .eq("organization_id", targetOrgId)
         .order("created_at", { ascending: false });
 
     if (error) {
+        console.error("getTasks error:", error);
         return { success: false, message: error.message, data: [] };
-    }
-
-    const resultData = data || [];
-
-    if (resultData.length > 0) {
-        // Collect all unique user IDs from all task assignees
-        const userIds = new Set<string>();
-        resultData.forEach((task: any) => {
-            if (task.assignees) {
-                task.assignees.forEach((a: any) => {
-                    const userId = a.member?.user?.id || a.organization_member?.user?.id;
-                    if (userId) userIds.add(userId);
-                });
-            }
-        });
-
-        if (userIds.size > 0) {
-            // Fetch profile photos from user_profiles
-            const { data: profiles, error: profileError } = await supabase
-                .from("user_profiles")
-                .select("id, profile_photo_url")
-                .in("id", Array.from(userIds));
-
-            if (!profileError && profiles) {
-                const photoMap = new Map();
-                profiles.forEach((p: any) => {
-                    if (p.profile_photo_url) photoMap.set(p.id, p.profile_photo_url);
-                });
-
-                // Inject profiles into assignees
-                resultData.forEach((task: any) => {
-                    if (task.assignees) {
-                        task.assignees.forEach((a: any) => {
-                            const user = a.member?.user || a.organization_member?.user;
-                            if (user && user.id && photoMap.has(user.id)) {
-                                user.profile_photo_url = photoMap.get(user.id);
-                            }
-                        });
-                    }
-                });
-            }
-        }
     }
 
     return {
         success: true,
-        data: resultData as ITask[]
+        data: (data ?? []) as ITask[]
     };
 };
 
@@ -128,15 +86,25 @@ export const getTaskStatuses = async (organizationId?: string | number) => {
  */
 export const createTask = async (formData: FormData) => {
     const supabase = await getSupabase();
-    const task: Partial<ITask> = {
+
+    let organizationId: string | number;
+    try {
+        organizationId = await getUserOrganization(supabase);
+    } catch {
+        return { success: false, message: "Unauthorized", data: null };
+    }
+
+    const task: Record<string, any> = {
         name: formData.get("name") as string,
         project_id: Number(formData.get("project_id")),
-        status_id: Number(formData.get("status_id")),
+        organization_id: organizationId,
+        priority: (formData.get("priority") as string) || "medium",
         position_in_column: Number(formData.get("position_in_column") || 1),
-        priority: (formData.get("priority") as any) || "medium",
-        description: formData.get("description") as string || null,
-        parent_task_id: formData.get("parent_task_id") ? Number(formData.get("parent_task_id")) : null
     };
+
+    if (formData.get("status_id")) task.status_id = Number(formData.get("status_id"));
+    if (formData.get("description")) task.description = formData.get("description") as string;
+    if (formData.get("parent_task_id")) task.parent_task_id = Number(formData.get("parent_task_id"));
 
     const { data, error } = await supabase
         .from("tasks")
@@ -145,6 +113,7 @@ export const createTask = async (formData: FormData) => {
         .single();
 
     if (error) {
+        console.error("createTask error:", error);
         return { success: false, message: error.message, data: null };
     }
 
@@ -157,12 +126,12 @@ export const createTask = async (formData: FormData) => {
 export const updateTask = async (formData: FormData) => {
     const supabase = await getSupabase();
     const id = formData.get("id") as string;
-    const task: Partial<ITask> = {};
+    const task: Record<string, any> = {};
 
     if (formData.has("name")) task.name = formData.get("name") as string;
     if (formData.has("status_id")) task.status_id = Number(formData.get("status_id"));
     if (formData.has("position_in_column")) task.position_in_column = Number(formData.get("position_in_column"));
-    if (formData.has("priority")) task.priority = formData.get("priority") as any;
+    if (formData.has("priority")) task.priority = formData.get("priority") as string;
     if (formData.has("project_id")) task.project_id = Number(formData.get("project_id"));
     if (formData.has("description")) task.description = formData.get("description") as string;
 
@@ -174,6 +143,7 @@ export const updateTask = async (formData: FormData) => {
         .single();
 
     if (error) {
+        console.error("updateTask error:", error);
         return { success: false, message: error.message, data: null };
     }
 
@@ -200,19 +170,48 @@ export const deleteTask = async (formData: FormData) => {
 };
 
 /**
- * Assign a member to a task
+ * Assign a member to a task (supports multiple assignees)
  */
-export const assignTaskMember = async (taskId: number, memberId: number, role: string = 'assignee') => {
+export const assignTaskMember = async (
+    taskId: number,
+    memberId: number,
+    role: string = "assignee"
+) => {
     const supabase = await getSupabase();
+
+    // Upsert to avoid duplicate assignee error
     const { data, error } = await supabase
         .from("task_assignees")
-        .insert([{ task_id: taskId, organization_member_id: memberId, role }])
+        .upsert(
+            [{ task_id: taskId, organization_member_id: memberId, role }],
+            { onConflict: "task_id,organization_member_id" }
+        )
         .select()
         .single();
+
+    if (error) {
+        console.error("assignTaskMember error:", error);
+        return { success: false, message: error.message };
+    }
+
+    return { success: true, data };
+};
+
+/**
+ * Remove a member from a task
+ */
+export const removeTaskMember = async (taskId: number, memberId: number) => {
+    const supabase = await getSupabase();
+
+    const { error } = await supabase
+        .from("task_assignees")
+        .delete()
+        .eq("task_id", taskId)
+        .eq("organization_member_id", memberId);
 
     if (error) {
         return { success: false, message: error.message };
     }
 
-    return { success: true, data };
+    return { success: true };
 };
