@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Not main branch" })
   }
 
-  spawn("bash", ["/www/wwwroot/absensi/deploy.sh"], {
+  spawn("bash", ["/www/wwwroot/Bot-Deploy/deploy.sh"], {
     detached: true,
     stdio: "ignore",
   }).unref()
