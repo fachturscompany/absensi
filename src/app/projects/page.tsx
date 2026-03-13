@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -117,17 +117,37 @@ export default function ProjectsPage() {
         setIsLoading(false)
     }
 
-    const fetchDropdowns = React.useCallback(() => {
+
+    // ── Tambah ref ────────────────────────────────────────────────────────────────
+    const dropdownsFetched = useRef(false)
+
+    const fetchDropdowns = React.useCallback(async () => {
         if (!organizationId) return
-        Promise.all([
+        // Hanya fetch 1x per session, tidak perlu refetch setiap org berubah
+        // kecuali org memang berubah
+        if (dropdownsFetched.current) return
+        dropdownsFetched.current = true
+
+        const [membersRes, clientsRes, groupsRes] = await Promise.all([
             getSimpleMembersForDropdown(organizationId),
             getClients(String(organizationId)),
             getAllGroups(Number(organizationId)),
-        ]).then(([membersRes, clientsRes, groupsRes]) => {
-            if (membersRes.success) setRealMembers(membersRes.data)
-            if (clientsRes.success) setClients(clientsRes.data)
-            if (groupsRes.success) setGroups(groupsRes.data)
-        })
+        ])
+        if (membersRes.success) setRealMembers(membersRes.data)
+        if (clientsRes.success) setClients(clientsRes.data)
+        if (groupsRes.success) setGroups(groupsRes.data)
+    }, [organizationId])
+
+    // Reset saat org berubah agar fetch ulang
+    React.useEffect(() => {
+        dropdownsFetched.current = false
+    }, [organizationId])
+
+    React.useEffect(() => {
+        fetchProjects()
+        // Dropdown tidak perlu blocking — defer ke setelah projects selesai
+        const t = setTimeout(() => fetchDropdowns(), 200)
+        return () => clearTimeout(t)
     }, [organizationId])
 
     React.useEffect(() => {
