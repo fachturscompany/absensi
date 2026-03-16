@@ -222,11 +222,15 @@ export const getUserOrganization = async () => {
         .eq("user_id", user.id)
         .limit(1);
         
-      if (fallbackQuery.data && fallbackQuery.data.length > 0) {
+      if (fallbackQuery.data && fallbackQuery.data.length > 0 && fallbackQuery.data[0]) {
         return fetchOrganization(supabase, fallbackQuery.data[0].organization_id);
       }
     }
     return { success: false, message: "User not in any organization", data: null };
+  }
+
+  if (!members || members.length === 0 || !members[0]) {
+    return { success: false, message: "User organization data not found", data: null };
   }
 
   return fetchOrganization(supabase, members[0].organization_id);

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Info, Search, User, Loader2 } from "lucide-react"
 import { Calendar } from "lucide-react"
 

@@ -64,12 +64,14 @@ export async function getSettingsMembers(
                     .eq("user_id", user.id)
                     .limit(1);
                 
-                if (!fallback.data || fallback.data.length === 0) {
+                if (!fallback.data || fallback.data.length === 0 || !fallback.data[0]) {
                     return { success: true, message: "User not in any organization", data: [] };
                 }
                 organizationId = fallback.data[0].organization_id;
-            } else {
+            } else if (members[0]) {
                 organizationId = members[0].organization_id;
+            } else {
+                return { success: false, message: "Organization membership not found", data: [] };
             }
         }
 
