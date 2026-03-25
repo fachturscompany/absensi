@@ -14,7 +14,7 @@ export function useMemberSchedules(organizationId?: string) {
     queryKey: ["memberSchedules", organizationId],
     queryFn: async () => {
       memberLogger.debug('[React Query] Fetching member schedules via API')
-      const url = organizationId ? `/api/schedule/member?organizationId=${organizationId}` : '/api/schedule/member'
+      const url = organizationId ? `/api/schedules/member?organizationId=${organizationId}` : '/api/schedules/member'
       const response = await fetch(url, { credentials: 'same-origin' })
       const json = await response.json()
       if (!json.success) {

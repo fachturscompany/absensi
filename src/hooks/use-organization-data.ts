@@ -27,10 +27,10 @@ export function useOrganizationData() {
       if (!user?.id) return null
 
       // ✅ USE SECURE API ROUTE - kirim organizationId dari store kalau ada
-      let url = '/api/organization/info'
+      let url = '/api/organizations/info'
       if (storeOrgId) {
         const params = new URLSearchParams({ organizationId: String(storeOrgId) })
-        url = `/api/organization/info?${params.toString()}`
+        url = `/api/organizations/info?${params.toString()}`
       }
 
       const response = await fetch(url, {
@@ -80,12 +80,12 @@ export function useOrganizationId() {
  */
 export function useOrganizationName() {
   const { data, isLoading, ...rest } = useOrganizationData()
-  
+
   // Force refetch when data changes to ensure UI updates
   useEffect(() => {
     // This ensures the hook responds to data changes
   }, [data])
-  
+
   return {
     organizationName: data?.organizationName ?? null,
     loading: isLoading,
