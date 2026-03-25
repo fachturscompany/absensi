@@ -190,50 +190,58 @@ export const getAllOrganization = async () => {
 // This function returns only the organization that the current user belongs to
 export const getUserOrganization = async () => {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
   const orgIdFromCookie = cookieStore.get('org_id')?.value;
 
-  // Get current user
+  // Get current user via regular client (to verify session)
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     return { success: false, message: "User not authenticated", data: null };
   }
 
-  // Get user's organization membership
-  let query = supabase
+  // Get user's organization membership using ADMIN CLIENT to bypass RLS
+  let query = adminClient
     .from("organization_members")
     .select("organization_id")
     .eq("user_id", user.id);
 
   // If we have an org_id from cookie, try to get that specific membership
-  if (orgIdFromCookie) {
-    query = query.eq("organization_id", orgIdFromCookie);
+  if (orgIdFromCookie && orgIdFromCookie !== "undefined") {
+    const numericOrgId = parseInt(orgIdFromCookie, 10);
+    if (!isNaN(numericOrgId)) {
+      query = query.eq("organization_id", numericOrgId);
+    }
   }
 
   const { data: members, error: memberError } = await query.limit(1);
 
   if (memberError || !members || members.length === 0) {
-    // If cookie failed or not present, fallback to ANY active membership
-    if (orgIdFromCookie) {
-      const fallbackQuery = await supabase
-        .from("organization_members")
-        .select("organization_id")
-        .eq("user_id", user.id)
-        .limit(1);
-        
-      if (fallbackQuery.data && fallbackQuery.data.length > 0 && fallbackQuery.data[0]) {
-        return fetchOrganization(supabase, fallbackQuery.data[0].organization_id);
-      }
+    // If cookie failed or not present, fallback to ANY active membership using ADMIN client
+    const { data: fallbackMembers, error: fallbackError } = await adminClient
+      .from("organization_members")
+      .select("organization_id")
+      .eq("user_id", user.id)
+      .limit(1);
+
+    if (fallbackError) {
+      console.error("[getUserOrganization] Fallback query error:", fallbackError);
     }
+
+    if (fallbackMembers && fallbackMembers.length > 0 && fallbackMembers[0]) {
+      console.log(`[getUserOrganization] Using fallback org: ${fallbackMembers[0].organization_id}`);
+      return fetchOrganization(adminClient, fallbackMembers[0].organization_id);
+    }
+
     return { success: false, message: "User not in any organization", data: null };
   }
 
-  if (!members || members.length === 0 || !members[0]) {
+  if (!members[0]) {
     return { success: false, message: "User organization data not found", data: null };
   }
 
-  return fetchOrganization(supabase, members[0].organization_id);
+  return fetchOrganization(adminClient, members[0].organization_id);
 };
 
 // Helper to fetch organization by ID

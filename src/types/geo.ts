@@ -1,3 +1,7 @@
+// src/types/geo.ts
+// Single source of truth untuk semua geo types
+// Dipakai oleh loader.ts, api routes, dan hooks
+
 export interface GeoCity {
   value: string;
   label: string;
@@ -12,7 +16,11 @@ export interface GeoState {
 
 export interface GeoCountry {
   code: string;
-  name: string;
+  label: string;   // konsisten dengan usage di hook & component
   states: GeoState[];
 }
 
+export interface CountryOption {
+  value: string;  // e.g. "ID"
+  label: string;  // e.g. "Indonesia"
+}

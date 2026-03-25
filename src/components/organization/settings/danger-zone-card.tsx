@@ -48,7 +48,7 @@ export function DangerZoneCard({ orgData }: DangerZoneCardProps) {
       const result = await deleteOrganization(String(orgData.id));
       if (result.success) {
         toast.success("Organization deleted successfully. Redirecting...");
-        await fetch("/api/organization/clear", { method: "POST" });
+        await fetch("/api/organizations/clear", { method: "POST" });
         setTimeout(() => {
           window.location.href = "/organization";
         }, 1500);

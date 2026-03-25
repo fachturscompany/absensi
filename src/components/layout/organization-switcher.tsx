@@ -46,7 +46,7 @@ export function OrganizationSwitcher() {
         console.log('[ORG-SWITCHER] Auto-fixing organization ID:', activeOrg.organization_id);
         setOrganizationId(activeOrg.organization_id, activeOrg.organization_name);
 
-        fetch("/api/organization/select", {
+        fetch("/api/organizations/select", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ organizationId: activeOrg.organization_id }),
@@ -56,7 +56,7 @@ export function OrganizationSwitcher() {
   }, [activeOrg, selectedOrg, organizationId, setOrganizationId]);
 
   // Handle switching organization
-const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
+  const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
     // Prevent multiple rapid switches
     if (isSwitching) {
       console.log('[ORG-SWITCHER] Switch already in progress, ignoring click');
@@ -81,7 +81,7 @@ const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
 
       // Step 3: Set cookie on server (wait for this to complete)
       console.log('[ORG-SWITCHER] Setting server cookie...');
-      const cookieResponse = await fetch("/api/organization/select", {
+      const cookieResponse = await fetch("/api/organizations/select", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,13 +107,13 @@ const handleSwitchOrg = async (org: typeof userOrganizations[0]) => {
 
     } catch (error) {
       console.error('[ORG-SWITCHER] Error switching organization:', error);
-      
+
       // Fallback: Try setting cookie manually if API fails
       try {
         document.cookie = `org_id=${org.organization_id}; path=/; max-age=31536000`;
         console.log('[ORG-SWITCHER] Fallback: Cookie set via document.cookie');
         router.refresh();
-        
+
         switchingTimeoutRef.current = setTimeout(() => {
           setIsSwitching(false);
         }, 1000);

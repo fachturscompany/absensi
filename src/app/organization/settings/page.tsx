@@ -24,6 +24,7 @@ export default function SettingsPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
   // ----------------------------------------------------------
   // Hooks
   // ----------------------------------------------------------
@@ -33,6 +34,7 @@ export default function SettingsPage() {
     setFormData,
     loading,
     saving,
+    countryOptions,
     stateOptions,
     cityOptions,
     stateLabel,
@@ -44,12 +46,9 @@ export default function SettingsPage() {
   const { logoPreview, isCompressing, compressionError, handleLogoChange, resolveLogoUrl } =
     useLogoUpload(orgData);
 
-  const handleOrgDataRefresh = useCallback(
-    (_data: OrganizationData) => {
-      // useOrgSettings refetch otomatis via queryClient, ini hanya untuk fallback
-    },
-    [],
-  );
+  const handleOrgDataRefresh = useCallback((_data: OrganizationData) => {
+    // useOrgSettings refetch otomatis via queryClient, ini hanya untuk fallback
+  }, []);
 
   const {
     showInviteCode,
@@ -115,6 +114,7 @@ export default function SettingsPage() {
             formData={formData}
             onChange={handleChange}
             onCountryChange={handleCountryChange}
+            countryOptions={countryOptions}
             stateOptions={stateOptions}
             cityOptions={cityOptions}
             stateLabel={stateLabel}

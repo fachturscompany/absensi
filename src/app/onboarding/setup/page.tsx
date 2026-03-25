@@ -128,7 +128,7 @@ export default function OnboardingSetupPage() {
                 clearTimeout(codeValidationTimeoutRef.current);
             }
         };
-         
+
     }, []);
 
     const loadInitialData = async () => {
@@ -315,7 +315,7 @@ export default function OnboardingSetupPage() {
                 toast.success(`Organization "${result.data.organizationName}" created! Welcome aboard 🎉`);
 
                 // Set org_id cookie via API so middleware knows we're good
-                await fetch("/api/organization/select", {
+                await fetch("/api/organizations/select", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ organizationId: result.data.organizationId }),

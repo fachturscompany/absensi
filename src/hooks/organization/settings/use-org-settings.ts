@@ -4,7 +4,7 @@
 // Mengelola fetch, state, dan save untuk organization settings
 // Menggunakan TanStack Query untuk caching + invalidation
 
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ import type {
   OrgSettingsFormData,
   GeoCountry,
   GeoCity,
+  CountryOption,
   OrganizationUpdatePayload,
 } from "@/types/organization/org-settings";
 
@@ -65,6 +66,21 @@ function normalizeCityValue(
 }
 
 // ----------------------------------------------------------
+// Fallback country list — dipakai jika /api/geo/countries gagal
+// ----------------------------------------------------------
+const FALLBACK_COUNTRY_OPTIONS: CountryOption[] = [
+  { value: "ID", label: "Indonesia" },
+  { value: "MY", label: "Malaysia" },
+  { value: "SG", label: "Singapore" },
+  { value: "TH", label: "Thailand" },
+  { value: "PH", label: "Philippines" },
+  { value: "VN", label: "Vietnam" },
+  { value: "US", label: "United States" },
+  { value: "GB", label: "United Kingdom" },
+  { value: "AU", label: "Australia" },
+];
+
+// ----------------------------------------------------------
 // Hook: useOrgSettings
 // ----------------------------------------------------------
 export function useOrgSettings() {
@@ -78,8 +94,27 @@ export function useOrgSettings() {
   const [geoData, setGeoData] = useState<GeoCountry | null>(null);
   const geoCacheRef = useRef<Record<string, GeoCountry>>({});
 
+  // Country options — dinamis dari /api/geo/countries
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+
   // ----------------------------------------------------------
-  // Fetch geo data
+  // Fetch country list saat mount — statis, cukup sekali
+  // ----------------------------------------------------------
+  useEffect(() => {
+    fetch("/api/geo/countries")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch countries");
+        return res.json() as Promise<CountryOption[]>;
+      })
+      .then((data) => setCountryOptions(data))
+      .catch(() => {
+        // Fallback ke daftar manual jika endpoint gagal
+        setCountryOptions(FALLBACK_COUNTRY_OPTIONS);
+      });
+  }, []);
+
+  // ----------------------------------------------------------
+  // Fetch geo data (states + cities) per country
   // ----------------------------------------------------------
   const fetchGeoData = useCallback(async (countryCode: string): Promise<GeoCountry | null> => {
     const key = (countryCode || "ID").toUpperCase();
@@ -266,6 +301,7 @@ export function useOrgSettings() {
     // Geo
     geoData,
     selectedCountry,
+    countryOptions,
     stateOptions,
     cityOptions,
     stateLabel,

@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/organization/settings/ContactLocationCard.tsx
+// src/components/organization/settings/contact-location-card.tsx
 
 import {
   Card,
@@ -43,22 +43,18 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-import type { OrgSettingsFormData, GeoState, GeoCity } from "@/types/organization/org-settings";
-
-// Country list — statis, tidak perlu API (hanya beberapa negara SEA)
-const COUNTRY_OPTIONS = [
-  { value: "ID", label: "Indonesia" },
-  { value: "MY", label: "Malaysia" },
-  { value: "SG", label: "Singapore" },
-  { value: "TH", label: "Thailand" },
-  { value: "PH", label: "Philippines" },
-  { value: "VN", label: "Vietnam" },
-] as const;
+import type {
+  OrgSettingsFormData,
+  GeoState,
+  GeoCity,
+  CountryOption,
+} from "@/types/organization/org-settings";
 
 interface ContactLocationCardProps {
   formData: OrgSettingsFormData;
   onChange: (updates: Partial<OrgSettingsFormData>) => void;
   onCountryChange: (countryCode: string) => void;
+  countryOptions: CountryOption[];
   stateOptions: GeoState[];
   cityOptions: GeoCity[];
   stateLabel: string;
@@ -69,11 +65,13 @@ export function ContactLocationCard({
   formData,
   onChange,
   onCountryChange,
+  countryOptions,
   stateOptions,
   cityOptions,
   stateLabel,
   cityLabel,
 }: ContactLocationCardProps) {
+  const [countryPopoverOpen, setCountryPopoverOpen] = useState(false);
   const [statePopoverOpen, setStatePopoverOpen] = useState(false);
   const [cityPopoverOpen, setCityPopoverOpen] = useState(false);
 
@@ -158,18 +156,52 @@ export function ContactLocationCard({
             <Label htmlFor="org-country" className="text-sm font-medium">
               Country
             </Label>
-            <Select value={formData.country_code} onValueChange={onCountryChange}>
-              <SelectTrigger id="org-country" className="h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRY_OPTIONS.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={countryPopoverOpen} onOpenChange={setCountryPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={countryPopoverOpen}
+                  className="w-full justify-between h-10"
+                >
+                  <span className="truncate">
+                    {countryOptions.find((c) => c.value === formData.country_code)?.label ||
+                      "Select country..."}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[300px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search country..." />
+                  <CommandEmpty>No country found.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandList>
+                      {countryOptions.map((country) => (
+                        <CommandItem
+                          key={country.value}
+                          value={country.label} // Command search works on value, so we use label for searching
+                          onSelect={() => {
+                            onCountryChange(country.value);
+                            setCountryPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              formData.country_code === country.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {country.label}
+                        </CommandItem>
+                      ))}
+                    </CommandList>
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-2">
@@ -181,6 +213,7 @@ export function ContactLocationCard({
                   role="combobox"
                   aria-expanded={statePopoverOpen}
                   className="w-full justify-between h-10"
+                  disabled={stateOptions.length === 0}
                 >
                   <span className="truncate">{stateLabel || "Select state..."}</span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -207,7 +240,9 @@ export function ContactLocationCard({
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              formData.state_province === state.value ? "opacity-100" : "opacity-0",
+                              formData.state_province === state.value
+                                ? "opacity-100"
+                                : "opacity-0",
                             )}
                           />
                           {state.label}

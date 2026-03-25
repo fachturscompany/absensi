@@ -1,6 +1,7 @@
-// ============================================================
-// Organization Settings — Type Definitions
-// ============================================================
+// src/types/organization/org-settings.ts
+
+// Geo types di-re-export dari types/geo.ts — jangan duplikat di sini
+export type { GeoCity, GeoState, GeoCountry, CountryOption } from "@/types/geo";
 
 // ----------------------------------------------------------
 // Raw data shape from Supabase (tabel `organization`)
@@ -87,26 +88,6 @@ export interface OrganizationUpdatePayload {
   industry: string;
   logo_url: string | null | undefined;
   time_format: "12h" | "24h";
-}
-
-// ----------------------------------------------------------
-// Geo types (states & cities dari /api/geo/[country])
-// ----------------------------------------------------------
-export interface GeoCity {
-  value: string;
-  label: string;
-}
-
-export interface GeoState {
-  value: string;
-  label: string;
-  cities: GeoCity[];
-}
-
-export interface GeoCountry {
-  code: string;
-  label: string;
-  states: GeoState[];
 }
 
 // ----------------------------------------------------------

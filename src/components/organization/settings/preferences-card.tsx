@@ -16,13 +16,26 @@ import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Clock, Loader2 } from "@/components/icons/lucide-exports";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Clock, Loader2, Check, ChevronsUpDown } from "@/components/icons/lucide-exports";
+import { cn } from "@/lib/utils";
 
 import { useTimezones, useCurrencies } from "@/hooks/organization/settings/use-select-option";
 import type { OrgSettingsFormData } from "@/types/organization/org-settings";
@@ -34,6 +47,9 @@ interface PreferencesCardProps {
 
 export function PreferencesCard({ formData, onChange }: PreferencesCardProps) {
   const [mounted, setMounted] = useState(false);
+  const [tzPopoverOpen, setTzPopoverOpen] = useState(false);
+  const [curPopoverOpen, setCurPopoverOpen] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -77,28 +93,51 @@ export function PreferencesCard({ formData, onChange }: PreferencesCardProps) {
               Loading timezones...
             </div>
           ) : (
-            <Select
-              value={formData.timezone}
-              onValueChange={(value) => onChange({ timezone: value })}
-            >
-              <SelectTrigger id="org-timezone" className="h-10">
-                <SelectValue placeholder="Select timezone" />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {Object.entries(timezoneGroups).map(([region, tzList]) => (
-                  <SelectGroup key={region}>
-                    <SelectLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      {region}
-                    </SelectLabel>
-                    {tzList.map((tz) => (
-                      <SelectItem key={tz.value} value={tz.value}>
-                        {tz.label}
-                      </SelectItem>
+            <Popover open={tzPopoverOpen} onOpenChange={setTzPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={tzPopoverOpen}
+                  className="w-full justify-between h-10 font-normal"
+                >
+                  <span className="truncate">
+                    {timezones?.find((tz) => tz.value === formData.timezone)?.label || "Select timezone..."}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search timezone..." />
+                  <CommandEmpty>No timezone found.</CommandEmpty>
+                  <CommandList className="max-h-72">
+                    {Object.entries(timezoneGroups).map(([region, tzList]) => (
+                      <CommandGroup key={region} heading={region}>
+                        {tzList.map((tz) => (
+                          <CommandItem
+                            key={tz.value}
+                            value={tz.value}
+                            onSelect={() => {
+                              onChange({ timezone: tz.value });
+                              setTzPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.timezone === tz.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {tz.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
                     ))}
-                  </SelectGroup>
-                ))}
-              </SelectContent>
-            </Select>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
 
@@ -113,21 +152,49 @@ export function PreferencesCard({ formData, onChange }: PreferencesCardProps) {
               Loading currencies...
             </div>
           ) : (
-            <Select
-              value={formData.currency_code}
-              onValueChange={(value) => onChange({ currency_code: value })}
-            >
-              <SelectTrigger id="org-currency" className="h-10">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {currencies?.map((cur) => (
-                  <SelectItem key={cur.code} value={cur.code}>
-                    {cur.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={curPopoverOpen} onOpenChange={setCurPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={curPopoverOpen}
+                  className="w-full justify-between h-10 font-normal"
+                >
+                  <span className="truncate">
+                    {currencies?.find((cur) => cur.code === formData.currency_code)?.label || "Select currency..."}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search currency..." />
+                  <CommandEmpty>No currency found.</CommandEmpty>
+                  <CommandList className="max-h-72">
+                    <CommandGroup>
+                      {currencies?.map((cur) => (
+                        <CommandItem
+                          key={cur.code}
+                          value={cur.code}
+                          onSelect={() => {
+                            onChange({ currency_code: cur.code });
+                            setCurPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              formData.currency_code === cur.code ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {cur.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
 

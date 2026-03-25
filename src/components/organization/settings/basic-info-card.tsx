@@ -13,14 +13,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Building2 } from "@/components/icons/lucide-exports";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Building2, Check, ChevronsUpDown } from "@/components/icons/lucide-exports";
+import { cn } from "@/lib/utils";
 
 import { LogoUploader } from "./logo-upload";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
@@ -46,6 +55,7 @@ export function BasicInfoCard({
   compressionError,
   onLogoChange,
 }: BasicInfoCardProps) {
+  const [industryPopoverOpen, setIndustryPopoverOpen] = useState(false);
   return (
     <Card className="border shadow-sm">
       <CardHeader className="pb-4">
@@ -99,26 +109,53 @@ export function BasicInfoCard({
           />
         </div>
 
-        {/* Industry */}
         <div className="space-y-2">
           <Label htmlFor="org-industry" className="text-sm font-medium">
             Industry
           </Label>
-          <Select
-            value={formData.industry}
-            onValueChange={(value) => onChange({ industry: value })}
-          >
-            <SelectTrigger id="org-industry" className="h-10">
-              <SelectValue placeholder="Select industry" />
-            </SelectTrigger>
-            <SelectContent>
-              {INDUSTRY_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={industryPopoverOpen} onOpenChange={setIndustryPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={industryPopoverOpen}
+                className="w-full justify-between h-10 font-normal"
+              >
+                <span className="truncate">
+                  {INDUSTRY_OPTIONS.find((opt) => opt.value === formData.industry)?.label || "Select industry..."}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Search industry..." />
+                <CommandEmpty>No industry found.</CommandEmpty>
+                <CommandList className="max-h-72">
+                  <CommandGroup>
+                    {INDUSTRY_OPTIONS.map((option) => (
+                      <CommandItem
+                        key={option.value}
+                        value={option.value}
+                        onSelect={() => {
+                          onChange({ industry: option.value });
+                          setIndustryPopoverOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.industry === option.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {option.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </CardContent>
     </Card>

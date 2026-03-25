@@ -107,7 +107,7 @@ export default function OrganizationPage() {
 
       // Set cookie via API route (server-side) to ensure middleware can read it
       console.log("[ORG-PAGE] Setting cookie via API...")
-      const cookieResponse = await fetch("/api/organization/select", {
+      const cookieResponse = await fetch("/api/organizations/select", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
