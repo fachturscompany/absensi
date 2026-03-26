@@ -2,7 +2,7 @@
 // Loader hybrid: local JSON (9 negara) → fallback Geonames API
 // Geonames dipakai untuk negara yang belum ada JSON lokalnya
 
-import type { GeoCountry, CountryOption } from "@/types/geo";
+import type { GeoCountry, CountryOption, GeoState } from "@/types/geo";
 import manifest from "@/lib/data/geo/manifest.json";
 
 // In-memory cache untuk hasil fetch Geonames
@@ -66,7 +66,9 @@ async function fetchCitiesFromGeonames(
 }
 
 async function buildGeoCountryFromGeonames(countryCode: string): Promise<GeoCountry> {
+  console.log(`[geo/loader] Building data for ${countryCode} from Geonames...`);
   const rawStates = await fetchStatesFromGeonames(countryCode);
+  console.log(`[geo/loader] Found ${rawStates.length} states for ${countryCode}`);
 
   // Fetch cities per state secara parallel (batasi 30 state pertama untuk menghindari rate limit)
   const statesToFetch = rawStates.slice(0, 30);
@@ -76,20 +78,20 @@ async function buildGeoCountryFromGeonames(countryCode: string): Promise<GeoCoun
       try {
         const rawCities = await fetchCitiesFromGeonames(countryCode, state.adminCode1);
         const cities = rawCities.map((city) => ({
-          value: city.name.toLowerCase().replace(/\s+/g, "-"),
+          value: `${city.geonameId}-${city.name.toLowerCase().replace(/\s+/g, "-")}`,
           label: city.name,
         }));
 
         return {
-          value: state.adminCode1,
+          value: `${state.geonameId}-${state.adminCode1}`,
           label: state.name,
           state_code: state.adminCode1,
           cities,
         };
-      } catch {
-        // Jika gagal fetch cities untuk satu state, tetap kembalikan state tanpa cities
+      } catch (err) {
+        console.warn(`[geo/loader] Failed to fetch cities for state ${state.name}:`, err);
         return {
-          value: state.adminCode1,
+          value: `${state.geonameId}-${state.adminCode1}`,
           label: state.name,
           state_code: state.adminCode1,
           cities: [],
@@ -100,23 +102,46 @@ async function buildGeoCountryFromGeonames(countryCode: string): Promise<GeoCoun
 
   return {
     code: countryCode,
-    label: countryCode, // label akan diisi dari countries list di client
+    label: countryCode,
     states: statesWithCities,
   };
 }
 
 // ----------------------------------------------------------
-// Public: loadGeoCountry — Full fetch from Geonames API
+// Public: loadGeoCountry — Hybrid: Local JSON → Geonames API
 // ----------------------------------------------------------
 export const loadGeoCountry = async (code: string): Promise<GeoCountry | null> => {
   const key = (code || "").toUpperCase();
 
-  // Cek cache dulu (In-memory)
+  // 1. Cek cache dulu (In-memory)
   if (geoCache.has(key)) {
     return geoCache.get(key)!;
   }
 
-  // Fetch langsung dari API
+  // 2. Coba muat dari JSON lokal (untuk 9 negara utama)
+  const isLocalSupported = (manifest?.countries ?? []).some((c) => c.code === key);
+  if (isLocalSupported) {
+    try {
+      console.log(`[geo/loader] Loading local JSON for ${key}`);
+      const module = await import(`@/lib/data/geo/${key}.json`);
+      const localData = module.default || module;
+
+      if (localData && localData.states) {
+        const data: GeoCountry = {
+          code: key,
+          label: (manifest?.countries ?? []).find((c) => c.code === key)?.name || key,
+          states: localData.states as GeoState[],
+        };
+        geoCache.set(key, data);
+        console.log(`[geo/loader] Loaded local JSON for ${key} with ${data.states.length} states`);
+        return data;
+      }
+    } catch (err) {
+      console.warn(`[geo/loader] Local JSON for ${key} failed to load:`, err);
+    }
+  }
+
+  // 3. Fallback ke Geonames API
   try {
     const data = await buildGeoCountryFromGeonames(key);
     geoCache.set(key, data);

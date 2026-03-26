@@ -89,6 +89,7 @@ export function useOrgSettings() {
 
   const [formData, setFormData] = useState<OrgSettingsFormData>(DEFAULT_FORM_DATA);
   const [saving, setSaving] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
 
   // Geo state
   const [geoData, setGeoData] = useState<GeoCountry | null>(null);
@@ -118,20 +119,27 @@ export function useOrgSettings() {
   // ----------------------------------------------------------
   const fetchGeoData = useCallback(async (countryCode: string): Promise<GeoCountry | null> => {
     const key = (countryCode || "ID").toUpperCase();
+    console.log(`[useOrgSettings] Fetching geo data for ${key}`);
     if (geoCacheRef.current[key]) {
+      console.log(`[useOrgSettings] Cache hit for ${key}`);
       setGeoData(geoCacheRef.current[key]);
       return geoCacheRef.current[key];
     }
     try {
+      setGeoLoading(true);
       const res = await fetch(`/api/geo/${key}`);
       if (!res.ok) throw new Error("Failed to fetch geo data");
       const data: GeoCountry = await res.json();
+      console.log(`[useOrgSettings] Received ${data.states.length} states for ${key}`);
       geoCacheRef.current[key] = data;
       setGeoData(data);
       return data;
-    } catch {
+    } catch (err) {
+      console.error(`[useOrgSettings] Failed to load geo data for ${key}:`, err);
       toast.error("Failed to load geographic data");
       return null;
+    } finally {
+      setGeoLoading(false);
     }
   }, []);
 
@@ -193,17 +201,30 @@ export function useOrgSettings() {
 
   const cityOptions = useMemo<GeoCity[]>(() => {
     if (!geoData || !formData.state_province) return [];
-    const state = geoData.states.find((s) => s.value === formData.state_province);
+    const state = geoData.states.find(
+      (s) => s.value.toLowerCase() === formData.state_province.toLowerCase(),
+    );
     return state ? state.cities : [];
   }, [geoData, formData.state_province]);
 
   const stateLabel = useMemo(
-    () => getStateLabelFromGeo(geoData, formData.state_province),
+    () => {
+      const val = formData.state_province.toLowerCase();
+      return geoData?.states.find((s) => s.value.toLowerCase() === val)?.label ?? "";
+    },
     [geoData, formData.state_province],
   );
 
   const cityLabel = useMemo(
-    () => getCityLabelFromGeo(geoData, formData.city),
+    () => {
+      if (!geoData) return "";
+      const val = formData.city.toLowerCase();
+      for (const state of geoData.states) {
+        const city = state.cities.find((c) => c.value.toLowerCase() === val);
+        if (city) return city.label;
+      }
+      return "";
+    },
     [geoData, formData.city],
   );
 
@@ -297,6 +318,7 @@ export function useOrgSettings() {
     // Status
     loading,
     saving,
+    geoLoading,
 
     // Geo
     geoData,

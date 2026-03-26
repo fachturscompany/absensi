@@ -14,13 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -39,6 +32,7 @@ import {
   Globe,
   Check,
   ChevronsUpDown,
+  Loader2,
 } from "@/components/icons/lucide-exports";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -59,6 +53,7 @@ interface ContactLocationCardProps {
   cityOptions: GeoCity[];
   stateLabel: string;
   cityLabel: string;
+  geoLoading?: boolean;
 }
 
 export function ContactLocationCard({
@@ -70,10 +65,24 @@ export function ContactLocationCard({
   cityOptions,
   stateLabel,
   cityLabel,
+  geoLoading = false,
 }: ContactLocationCardProps) {
   const [countryPopoverOpen, setCountryPopoverOpen] = useState(false);
   const [statePopoverOpen, setStatePopoverOpen] = useState(false);
   const [cityPopoverOpen, setCityPopoverOpen] = useState(false);
+
+  // Debug & Safeguard: Deduplicate options to avoid "Encountered two children with the same key"
+  const safeCountryOptions = Array.from(new Map(countryOptions.map(o => [o.value, o])).values());
+  const safeStateOptions = Array.from(new Map(stateOptions.map(o => [o.value, o])).values());
+  const safeCityOptions = Array.from(new Map(cityOptions.map(o => [o.value, o])).values());
+
+  const hasCityDuplicates = cityOptions.length !== safeCityOptions.length;
+  if (hasCityDuplicates) {
+    console.warn("[ContactLocationCard] Found city duplicates for key uniqueness safety:",
+      cityOptions.filter((item, index) => cityOptions.findIndex(c => c.value === item.value) !== index)
+        .map(c => c.value)
+    );
+  }
 
   return (
     <Card className="border shadow-sm">
@@ -177,7 +186,7 @@ export function ContactLocationCard({
                   <CommandEmpty>No country found.</CommandEmpty>
                   <CommandGroup>
                     <CommandList>
-                      {countryOptions.map((country) => (
+                      {safeCountryOptions.map((country) => (
                         <CommandItem
                           key={country.value}
                           value={country.label} // Command search works on value, so we use label for searching
@@ -213,9 +222,18 @@ export function ContactLocationCard({
                   role="combobox"
                   aria-expanded={statePopoverOpen}
                   className="w-full justify-between h-10"
-                  disabled={stateOptions.length === 0}
+                  disabled={stateOptions.length === 0 || geoLoading}
                 >
-                  <span className="truncate">{stateLabel || "Select state..."}</span>
+                  <span className="truncate">
+                    {geoLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Loading...
+                      </span>
+                    ) : (
+                      stateLabel || "Select state..."
+                    )}
+                  </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -225,11 +243,12 @@ export function ContactLocationCard({
                   <CommandEmpty>No state found.</CommandEmpty>
                   <CommandGroup>
                     <CommandList>
-                      {stateOptions.map((state) => (
+                      {safeStateOptions.map((state) => (
                         <CommandItem
                           key={state.value}
-                          value={state.value}
-                          onSelect={(val) => {
+                          value={state.label}
+                          onSelect={() => {
+                            const val = state.value;
                             onChange({
                               state_province: val === formData.state_province ? "" : val,
                               city: "", // Reset city saat state berubah
@@ -267,9 +286,18 @@ export function ContactLocationCard({
                   role="combobox"
                   aria-expanded={cityPopoverOpen}
                   className="w-full justify-between h-10"
-                  disabled={!formData.state_province}
+                  disabled={!formData.state_province || geoLoading}
                 >
-                  <span className="truncate">{cityLabel || "Select city..."}</span>
+                  <span className="truncate">
+                    {geoLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Loading...
+                      </span>
+                    ) : (
+                      cityLabel || "Select city..."
+                    )}
+                  </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -279,11 +307,12 @@ export function ContactLocationCard({
                   <CommandEmpty>No city found.</CommandEmpty>
                   <CommandGroup>
                     <CommandList>
-                      {cityOptions.map((city) => (
+                      {safeCityOptions.map((city) => (
                         <CommandItem
                           key={city.value}
-                          value={city.value}
-                          onSelect={(val) => {
+                          value={city.label}
+                          onSelect={() => {
+                            const val = city.value;
                             onChange({ city: val === formData.city ? "" : val });
                             setCityPopoverOpen(false);
                           }}

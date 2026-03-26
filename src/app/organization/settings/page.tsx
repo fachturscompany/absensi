@@ -41,6 +41,7 @@ export default function SettingsPage() {
     cityLabel,
     handleCountryChange,
     handleSave,
+    geoLoading,
   } = useOrgSettings();
 
   const { logoPreview, isCompressing, compressionError, handleLogoChange, resolveLogoUrl } =
@@ -119,6 +120,7 @@ export default function SettingsPage() {
             cityOptions={cityOptions}
             stateLabel={stateLabel}
             cityLabel={cityLabel}
+            geoLoading={geoLoading}
           />
         </div>
 

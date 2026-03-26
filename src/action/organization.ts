@@ -154,7 +154,7 @@ export const addOrganization = async (organization: Partial<IOrganization>) => {
 
 // ✏️ Update Organization
 export const updateOrganization = async (id: string, organization: Partial<IOrganization>) => {
-  const supabase = await createSupabaseClient();
+  const supabase = createAdminClient(); // ✅ Ganti ini — bypass RLS
   const { data, error } = await supabase
     .from("organizations")
     .update(organization)
