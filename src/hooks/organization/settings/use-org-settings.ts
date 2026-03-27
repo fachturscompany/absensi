@@ -23,7 +23,6 @@ import type {
 
 import { DEFAULT_FORM_DATA } from "@/types/organization/org-settings";
 
-
 // ----------------------------------------------------------
 // Geo helpers (tidak expose keluar — internal hook saja)
 // ----------------------------------------------------------
@@ -104,6 +103,27 @@ export function useOrgSettings() {
 
   // Country options — dinamis dari /api/geo/countries
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+
+  // Track org yang sudah diinisialisasi untuk menghindari overwrite saat user mengedit
+  const lastInitializedOrgId = useRef<number | null>(null);
+
+  // ----------------------------------------------------------
+  // Memastikan data lama tidak tampil saat switch org
+  // ----------------------------------------------------------
+  useEffect(() => {
+    if (!orgStore.organizationId) return;
+
+    console.log(`[useOrgSettings] Organization changed to: ${orgStore.organizationId}, resetting form`);
+
+    // Reset ref agar useEffect populasi formData berjalan ulang untuk org baru
+    lastInitializedOrgId.current = null;
+
+    // Reset formData ke default agar tidak tampil data org lama
+    setFormData(DEFAULT_FORM_DATA);
+
+    // Reset geo data agar tidak tampil state/city dari org lama
+    setGeoData(null);
+  }, [orgStore.organizationId]); // ← hanya depend pada organizationId, bukan seluruh orgStore
 
   // ----------------------------------------------------------
   // Fetch country list saat mount — statis, cukup sekali
@@ -191,7 +211,7 @@ export function useOrgSettings() {
         } catch {
           // Jika bukan JSON, cek apakah comma-separated
           if (String(rawIndustry).includes(",")) {
-            industryArray = String(rawIndustry).split(",").map(i => i.trim());
+            industryArray = String(rawIndustry).split(",").map((i) => i.trim());
           } else {
             industryArray = [String(rawIndustry)];
           }
@@ -203,46 +223,46 @@ export function useOrgSettings() {
         normalizedState,
         normalizedCity,
         industryArray,
-      };
+      } as OrganizationData;
     },
     enabled: !!orgStore.organizationId,
     staleTime: 1000 * 60 * 5, // 5 menit
   });
 
   // ----------------------------------------------------------
-  // Reactive Sync: Populate formData when orgData loads
+  // ✅ FIX: Reactive Sync — Populate formData ketika orgData berhasil di-fetch
+  // Hanya populate jika ini org baru (lastInitializedOrgId belum di-set)
   // ----------------------------------------------------------
-  const lastInitializedOrgId = useRef<number | null>(null);
-
   useEffect(() => {
     if (!orgData || !orgStore.organizationId) return;
 
-    // Only populate if it's a new organization, to avoid overwriting user edits
-    // on background refetch of the same organization.
-    if (lastInitializedOrgId.current !== orgStore.organizationId) {
-      console.log(`[useOrgSettings] Initializing formData for org: ${orgStore.organizationId}`);
-      
-      const data = orgData as any; // typed in queryFn above
-      
-      setFormData({
-        name: data.name || "",
-        description: data.description || "",
-        address: data.address || "",
-        city: data.normalizedCity || (data.city ?? ""),
-        state_province: data.normalizedState || (data.state_province ?? ""),
-        postal_code: data.postal_code || "",
-        phone: data.phone || "",
-        website: data.website || "",
-        email: data.email || "",
-        timezone: data.timezone || "UTC",
-        currency_code: data.currency_code || "USD",
-        country_code: (data.country_code || "ID").toUpperCase(),
-        industry: data.industryArray || [],
-        time_format: data.time_format || "24h",
-      });
+    // Jangan overwrite jika sudah pernah diinisialisasi untuk org ini
+    // (mencegah reset saat user sedang mengedit form dan terjadi background refetch)
+    if (lastInitializedOrgId.current === orgStore.organizationId) return;
 
-      lastInitializedOrgId.current = orgStore.organizationId;
-    }
+    console.log(`[useOrgSettings] Populating formData for org: ${orgStore.organizationId}`);
+
+    const data = orgData as any;
+
+    setFormData({
+      name: data.name || "",
+      description: data.description || "",
+      address: data.address || "",
+      city: data.normalizedCity || (data.city ?? ""),
+      state_province: data.normalizedState || (data.state_province ?? ""),
+      postal_code: data.postal_code || "",
+      phone: data.phone || "",
+      website: data.website || "",
+      email: data.email || "",
+      timezone: data.timezone || "UTC",
+      currency_code: data.currency_code || "USD",
+      country_code: (data.country_code || "ID").toUpperCase(),
+      industry: data.industryArray || [],
+      time_format: data.time_format || "24h",
+    });
+
+    // Tandai org ini sudah diinisialisasi
+    lastInitializedOrgId.current = orgStore.organizationId;
   }, [orgData, orgStore.organizationId]);
 
   // ----------------------------------------------------------
@@ -260,26 +280,20 @@ export function useOrgSettings() {
     return state ? state.cities : [];
   }, [geoData, formData.state_province]);
 
-  const stateLabel = useMemo(
-    () => {
-      const val = formData.state_province.toLowerCase();
-      return geoData?.states.find((s) => s.value.toLowerCase() === val)?.label ?? "";
-    },
-    [geoData, formData.state_province],
-  );
+  const stateLabel = useMemo(() => {
+    const val = formData.state_province.toLowerCase();
+    return geoData?.states.find((s) => s.value.toLowerCase() === val)?.label ?? "";
+  }, [geoData, formData.state_province]);
 
-  const cityLabel = useMemo(
-    () => {
-      if (!geoData) return "";
-      const val = formData.city.toLowerCase();
-      for (const state of geoData.states) {
-        const city = state.cities.find((c) => c.value.toLowerCase() === val);
-        if (city) return city.label;
-      }
-      return "";
-    },
-    [geoData, formData.city],
-  );
+  const cityLabel = useMemo(() => {
+    if (!geoData) return "";
+    const val = formData.city.toLowerCase();
+    for (const state of geoData.states) {
+      const city = state.cities.find((c) => c.value.toLowerCase() === val);
+      if (city) return city.label;
+    }
+    return "";
+  }, [geoData, formData.city]);
 
   // Sync geo data saat country berubah
   const handleCountryChange = useCallback(
