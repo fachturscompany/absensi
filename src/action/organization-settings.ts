@@ -5,8 +5,8 @@ import { getUserOrganization, updateOrganization as updateOrg, deleteOrganizatio
 
 export { updateOrg as updateOrganization, deleteOrg as deleteOrganization }
 
-export async function getCurrentUserOrganization() {
-  return getUserOrganization();
+export async function getCurrentUserOrganization(orgId?: string | number) {
+  return getUserOrganization(orgId);
 }
 
 export async function regenerateInviteCode(orgId: string) {

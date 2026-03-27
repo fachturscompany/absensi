@@ -180,7 +180,7 @@ export function useOrgSettings() {
   } = useQuery<OrganizationData | null>({
     queryKey: ["organization", "settings", orgStore.organizationId],
     queryFn: async () => {
-      const result = await getCurrentUserOrganization();
+      const result = await getCurrentUserOrganization(orgStore.organizationId || undefined);
       if (!result.success || !result.data) {
         toast.error(result.message || "Failed to load organization data");
         return null;

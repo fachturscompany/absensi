@@ -188,7 +188,7 @@ export const getAllOrganization = async () => {
 
 // 📂 Get User's Organization (SECURE - FILTERED BY USER)
 // This function returns only the organization that the current user belongs to
-export const getUserOrganization = async () => {
+export const getUserOrganization = async (targetOrgId?: string | number) => {
   const supabase = await createClient();
   const adminClient = createAdminClient();
   const { cookies } = await import('next/headers');
@@ -207,8 +207,10 @@ export const getUserOrganization = async () => {
     .select("organization_id")
     .eq("user_id", user.id);
 
-  // If we have an org_id from cookie, try to get that specific membership
-  if (orgIdFromCookie && orgIdFromCookie !== "undefined") {
+  // If a specific target is requested, use it, otherwise fallback to cookie
+  if (targetOrgId) {
+    query = query.eq("organization_id", targetOrgId);
+  } else if (orgIdFromCookie && orgIdFromCookie !== "undefined") {
     const numericOrgId = parseInt(orgIdFromCookie, 10);
     if (!isNaN(numericOrgId)) {
       query = query.eq("organization_id", numericOrgId);
@@ -218,7 +220,7 @@ export const getUserOrganization = async () => {
   const { data: members, error: memberError } = await query.limit(1);
 
   if (memberError || !members || members.length === 0) {
-    // If cookie failed or not present, fallback to ANY active membership using ADMIN client
+    // If targeted fetch or cookie failed, fallback to ANY active membership
     const { data: fallbackMembers, error: fallbackError } = await adminClient
       .from("organization_members")
       .select("organization_id")
