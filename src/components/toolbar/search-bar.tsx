@@ -42,7 +42,7 @@ export function SearchBar({
         value={inputValue}
         onChange={handleChange}
         placeholder={placeholder}
-        className="pl-10 pr-10 h-10"
+        className="pl-10 pr-10 h-10 !bg-transparent dark:!bg-black !border-zinc-800 dark:!border-zinc-800 shadow-none transition-colors"
         disabled={disabled || isLoading}
       />
 

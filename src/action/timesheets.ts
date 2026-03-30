@@ -381,10 +381,10 @@ export async function getTimeEntries(params: GetTimeEntriesParams): Promise<{ su
     }
 }
 
-export async function getTimesheetMembers(): Promise<{ success: boolean, data: TimesheetMember[] }> {
+export async function getTimesheetMembers(organizationId?: number | string): Promise<{ success: boolean, data: TimesheetMember[] }> {
     try {
         const admin = createAdminClient();
-        const { data, error } = await admin
+        let query = admin
             .from("organization_members")
             .select(`
                 id,
@@ -395,6 +395,12 @@ export async function getTimesheetMembers(): Promise<{ success: boolean, data: T
                     email
                 )
             `);
+
+        if (organizationId) {
+            query = query.eq("organization_id", organizationId);
+        }
+
+        const { data, error } = await query;
 
         if (error) return { success: false, data: [] };
 
@@ -427,10 +433,16 @@ export async function getTimesheetMembers(): Promise<{ success: boolean, data: T
     }
 }
 
-export async function getTimesheetProjects(): Promise<{ success: boolean, data: TimesheetProject[] }> {
+export async function getTimesheetProjects(organizationId?: number | string): Promise<{ success: boolean, data: TimesheetProject[] }> {
     try {
         const admin = createAdminClient();
-        const { data, error } = await admin.from("projects").select("id, name");
+        let query = admin.from("projects").select("id, name");
+
+        if (organizationId) {
+            query = query.eq("organization_id", organizationId);
+        }
+
+        const { data, error } = await query;
         if (error) return { success: false, data: [] };
         return { success: true, data: (data || []).map((p: any) => ({ id: p.id.toString(), name: p.name })) };
     } catch (e) {
@@ -438,10 +450,16 @@ export async function getTimesheetProjects(): Promise<{ success: boolean, data: 
     }
 }
 
-export async function getTimesheetTasks(): Promise<{ success: boolean, data: TimesheetTask[] }> {
+export async function getTimesheetTasks(organizationId?: number | string): Promise<{ success: boolean, data: TimesheetTask[] }> {
     try {
         const admin = createAdminClient();
-        const { data, error } = await admin.from("tasks").select("id, name, project_id");
+        let query = admin.from("tasks").select("id, name, project_id");
+
+        if (organizationId) {
+            query = query.eq("organization_id", organizationId);
+        }
+
+        const { data, error } = await query;
         if (error) return { success: false, data: [] };
         return {
             success: true, data: (data || []).map((t: any) => ({
