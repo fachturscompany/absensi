@@ -1,8 +1,6 @@
 "use client";
 
 // src/hooks/organization/settings/use-org-settings.ts
-// Mengelola fetch, state, dan save untuk organization settings
-// Menggunakan TanStack Query untuk caching + invalidation
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,7 +22,7 @@ import type {
 import { DEFAULT_FORM_DATA } from "@/types/organization/org-settings";
 
 // ----------------------------------------------------------
-// Geo helpers (tidak expose keluar — internal hook saja)
+// Geo helpers
 // ----------------------------------------------------------
 function getStateLabelFromGeo(geoData: GeoCountry | null, value: string | null): string {
   if (!geoData || !value) return "";
@@ -72,7 +70,7 @@ function isValidEmail(email: string) {
 }
 
 // ----------------------------------------------------------
-// Fallback country list — dipakai jika /api/geo/countries gagal
+// Fallback country list
 // ----------------------------------------------------------
 const FALLBACK_COUNTRY_OPTIONS: CountryOption[] = [
   { value: "ID", label: "Indonesia" },
@@ -97,36 +95,23 @@ export function useOrgSettings() {
   const [saving, setSaving] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
 
-  // Geo state
   const [geoData, setGeoData] = useState<GeoCountry | null>(null);
   const geoCacheRef = useRef<Record<string, GeoCountry>>({});
-
-  // Country options — dinamis dari /api/geo/countries
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
-
-  // Track org yang sudah diinisialisasi untuk menghindari overwrite saat user mengedit
   const lastInitializedOrgId = useRef<number | null>(null);
 
   // ----------------------------------------------------------
-  // Memastikan data lama tidak tampil saat switch org
+  // Reset saat organizationId berubah (org switcher)
   // ----------------------------------------------------------
   useEffect(() => {
     if (!orgStore.organizationId) return;
-
-    console.log(`[useOrgSettings] Organization changed to: ${orgStore.organizationId}, resetting form`);
-
-    // Reset ref agar useEffect populasi formData berjalan ulang untuk org baru
     lastInitializedOrgId.current = null;
-
-    // Reset formData ke default agar tidak tampil data org lama
     setFormData(DEFAULT_FORM_DATA);
-
-    // Reset geo data agar tidak tampil state/city dari org lama
     setGeoData(null);
-  }, [orgStore.organizationId]); // ← hanya depend pada organizationId, bukan seluruh orgStore
+  }, [orgStore.organizationId]);
 
   // ----------------------------------------------------------
-  // Fetch country list saat mount — statis, cukup sekali
+  // Fetch country list — sekali saat mount
   // ----------------------------------------------------------
   useEffect(() => {
     fetch("/api/geo/countries")
@@ -135,10 +120,7 @@ export function useOrgSettings() {
         return res.json() as Promise<CountryOption[]>;
       })
       .then((data) => setCountryOptions(data))
-      .catch(() => {
-        // Fallback ke daftar manual jika endpoint gagal
-        setCountryOptions(FALLBACK_COUNTRY_OPTIONS);
-      });
+      .catch(() => setCountryOptions(FALLBACK_COUNTRY_OPTIONS));
   }, []);
 
   // ----------------------------------------------------------
@@ -146,9 +128,7 @@ export function useOrgSettings() {
   // ----------------------------------------------------------
   const fetchGeoData = useCallback(async (countryCode: string): Promise<GeoCountry | null> => {
     const key = (countryCode || "ID").toUpperCase();
-    console.log(`[useOrgSettings] Fetching geo data for ${key}`);
     if (geoCacheRef.current[key]) {
-      console.log(`[useOrgSettings] Cache hit for ${key}`);
       setGeoData(geoCacheRef.current[key]);
       return geoCacheRef.current[key];
     }
@@ -157,7 +137,6 @@ export function useOrgSettings() {
       const res = await fetch(`/api/geo/${key}`);
       if (!res.ok) throw new Error("Failed to fetch geo data");
       const data: GeoCountry = await res.json();
-      console.log(`[useOrgSettings] Received ${data.states.length} states for ${key}`);
       geoCacheRef.current[key] = data;
       setGeoData(data);
       return data;
@@ -180,90 +159,106 @@ export function useOrgSettings() {
   } = useQuery<OrganizationData | null>({
     queryKey: ["organization", "settings", orgStore.organizationId],
     queryFn: async () => {
-      const result = await getCurrentUserOrganization(orgStore.organizationId || undefined);
+      const result = await getCurrentUserOrganization();
       if (!result.success || !result.data) {
         toast.error(result.message || "Failed to load organization data");
         return null;
       }
 
-      // IOrganization (dari server action) tidak overlap sempurna dengan OrganizationData
-      // karena field `id` bertipe string di IOrganization vs number di OrganizationData.
-      // Double cast via unknown untuk bridge perbedaan ini.
       const data = result.data as unknown as OrganizationData;
       const countryCode = (data.country_code || "ID").toUpperCase();
       const geo = await fetchGeoData(countryCode);
 
+      if (geo) {
+        geoCacheRef.current[countryCode] = geo;
+        setGeoData(geo);
+      }
+
+      // Attach normalized fields agar bisa dipakai di useEffect & handleDiscard
       const normalizedState = normalizeStateValue(geo, data.state_province ?? null);
       const normalizedCity = normalizeCityValue(geo, data.city ?? null, normalizedState);
 
-      // Transform Industry: handle JSON string, comma-separated string, or null
       let industryArray: string[] = [];
       const rawIndustry = (data as any).industry;
       if (rawIndustry) {
         try {
-          // Coba parse sebagai JSON (array)
           const parsed = JSON.parse(rawIndustry);
-          if (Array.isArray(parsed)) {
-            industryArray = parsed;
-          } else {
-            industryArray = [String(parsed)];
-          }
+          industryArray = Array.isArray(parsed) ? parsed : [String(parsed)];
         } catch {
-          // Jika bukan JSON, cek apakah comma-separated
-          if (String(rawIndustry).includes(",")) {
-            industryArray = String(rawIndustry).split(",").map((i) => i.trim());
-          } else {
-            industryArray = [String(rawIndustry)];
-          }
+          industryArray = String(rawIndustry).includes(",")
+            ? String(rawIndustry).split(",").map((i: string) => i.trim())
+            : [String(rawIndustry)];
         }
       }
 
       return {
         ...data,
-        normalizedState,
-        normalizedCity,
-        industryArray,
+        _normalizedState: normalizedState,
+        _normalizedCity: normalizedCity,
+        _industryArray: industryArray,
       } as OrganizationData;
     },
     enabled: !!orgStore.organizationId,
-    staleTime: 1000 * 60 * 5, // 5 menit
+    staleTime: 1000 * 60 * 5,
   });
 
   // ----------------------------------------------------------
-  // ✅ FIX: Reactive Sync — Populate formData ketika orgData berhasil di-fetch
-  // Hanya populate jika ini org baru (lastInitializedOrgId belum di-set)
+  // Helper internal: build formData dari orgData yang sudah di-fetch
+  // ----------------------------------------------------------
+  const buildFormData = useCallback((data: any): OrgSettingsFormData => ({
+    name: data.name || "",
+    description: data.description || "",
+    address: data.address || "",
+    city: data._normalizedCity || (data.city ?? ""),
+    state_province: data._normalizedState || (data.state_province ?? ""),
+    postal_code: data.postal_code || "",
+    phone: data.phone || "",
+    website: data.website || "",
+    email: data.email || "",
+    timezone: data.timezone || "UTC",
+    currency_code: data.currency_code || "USD",
+    country_code: (data.country_code || "ID").toUpperCase(),
+    industry: data._industryArray || [],
+    time_format: data.time_format || "24h",
+  }), []);
+
+  // ----------------------------------------------------------
+  // Populate formData saat orgData tersedia untuk pertama kali
+  // (atau setelah lastInitializedOrgId di-reset)
   // ----------------------------------------------------------
   useEffect(() => {
     if (!orgData || !orgStore.organizationId) return;
-
-    // Jangan overwrite jika sudah pernah diinisialisasi untuk org ini
-    // (mencegah reset saat user sedang mengedit form dan terjadi background refetch)
     if (lastInitializedOrgId.current === orgStore.organizationId) return;
 
-    console.log(`[useOrgSettings] Populating formData for org: ${orgStore.organizationId}`);
+    setFormData(buildFormData(orgData));
+    lastInitializedOrgId.current = orgStore.organizationId;
+  }, [orgData, orgStore.organizationId, buildFormData]);
+
+  // ----------------------------------------------------------
+  // ✅ Discard: kembalikan formData & geoData ke nilai server
+  // Dipanggil saat user ingin membatalkan perubahan
+  // ----------------------------------------------------------
+  const handleDiscard = useCallback(async () => {
+    if (!orgData) return;
 
     const data = orgData as any;
+    const countryCode = (data.country_code || "ID").toUpperCase();
 
-    setFormData({
-      name: data.name || "",
-      description: data.description || "",
-      address: data.address || "",
-      city: data.normalizedCity || (data.city ?? ""),
-      state_province: data.normalizedState || (data.state_province ?? ""),
-      postal_code: data.postal_code || "",
-      phone: data.phone || "",
-      website: data.website || "",
-      email: data.email || "",
-      timezone: data.timezone || "UTC",
-      currency_code: data.currency_code || "USD",
-      country_code: (data.country_code || "ID").toUpperCase(),
-      industry: data.industryArray || [],
-      time_format: data.time_format || "24h",
-    });
+    // Kembalikan geoData ke country org yang tersimpan di server
+    // (bukan country yang sempat dipilih user di form)
+    let geo = geoCacheRef.current[countryCode] ?? null;
+    if (!geo) {
+      geo = await fetchGeoData(countryCode);
+    } else {
+      // Paksa update geoData state ke country org asli
+      setGeoData(geo);
+    }
 
-    // Tandai org ini sudah diinisialisasi
-    lastInitializedOrgId.current = orgStore.organizationId;
-  }, [orgData, orgStore.organizationId]);
+    // Reset formData ke data server
+    setFormData(buildFormData(data));
+
+    toast.info("Changes discarded");
+  }, [orgData, fetchGeoData, buildFormData]);
 
   // ----------------------------------------------------------
   // Derived geo values untuk UI
@@ -295,7 +290,10 @@ export function useOrgSettings() {
     return "";
   }, [geoData, formData.city]);
 
-  // Sync geo data saat country berubah
+  // ----------------------------------------------------------
+  // Handle country change — hanya update formData lokal
+  // tidak menyentuh orgData (server state)
+  // ----------------------------------------------------------
   const handleCountryChange = useCallback(
     (countryCode: string) => {
       setFormData((prev) => ({
@@ -321,11 +319,9 @@ export function useOrgSettings() {
 
       setSaving(true);
       try {
-        // Convert geo internal values → human-readable labels untuk disimpan ke DB
         let resolvedCityLabel = getCityLabelFromGeo(geoData, formData.city);
         let resolvedStateLabel = getStateLabelFromGeo(geoData, formData.state_province);
 
-        // Fallback: jika sudah berupa label (bukan value berbentuk "id-ji-xxx")
         if (!resolvedCityLabel && formData.city) {
           const looksLikeValue = /^[a-z]{2}-[a-z]{2}(-[a-z0-9-]+)?$/i.test(formData.city);
           if (!looksLikeValue) resolvedCityLabel = formData.city;
@@ -335,7 +331,6 @@ export function useOrgSettings() {
           if (!looksLikeValue) resolvedStateLabel = formData.state_province;
         }
 
-        // Sanitize fields: trim and convert empty string to null
         const sanitize = (val: string | null | undefined) => {
           if (val === null || val === undefined) return null;
           const trimmed = val.trim();
@@ -347,7 +342,6 @@ export function useOrgSettings() {
         const phoneToSave = sanitize(formData.phone);
         const addressToSave = sanitize(formData.address);
 
-        // Client-side validation: if email is provided, it must be valid
         if (emailToSave && !isValidEmail(emailToSave)) {
           toast.error("Please enter a valid email address");
           setSaving(false);
@@ -368,7 +362,7 @@ export function useOrgSettings() {
           timezone: formData.timezone,
           currency_code: formData.currency_code,
           country_code: formData.country_code,
-          industry: JSON.stringify(formData.industry), // Simpan sebagai JSON string
+          industry: JSON.stringify(formData.industry),
           logo_url: logoUrl,
           time_format: formData.time_format,
         };
@@ -377,7 +371,11 @@ export function useOrgSettings() {
 
         if (result.success) {
           toast.success("Organization settings updated successfully!");
-          // Invalidate query cache agar semua komponen terupdate
+
+          // ✅ Reset lastInitializedOrgId agar setelah refetch,
+          // formData di-populate ulang dari data server terbaru
+          lastInitializedOrgId.current = null;
+
           queryClient.invalidateQueries({ queryKey: ["organization"] });
           await refetchOrg();
           return true;
@@ -419,6 +417,7 @@ export function useOrgSettings() {
 
     // Actions
     handleSave,
+    handleDiscard,
     refetchOrg,
   };
 }
