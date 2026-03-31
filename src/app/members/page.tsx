@@ -168,7 +168,6 @@ export default function MembersPage() {
   }, [currentOrg])
 
   const isOwner = roleCodes.includes("owner")
-  const isAdmin = roleCodes.includes("admin") || isOwner
   
   // Debugging role issues:
   console.log("[MEMBERS-PAGE] Org Lookup:", organizationId, "| Roles found:", roleCodes, "| isOwner:", isOwner);
