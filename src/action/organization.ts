@@ -4,8 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import { createSupabaseClient } from "@/config/supabase-config";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { IOrganization } from "@/interface";
-
 import { organizationLogger } from '@/lib/logger';
+import { del } from '@/lib/cache';
+
 export interface OrganizationStatus {
   isValid: boolean;
   reason?: "inactive" | "expired" | "not_found";
@@ -14,24 +15,16 @@ export interface OrganizationStatus {
   organizationName?: string;
 }
 
-/**
- * Check if user's organization is active and subscription is valid
- */
 export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
   try {
     const supabase = await createClient();
 
-    // 1. Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return {
-        isValid: false,
-        reason: "not_found"
-      };
+      return { isValid: false, reason: "not_found" };
     }
 
-    // 2. Get user's organization membership
     const { data: member, error: memberError } = await supabase
       .from("organization_members")
       .select("organization_id")
@@ -39,13 +32,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       .maybeSingle();
 
     if (memberError || !member) {
-      return {
-        isValid: false,
-        reason: "not_found"
-      };
+      return { isValid: false, reason: "not_found" };
     }
 
-    // 3. Get organization details
     const { data: organization, error: orgError } = await supabase
       .from("organizations")
       .select("id, name, is_active, is_suspended, subscription_expires_at")
@@ -53,13 +42,9 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       .maybeSingle();
 
     if (orgError || !organization) {
-      return {
-        isValid: false,
-        reason: "not_found"
-      };
+      return { isValid: false, reason: "not_found" };
     }
 
-    // 4. Check if organization is suspended (takes priority over other checks)
     if (organization.is_suspended) {
       return {
         isValid: false,
@@ -69,11 +54,6 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       };
     }
 
-    // 5. Check if organization is active (for onboarding - only relevant if not suspended)
-    // Note: We allow access even if is_active=false during onboarding
-    // The onboarding page will handle this separately
-
-    // 6. Check if subscription is expired
     if (organization.subscription_expires_at) {
       const expirationDate = new Date(organization.subscription_expires_at);
       const now = new Date();
@@ -89,7 +69,6 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
       }
     }
 
-    // Organization is valid
     return {
       isValid: true,
       organizationId: organization.id,
@@ -98,19 +77,12 @@ export async function checkOrganizationStatus(): Promise<OrganizationStatus> {
 
   } catch (error) {
     organizationLogger.error("Error checking organization status:", error);
-    return {
-      isValid: false,
-      reason: "not_found"
-    };
+    return { isValid: false, reason: "not_found" };
   }
 }
 
-/**
- * Get user's organization ID
- */
 export async function getUserOrganizationId(userId: string) {
   try {
-    console.log(`[getUserOrganizationId] Fetching for userId: ${userId}`);
     const supabase = createAdminClient();
 
     const { data: member, error } = await supabase
@@ -120,16 +92,14 @@ export async function getUserOrganizationId(userId: string) {
       .maybeSingle();
 
     if (error) {
-      console.error(`[getUserOrganizationId] DB Error: ${error.message}`);
+      organizationLogger.error(`DB Error getting user organization ID: ${error.message}`);
       return { organizationId: null };
     }
 
     if (!member) {
-      console.warn(`[getUserOrganizationId] No membership found for userId: ${userId}`);
       return { organizationId: null };
     }
 
-    console.log(`[getUserOrganizationId] Found organizationId: ${member.organization_id}`);
     return { organizationId: String(member.organization_id) };
   } catch (error) {
     organizationLogger.error("Error getting organization ID:", error);
@@ -137,7 +107,6 @@ export async function getUserOrganizationId(userId: string) {
   }
 }
 
-// ➕ Add Organization
 export const addOrganization = async (organization: Partial<IOrganization>) => {
   const supabase = await createSupabaseClient();
   const { data, error } = await supabase
@@ -152,9 +121,8 @@ export const addOrganization = async (organization: Partial<IOrganization>) => {
   return { success: true, message: "Organization added successfully", data: data as IOrganization };
 };
 
-// ✏️ Update Organization
 export const updateOrganization = async (id: string, organization: Partial<IOrganization>) => {
-  const supabase = createAdminClient(); // ✅ Ganti ini — bypass RLS
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("organizations")
     .update(organization)
@@ -165,13 +133,17 @@ export const updateOrganization = async (id: string, organization: Partial<IOrga
   if (error) {
     return { success: false, message: error.message, data: null };
   }
+
+  try {
+    await del(`org:info:${id}`);
+    organizationLogger.info(`Cache for org:info:${id} successfully deleted.`);
+  } catch (cacheErr) {
+    organizationLogger.warn(`Failed to delete cache for org:info:${id}`, cacheErr);
+  }
+
   return { success: true, message: "Organization updated successfully", data: data as IOrganization };
 };
 
-// 📂 Get All Organizations (ADMIN ONLY - USE WITH CAUTION)
-// WARNING: This function returns ALL organizations
-// Only use this for admin/system-level operations
-// For regular user operations, use getUserOrganization() instead
 export const getAllOrganization = async () => {
   const supabase = await createSupabaseClient();
   const { data, error } = await supabase
@@ -186,8 +158,6 @@ export const getAllOrganization = async () => {
   return { success: true, data: data as IOrganization[] };
 };
 
-// 📂 Get User's Organization (SECURE - FILTERED BY USER)
-// This function returns only the organization that the current user belongs to
 export const getUserOrganization = async (targetOrgId?: string | number) => {
   const supabase = await createClient();
   const adminClient = createAdminClient();
@@ -195,19 +165,16 @@ export const getUserOrganization = async (targetOrgId?: string | number) => {
   const cookieStore = await cookies();
   const orgIdFromCookie = cookieStore.get('org_id')?.value;
 
-  // Get current user via regular client (to verify session)
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     return { success: false, message: "User not authenticated", data: null };
   }
 
-  // Get user's organization membership using ADMIN CLIENT to bypass RLS
   let query = adminClient
     .from("organization_members")
     .select("organization_id")
     .eq("user_id", user.id);
 
-  // If a specific target is requested, use it, otherwise fallback to cookie
   if (targetOrgId) {
     query = query.eq("organization_id", targetOrgId);
   } else if (orgIdFromCookie && orgIdFromCookie !== "undefined") {
@@ -220,7 +187,6 @@ export const getUserOrganization = async (targetOrgId?: string | number) => {
   const { data: members, error: memberError } = await query.limit(1);
 
   if (memberError || !members || members.length === 0) {
-    // If targeted fetch or cookie failed, fallback to ANY active membership
     const { data: fallbackMembers, error: fallbackError } = await adminClient
       .from("organization_members")
       .select("organization_id")
@@ -228,11 +194,10 @@ export const getUserOrganization = async (targetOrgId?: string | number) => {
       .limit(1);
 
     if (fallbackError) {
-      console.error("[getUserOrganization] Fallback query error:", fallbackError);
+      organizationLogger.error("Fallback query error in getUserOrganization:", fallbackError);
     }
 
     if (fallbackMembers && fallbackMembers.length > 0 && fallbackMembers[0]) {
-      console.log(`[getUserOrganization] Using fallback org: ${fallbackMembers[0].organization_id}`);
       return fetchOrganization(adminClient, fallbackMembers[0].organization_id);
     }
 
@@ -246,7 +211,6 @@ export const getUserOrganization = async (targetOrgId?: string | number) => {
   return fetchOrganization(adminClient, members[0].organization_id);
 };
 
-// Helper to fetch organization by ID
 async function fetchOrganization(supabase: any, orgId: any) {
   const { data, error } = await supabase
     .from("organizations")
@@ -419,21 +383,16 @@ export async function getOrganizationTimezoneByUserId(userId: string) {
   return organizations?.timezone ?? "UTC";
 }
 
-/**
- * Get the count of organizations for the current user.
- */
 export async function getOrganizationCount(): Promise<{ success: boolean; count: number; message: string }> {
   try {
     const supabase = await createClient();
 
-    // 1. Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
       return { success: false, count: 0, message: "User not authenticated" };
     }
 
-    // 2. Get the count of user's organization memberships
     const { count, error: countError } = await supabase
       .from("organization_members")
       .select("organization_id", { count: 'exact', head: true })

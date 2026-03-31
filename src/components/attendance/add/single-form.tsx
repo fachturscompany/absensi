@@ -1,397 +1,733 @@
-import { useState, useEffect } from "react"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, X, Loader2 } from "lucide-react"
-import { TabsContent } from "@/components/ui/tabs"
-import type { UseFormReturn } from "react-hook-form"
-import type { SingleFormValues, MemberOption } from "@/types/attendance"
-import { QUICK_STATUSES } from "@/types/attendance"
-import { useRouter } from "next/navigation"
-import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
-import { getMemberSchedule } from "@/action/attendance"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+"use client";
 
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  LogIn,
+  LogOut,
+  Coffee,
+  Clock,
+  Search,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  CalendarOff,
+  Timer,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  getMemberSchedule,
+  createManualAttendance,
+  checkExistingAttendance,
+} from "@/action/attendance";
+import type { MemberOption } from "@/types/attendance";
+import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog";
+
+// ----------------------------------------------------------
+// Types
+// ----------------------------------------------------------
+type AttendanceStep =
+  | "idle"
+  | "checked_in"
+  | "break_in"
+  | "break_out"
+  | "checked_out";
+
+interface ScheduleRule {
+  start_time: string;
+  end_time: string;
+  break_start: string | null;
+  break_end: string | null;
+  day_of_week: number;
+}
+
+interface TimestampRecord {
+  checkIn: string | null;
+  breakIn: string | null;
+  breakOut: string | null;
+  checkOut: string | null;
+}
+
+// ----------------------------------------------------------
+// Helpers
+// ----------------------------------------------------------
+function nowISO(): string {
+  return new Date().toISOString();
+}
+
+function todayISO(): string {
+  return format(new Date(), "yyyy-MM-dd");
+}
+
+function parseTimeToMinutes(time: string | null | undefined): number | null {
+  if (!time) return null;
+  const parts = time.split(":").map(Number);
+  const hh = parts[0] ?? NaN;
+  const mm = parts[1] ?? NaN;
+  if (isNaN(hh) || isNaN(mm)) return null;
+  return hh * 60 + mm;
+}
+
+function currentMinutes(): number {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) return "--:--";
+  try {
+    return format(new Date(iso), "HH:mm");
+  } catch {
+    return "--:--";
+  }
+}
+
+// ----------------------------------------------------------
+// Step progress config
+// ----------------------------------------------------------
+const STEP_ORDER: AttendanceStep[] = [
+  "idle",
+  "checked_in",
+  "break_in",
+  "break_out",
+  "checked_out",
+];
+
+const STEP_LABELS: Record<Exclude<AttendanceStep, "idle">, string> = {
+  checked_in: "Check In",
+  break_in: "Break In",
+  break_out: "Break Out",
+  checked_out: "Check Out",
+};
+
+function stepIndex(step: AttendanceStep): number {
+  return STEP_ORDER.indexOf(step);
+}
+
+// ----------------------------------------------------------
+// Live clock
+// ----------------------------------------------------------
+function LiveClock() {
+  const [time, setTime] = useState(() => format(new Date(), "HH:mm:ss"));
+  useEffect(() => {
+    const id = setInterval(
+      () => setTime(format(new Date(), "HH:mm:ss")),
+      1000,
+    );
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <span className="font-mono tabular-nums text-xl font-semibold tracking-tight">
+      {time}
+    </span>
+  );
+}
+
+// ----------------------------------------------------------
+// Action button
+// ----------------------------------------------------------
+interface ActionButtonProps {
+  label: string;
+  sublabel?: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  disabled: boolean;
+  loading: boolean;
+  variant: "checkin" | "breakin" | "breakout" | "checkout";
+  done: boolean;
+}
+
+const VARIANT_ACTIVE: Record<ActionButtonProps["variant"], string> = {
+  checkin:
+    "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-400 dark:hover:bg-gray-950/60",
+  breakin:
+    "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-400 dark:hover:bg-gray-950/60",
+  breakout:
+    "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-400 dark:hover:bg-gray-950/60",
+  checkout:
+    "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-400 dark:hover:bg-gray-950/60",
+};
+
+const VARIANT_DONE: Record<ActionButtonProps["variant"], string> = {
+  checkin:
+    "border-gray-300 bg-gray-100 text-gray-600 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-500",
+  breakin:
+    "border-gray-300 bg-gray-100 text-gray-600 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-500",
+  breakout:
+    "border-gray-300 bg-gray-100 text-gray-600 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-500",
+  checkout:
+    "border-gray-300 bg-gray-100 text-gray-600 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-500",
+};
+
+function ActionButton({
+  label,
+  sublabel,
+  icon,
+  onClick,
+  disabled,
+  loading,
+  variant,
+  done,
+}: ActionButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || loading || done}
+      className={cn(
+        "relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-5 transition-all duration-200 w-full",
+        "disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        done ? VARIANT_DONE[variant] : VARIANT_ACTIVE[variant],
+        !disabled && !done && "shadow-sm hover:shadow-md active:scale-[0.98]",
+      )}
+    >
+      {done && (
+        <span className="absolute top-2 right-2">
+          <CheckCircle2 className="h-4 w-4" />
+        </span>
+      )}
+      <span className="text-2xl">
+        {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : icon}
+      </span>
+      <span className="text-sm font-semibold leading-none">{label}</span>
+      {sublabel && (
+        <span className="text-[11px] font-normal opacity-70 text-center leading-tight">
+          {sublabel}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ----------------------------------------------------------
+// Main Component
+// ----------------------------------------------------------
 interface SingleFormProps {
-  activeTab: "single" | "batch"
-  form: UseFormReturn<SingleFormValues>
-  members: MemberOption[]
-  loading: boolean
-  singleCheckInDate: string | null
-  onSubmit: (values: SingleFormValues) => Promise<void>
-  dialogHandlers: DialogHandlers
+  activeTab: "single" | "batch";
+  members: MemberOption[];
+  loading: boolean;
+  dialogHandlers: DialogHandlers;
+  // ✅ Prop baru — dipanggil dari parent saat MemberDialog confirm pilihan
+  selectedMemberId?: string;
+  onMemberSelect?: (memberId: string) => void;
+  // Legacy props — dibiarkan agar tidak break parent
+  form?: any;
+  singleCheckInDate?: string | null;
+  onSubmit?: (values: any) => Promise<void>;
 }
 
 export function SingleForm({
-  form,
+  activeTab: _activeTab,
   members,
-  loading,
-  onSubmit,
-  dialogHandlers  // ✅ Props OK!
+  loading: membersLoading,
+  dialogHandlers,
+  selectedMemberId: externalMemberId = "",
+  onMemberSelect: _onMemberSelect,
 }: SingleFormProps) {
-  const router = useRouter()
-  const [localSchedule, setLocalSchedule] = useState<any>(null)
-  const [scheduleError, setScheduleError] = useState<string | null>(null)
+  const router = useRouter();
 
-  const memberId = form.watch("memberId")
-  const checkInDate = form.watch("checkInDate")
+  // ----------------------------------------------------------
+  // State
+  // ----------------------------------------------------------
+  const [schedule, setSchedule] = useState<ScheduleRule | null>(null);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
+  const [isHoliday, setIsHoliday] = useState(false);
 
-  // Auto-fetch schedule when member or date changes
+  const [step, setStep] = useState<AttendanceStep>("idle");
+  const [timestamps, setTimestamps] = useState<TimestampRecord>({
+    checkIn: null,
+    breakIn: null,
+    breakOut: null,
+    checkOut: null,
+  });
+
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [remarks, setRemarks] = useState("");
+
+  // ----------------------------------------------------------
+  // Reset + fetch schedule saat member berubah
+  // ----------------------------------------------------------
   useEffect(() => {
-    if (memberId && checkInDate) {
-      // Ensure date is string if it's a Date object
-      const dateStr = typeof checkInDate === 'string' ? checkInDate : (checkInDate && (checkInDate as any).toISOString ? (checkInDate as any).toISOString().split('T')[0] : String(checkInDate))
+    if (!externalMemberId) return;
 
-      if (dateStr) {
-        getMemberSchedule(memberId, dateStr).then(res => {
-          if (res.success) {
-            setLocalSchedule(res.data)
-            setScheduleError(null)
-          } else {
-            setLocalSchedule(null)
-            setScheduleError(res.message || "Failed to fetch schedule")
-          }
-        })
+    // Reset semua state saat member berganti
+    setStep("idle");
+    setTimestamps({ checkIn: null, breakIn: null, breakOut: null, checkOut: null });
+    setRemarks("");
+    setSchedule(null);
+    setScheduleError(null);
+    setIsHoliday(false);
+
+    const fetchSchedule = async () => {
+      setScheduleLoading(true);
+      const today = todayISO();
+      const res = await getMemberSchedule(externalMemberId, today);
+      setScheduleLoading(false);
+
+      if (!res.success || !res.data) {
+        setScheduleError(res.message || "No schedule found for today");
+        setIsHoliday(true);
+        return;
       }
-    } else {
-      setLocalSchedule(null)
-      setScheduleError(null)
+
+      const rule = res.data as ScheduleRule;
+
+      // start_time kosong = non-working day
+      if (!rule.start_time) {
+        setIsHoliday(true);
+        setScheduleError("Today is a non-working day based on the assigned schedule");
+        return;
+      }
+
+      setSchedule(rule);
+    };
+
+    fetchSchedule();
+  }, [externalMemberId]);
+
+  // ----------------------------------------------------------
+  // Break window check — waktu sekarang dalam range break_start–break_end
+  // ----------------------------------------------------------
+  const isInBreakWindow = useCallback((): boolean => {
+    if (!schedule?.break_start || !schedule?.break_end) return false;
+    const current = currentMinutes();
+    const bStart = parseTimeToMinutes(schedule.break_start);
+    const bEnd = parseTimeToMinutes(schedule.break_end);
+    if (bStart === null || bEnd === null) return false;
+    return current >= bStart && current <= bEnd;
+  }, [schedule]);
+
+  // ----------------------------------------------------------
+  // Selected member info
+  // ----------------------------------------------------------
+  const selectedMember = members.find((m) => m.id === externalMemberId);
+
+  // ----------------------------------------------------------
+  // Button enable/disable logic
+  // ----------------------------------------------------------
+  const canCheckIn =
+    !isHoliday && step === "idle" && !!externalMemberId && !!schedule;
+
+  const canBreakIn =
+    !isHoliday &&
+    step === "checked_in" &&
+    !!schedule?.break_start &&
+    isInBreakWindow();
+
+  const canBreakOut = !isHoliday && step === "break_in";
+
+  // Check out bisa dilakukan setelah CI, atau setelah BO (skip break juga boleh)
+  const canCheckOut =
+    !isHoliday && (step === "checked_in" || step === "break_out");
+
+  const isDone = (targetStep: AttendanceStep) =>
+    stepIndex(step) > stepIndex(targetStep);
+
+  // ----------------------------------------------------------
+  // Actions
+  // ----------------------------------------------------------
+  const handleCheckIn = async () => {
+    if (!externalMemberId || !schedule) return;
+    setActionLoading("checkin");
+    try {
+      const today = todayISO();
+      const existing = await checkExistingAttendance(externalMemberId, today);
+      if (existing.exists) {
+        toast.error("Attendance already exists for today");
+        return;
+      }
+      const now = nowISO();
+      setTimestamps((prev) => ({ ...prev, checkIn: now }));
+      setStep("checked_in");
+      toast.success(`Check In recorded at ${formatTime(now)}`);
+    } catch {
+      toast.error("Failed to record Check In");
+    } finally {
+      setActionLoading(null);
     }
-  }, [memberId, checkInDate])
+  };
 
-  // Helper to check if value matches preset
-  const isMatch = (fieldName: keyof SingleFormValues, scheduleValue?: string | null) => {
-    if (!scheduleValue) return false
-    const formValue = form.getValues(fieldName)
-    return formValue === scheduleValue.slice(0, 5)
-  }
+  const handleBreakIn = async () => {
+    setActionLoading("breakin");
+    try {
+      const now = nowISO();
+      setTimestamps((prev) => ({ ...prev, breakIn: now }));
+      setStep("break_in");
+      toast.success(`Break started at ${formatTime(now)}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
+  const handleBreakOut = async () => {
+    setActionLoading("breakout");
+    try {
+      const now = nowISO();
+      setTimestamps((prev) => ({ ...prev, breakOut: now }));
+      setStep("break_out");
+      toast.success(`Break ended at ${formatTime(now)}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleCheckOut = async () => {
+    if (!externalMemberId || !timestamps.checkIn) return;
+    setActionLoading("checkout");
+    try {
+      const now = nowISO();
+      const today = todayISO();
+
+      const result = await createManualAttendance({
+        organization_member_id: externalMemberId,
+        attendance_date: today,
+        actual_check_in: timestamps.checkIn,
+        actual_check_out: now,
+        actual_break_start: timestamps.breakIn ?? null,
+        actual_break_end: timestamps.breakOut ?? null,
+        status: "present",
+        remarks: remarks.trim() || undefined,
+        check_in_method: "manual",
+        check_out_method: "manual",
+      });
+
+      if (!result.success) {
+        toast.error(result.message || "Failed to save attendance");
+        return;
+      }
+
+      setTimestamps((prev) => ({ ...prev, checkOut: now }));
+      setStep("checked_out");
+      toast.success("Attendance saved successfully!");
+
+      setTimeout(() => router.push("/attendance"), 1500);
+    } catch {
+      toast.error("Failed to record Check Out");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // ----------------------------------------------------------
+  // Render
+  // ----------------------------------------------------------
   return (
-    <TabsContent value="single" className="space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add Single Attendance</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+    <TabsContent value="single" className="space-y-5">
 
-              {/* ✅ MEMBER BUTTON - PERFECT */}
-              <FormField
-                control={form.control}
-                name="memberId"
-                render={({ field }) => {
-                  const selectedMember = members.find(m => m.id === field.value)
-                  return (
-                    <FormItem className="flex flex-col">
-                      <FormControl>
-                        <input type="hidden" {...field} />
-                      </FormControl>
-                      <FormLabel>Select Member *</FormLabel>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={`w-full justify-between font-normal ${!field.value && "text-muted-foreground"}`}
-                        disabled={loading}
-                        type="button"
-                        onClick={() => {
-                          dialogHandlers.setActiveBatchEntryId(null)
-                          dialogHandlers.setMemberDialogOpen(true)
-                        }}
-                      >
-                        {selectedMember ? `${selectedMember.label} (${selectedMember.department})` : "Choose a member..."}
-                        <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
+      {/* ── Member selector ── */}
+      <Card className="border shadow-sm">
+        <CardContent className="pt-5 pb-5">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3 min-w-0">
+              {selectedMember ? (
+                <>
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                    {selectedMember.label.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">
+                      {selectedMember.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {selectedMember.department}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No member selected
+                </p>
+              )}
+            </div>
 
-                      <div className="grid grid-cols-4 gap-2 mt-2">
-                        <Button
-                          type="button"
-                          variant={isMatch("checkInTime", localSchedule?.start_time) ? "default" : "secondary"}
-                          size="sm"
-                          className={cn(
-                            "text-[10px] h-8 px-1",
-                            isMatch("checkInTime", localSchedule?.start_time) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
-                          )}
-                          disabled={loading || !field.value}
-                          onClick={() => {
-                            if (localSchedule?.start_time) {
-                              const checkInTime = localSchedule.start_time.slice(0, 5)
-                              form.setValue("checkInTime", checkInTime)
-
-                              // Auto-calculate status: if current time > schedule start time, set to late
-                              // Simplified client-side logic for manual preset
-                              const now = new Date()
-                              const currentH = now.getHours()
-                              const currentM = now.getMinutes()
-                              const [schedH, schedM] = checkInTime.split(":").map(Number)
-
-                              if (currentH > schedH || (currentH === schedH && currentM > schedM)) {
-                                form.setValue("status", "late")
-                              } else {
-                                form.setValue("status", "present")
-                              }
-
-                              toast.info(`Status set based on schedule: ${currentH > schedH || (currentH === schedH && currentM > schedM) ? "Late" : "On-Time"}`)
-                            } else if (scheduleError) {
-                              toast.error(scheduleError)
-                            } else if (!localSchedule) {
-                              toast.error("No schedule assigned for this date")
-                            } else {
-                              toast.error("Start time is not set in schedule")
-                            }
-                          }}
-                        >
-                          Check-in
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={isMatch("checkOutTime", localSchedule?.core_hours_end) ? "default" : "secondary"}
-                          size="sm"
-                          className={cn(
-                            "text-[10px] h-8 px-1",
-                            isMatch("checkOutTime", localSchedule?.core_hours_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
-                          )}
-                          disabled={loading || !field.value}
-                          onClick={() => {
-                            if (localSchedule?.core_hours_end) {
-                              form.setValue("checkOutTime", localSchedule.core_hours_end.slice(0, 5))
-                            } else if (scheduleError) {
-                              toast.error(scheduleError)
-                            } else if (!localSchedule) {
-                              toast.error("No schedule assigned for this date")
-                            } else {
-                              toast.error("Core hours end is not set in schedule")
-                            }
-                          }}
-                        >
-                          Check-out
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={isMatch("breakStartTime", localSchedule?.break_start) ? "default" : "secondary"}
-                          size="sm"
-                          className={cn(
-                            "text-[10px] h-8 px-1",
-                            isMatch("breakStartTime", localSchedule?.break_start) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
-                          )}
-                          disabled={loading || !field.value}
-                          onClick={() => {
-                            if (localSchedule?.break_start) {
-                              form.setValue("breakStartTime", localSchedule.break_start.slice(0, 5))
-                            } else if (!localSchedule) {
-                              toast.error("No schedule assigned for this date")
-                            } else {
-                              toast.error("Break start is not set in schedule")
-                            }
-                          }}
-                        >
-                          Break In
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={isMatch("breakEndTime", localSchedule?.break_end) ? "default" : "secondary"}
-                          size="sm"
-                          className={cn(
-                            "text-[10px] h-8 px-1",
-                            isMatch("breakEndTime", localSchedule?.break_end) && "bg-zinc-900 text-white hover:bg-zinc-900/90"
-                          )}
-                          disabled={loading || !field.value}
-                          onClick={() => {
-                            if (localSchedule?.break_end) {
-                              form.setValue("breakEndTime", localSchedule.break_end.slice(0, 5))
-                            } else if (!localSchedule) {
-                              toast.error("No schedule assigned for this date")
-                            } else {
-                              toast.error("Break end is not set in schedule")
-                            }
-                          }}
-                        >
-                          Break Out
-                        </Button>
-                      </div>
-
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
-              />
-
-              {/* ✅ CHECK-IN - CORRECT */}
-              <div className="space-y-3">
-                <FormLabel>Check-in Date & Time *</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="checkInDate"  // ✅ CORRECT!
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        {localSchedule && (
-                          <p className="text-[10px] text-emerald-600 font-medium mt-1">
-                            📅 Work Hours: {localSchedule.start_time?.slice(0, 5)} - {localSchedule.end_time?.slice(0, 5)}
-                          </p>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="checkInTime"  // ✅ CORRECT!
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Time</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* ✅ CHECK-OUT - CORRECT */}
-              <div className="space-y-3">
-                <FormLabel>Check-out Date & Time</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="checkOutDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="checkOutTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Time</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* ✅ BREAK TIMES */}
-              <div className="space-y-3">
-                <FormLabel>Break Times (Optional)</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="breakStartTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Break In</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="breakEndTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Break Out</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-
-              {/* Status + Remarks - IDENTICAL (sudah benar) */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status *</FormLabel>
-                    <Select
-                      disabled={form.formState.isSubmitting}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full md:w-1/2">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {QUICK_STATUSES.map((status) => (
-                          <SelectItem key={status.value} value={status.value}>
-                            <div className="flex items-center">
-                              <span className={`px-2 py-0.5 rounded text-xs font-medium ${status.color}`}>
-                                {status.label}
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="remarks"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Add any notes..."
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Max 500 characters</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => router.back()}>
-              <X className="mr-2 h-4 w-4" /> Cancel
-            </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting || !form.watch("memberId")}>
-              {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={membersLoading || step !== "idle"}
+              onClick={() => {
+                dialogHandlers.setActiveBatchEntryId(null);
+                dialogHandlers.setMemberDialogOpen(true);
+              }}
+              className="shrink-0 gap-2"
+            >
+              <Search className="h-4 w-4" />
+              {selectedMember ? "Change Member" : "Select Member"}
             </Button>
           </div>
-        </form>
-      </Form>
-    </TabsContent>
-  )
-}
+        </CardContent>
+      </Card>
 
+      {/* ── Schedule info + live clock ── */}
+      {externalMemberId && (
+        <Card className="border shadow-sm">
+          <CardContent className="pt-4 pb-4">
+            {scheduleLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading schedule...
+              </div>
+            ) : isHoliday ? (
+              <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+                <CalendarOff className="h-4 w-4 shrink-0" />
+                <span>{scheduleError || "Today is a non-working day"}</span>
+              </div>
+            ) : schedule ? (
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span className="font-medium text-foreground">
+                    {schedule.start_time?.slice(0, 5)} –{" "}
+                    {schedule.end_time?.slice(0, 5)}
+                  </span>
+                </div>
+                {schedule.break_start && schedule.break_end && (
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Coffee className="h-3.5 w-3.5" />
+                    <span>
+                      Break:{" "}
+                      <span className="font-medium text-foreground">
+                        {schedule.break_start.slice(0, 5)} –{" "}
+                        {schedule.break_end.slice(0, 5)}
+                      </span>
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 text-muted-foreground ml-auto">
+                  <Timer className="h-3.5 w-3.5" />
+                  <LiveClock />
+                </div>
+              </div>
+            ) : scheduleError ? (
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{scheduleError}</span>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Step progress bar ── */}
+      {externalMemberId && !isHoliday && (
+        <div className="flex items-start gap-1 px-1">
+          {(Object.keys(STEP_LABELS) as Exclude<AttendanceStep, "idle">[]).map(
+            (s, i, arr) => {
+              const idx = stepIndex(s);
+              const currentIdx = stepIndex(step);
+              const isCompleted = currentIdx > idx;
+              const isActive = currentIdx === idx;
+              return (
+                <div key={s} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center flex-1">
+                    <div
+                      className={cn(
+                        "h-1.5 w-full rounded-full transition-all duration-300",
+                        isCompleted
+                          ? "bg-primary"
+                          : isActive
+                          ? "bg-primary/40"
+                          : "bg-muted",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "mt-1.5 text-[10px] font-medium",
+                        isCompleted || isActive
+                          ? "text-primary"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {STEP_LABELS[s]}
+                    </span>
+                  </div>
+                  {i < arr.length - 1 && <div className="w-1 shrink-0" />}
+                </div>
+              );
+            },
+          )}
+        </div>
+      )}
+
+      {/* ── 4 Action buttons ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <ActionButton
+          label="Check In"
+          sublabel={
+            timestamps.checkIn
+              ? formatTime(timestamps.checkIn)
+              : "Tap to start"
+          }
+          icon={<LogIn className="h-6 w-6" />}
+          onClick={handleCheckIn}
+          disabled={!canCheckIn}
+          loading={actionLoading === "checkin"}
+          variant="checkin"
+          done={isDone("checked_in")}
+        />
+        <ActionButton
+          label="Break In"
+          sublabel={
+            schedule?.break_start
+              ? timestamps.breakIn
+                ? formatTime(timestamps.breakIn)
+                : `From ${schedule.break_start.slice(0, 5)}`
+              : "No break scheduled"
+          }
+          icon={<Coffee className="h-6 w-6" />}
+          onClick={handleBreakIn}
+          disabled={!canBreakIn}
+          loading={actionLoading === "breakin"}
+          variant="breakin"
+          done={isDone("break_in")}
+        />
+        <ActionButton
+          label="Break Out"
+          sublabel={
+            timestamps.breakOut ? formatTime(timestamps.breakOut) : "End break"
+          }
+          icon={<Coffee className="h-6 w-6" />}
+          onClick={handleBreakOut}
+          disabled={!canBreakOut}
+          loading={actionLoading === "breakout"}
+          variant="breakout"
+          done={isDone("break_out")}
+        />
+        <ActionButton
+          label="Check Out"
+          sublabel={
+            timestamps.checkOut
+              ? formatTime(timestamps.checkOut)
+              : "Tap to finish"
+          }
+          icon={<LogOut className="h-6 w-6" />}
+          onClick={handleCheckOut}
+          disabled={!canCheckOut}
+          loading={actionLoading === "checkout"}
+          variant="checkout"
+          done={isDone("checked_out")}
+        />
+      </div>
+
+      {/* ── Timestamp summary ── */}
+      {step !== "idle" && (
+        <Card className="border shadow-sm bg-muted/30">
+          <CardContent className="pt-4 pb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-sm">
+              {[
+                {
+                  label: "Check In",
+                  value: timestamps.checkIn,
+                  color: "text-emerald-600 dark:text-emerald-400",
+                },
+                {
+                  label: "Break In",
+                  value: timestamps.breakIn,
+                  color: "text-amber-600 dark:text-amber-400",
+                },
+                {
+                  label: "Break Out",
+                  value: timestamps.breakOut,
+                  color: "text-blue-600 dark:text-blue-400",
+                },
+                {
+                  label: "Check Out",
+                  value: timestamps.checkOut,
+                  color: "text-red-600 dark:text-red-400",
+                },
+              ].map((item) => (
+                <div key={item.label} className="space-y-1">
+                  <p className="text-xs text-muted-foreground">{item.label}</p>
+                  <p
+                    className={cn(
+                      "font-mono font-semibold tabular-nums",
+                      item.value
+                        ? item.color
+                        : "text-muted-foreground/40",
+                    )}
+                  >
+                    {item.value ? formatTime(item.value) : "--:--"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Remarks ── */}
+      {step !== "idle" && step !== "checked_out" && (
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Notes (Optional)</Label>
+          <Textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Add any notes about this attendance..."
+            rows={2}
+            maxLength={500}
+            className="resize-none"
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {remarks.length}/500
+          </p>
+        </div>
+      )}
+
+      {/* ── Break In belum waktunya — hint ── */}
+      {step === "checked_in" && schedule?.break_start && !isInBreakWindow() && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            Break In will be available during the scheduled break window:{" "}
+            <strong>
+              {schedule.break_start.slice(0, 5)} –{" "}
+              {schedule.break_end?.slice(0, 5)}
+            </strong>
+          </span>
+        </div>
+      )}
+
+      {/* ── Holiday state ── */}
+      {isHoliday && externalMemberId && (
+        <div className="flex items-start gap-2 rounded-lg border border-muted bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+          <CalendarOff className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            All attendance actions are disabled. Today is marked as a
+            non-working day in the member&apos;s schedule.
+          </span>
+        </div>
+      )}
+
+      {/* ── Success state ── */}
+      {step === "checked_out" && (
+        <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
+          <span className="font-medium">
+            Attendance complete! Redirecting to attendance list...
+          </span>
+        </div>
+      )}
+
+      {/* ── Cancel ── */}
+      <div className="flex justify-end pt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={actionLoading !== null}
+        >
+          Cancel
+        </Button>
+      </div>
+    </TabsContent>
+  );
+}

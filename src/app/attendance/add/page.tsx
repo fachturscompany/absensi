@@ -1,12 +1,14 @@
 "use client"
 
-import { useCallback } from "react"
+// src/app/attendance/add/page.tsx (atau sesuai path Anda)
+
+import { useCallback, useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SingleForm } from "@/components/attendance/add/single-form"
 import { BatchForm } from "@/components/attendance/add/batch-form"
-import { MemberDialog } from "@/components/attendance/add/dialogs/member-dialog"  // ✅ FIXED path
+import { MemberDialog } from "@/components/attendance/add/dialogs/member-dialog"
 import {
   singleFormSchema,
   type SingleFormValues,
@@ -16,8 +18,6 @@ import { useMembers } from "@/hooks/attendance/add/use-members"
 import { useBatchAttendance } from "@/hooks/attendance/add/use-batch-attendance"
 import { createManualAttendance } from "@/action/attendance"
 import { toast } from "sonner"
-
-// REMOVE local DialogHandlers interface
 
 // Helper untuk parse date+time → Date object
 const parseDateTime = (dateStr: string, timeStr: string): Date => {
@@ -35,9 +35,9 @@ const parseDateTime = (dateStr: string, timeStr: string): Date => {
 }
 
 export default function AttendancePage() {
-  const router = useRouter()  // ✅ DECLARED!
+  const router = useRouter()
 
-  // ✅ SINGLE FORM - DECLARED PERTAMA!
+  // ✅ Form tetap dipakai — MemberDialog masih set via form.setValue
   const singleForm = useForm<SingleFormValues>({
     resolver: zodResolver(singleFormSchema),
     defaultValues: {
@@ -51,11 +51,25 @@ export default function AttendancePage() {
     }
   })
 
-  // ✅ HOOKS - SINGLE SOURCE OF TRUTH
+  // ✅ State lokal untuk diteruskan ke SingleForm
+  // Ini adalah "jembatan" antara MemberDialog (yang set form)
+  // dan SingleForm baru (yang tidak pakai form)
+  const [selectedMemberId, setSelectedMemberId] = useState<string>("")
+
+  // ✅ Sync: setiap kali form.memberId berubah (diset oleh MemberDialog),
+  // update selectedMemberId agar SingleForm ikut ter-update
+  const watchedMemberId = singleForm.watch("memberId")
+  useEffect(() => {
+    if (watchedMemberId && watchedMemberId !== selectedMemberId) {
+      setSelectedMemberId(watchedMemberId)
+    }
+  }, [watchedMemberId, selectedMemberId])
+
   const { members, departments, loading: membersLoading } = useMembers()
   const batch = useBatchAttendance()
 
-  // ✅ SINGLE FORM SUBMIT
+  // Legacy submit — tidak dipakai di SingleForm baru tapi dibiarkan
+  // agar tidak break jika ada komponen lain yang masih pakai
   const handleSingleSubmit = useCallback(async (values: SingleFormValues) => {
     try {
       const res = await createManualAttendance({
@@ -92,7 +106,6 @@ export default function AttendancePage() {
 
   const loading = membersLoading || batch.isSubmitting
 
-
   return (
     <div className="">
       <div className="flex items-center justify-between">
@@ -113,6 +126,10 @@ export default function AttendancePage() {
           singleCheckInDate={singleForm.watch("checkInDate")}
           onSubmit={handleSingleSubmit}
           dialogHandlers={batch}
+          // ✅ Prop baru: member yang dipilih dari MemberDialog
+          // diteruskan ke SingleForm via state yang di-sync dari form
+          selectedMemberId={selectedMemberId}
+          onMemberSelect={setSelectedMemberId}
         />
 
         <BatchForm
@@ -122,7 +139,7 @@ export default function AttendancePage() {
         />
       </Tabs>
 
-      {/* ✅ MEMBER DIALOG */}
+      {/* MemberDialog tidak perlu diubah — tetap set via form.setValue */}
       <MemberDialog
         members={members}
         departments={departments}
@@ -132,4 +149,4 @@ export default function AttendancePage() {
       />
     </div>
   )
-}
+} 

@@ -1,23 +1,62 @@
+import { formatInTimeZone } from "date-fns-tz";
+
 /**
- * Get locale-aware day name using Intl API
- * @param dayIndex - 0-6 where 0=Sunday, following JavaScript Date convention
- * @param locale - Optional BCP 47 language tag (e.g., 'en-US', 'id-ID'), defaults to browser locale
- * @param format - 'long' for full name, 'short' for abbreviated
+ * Memformat string UTC ke waktu lokal berdasarkan timezone IANA (e.g. Asia/Jakarta)
+ * Digunakan secara global di frontend berdasarkan preferensi Organisasi.
  */
+export function formatLocalTime(
+  utcString: string | null | undefined,
+  timezone: string,
+  timeFormat: '12h' | '24h' = '24h',
+  includeDate: boolean = false
+) {
+  // 1. Handle null, undefined, atau string kosong
+  if (!utcString || typeof utcString !== 'string' || ["-", ""].includes(utcString.trim())) {
+    return "-";
+  }
+
+  try {
+    let normalized = utcString.trim().replace(' ', 'T');
+
+    // 2. Fix spesifik Supabase/Postgres: 
+    // Mengubah format '+00' atau '+0000' menjadi 'Z' (UTC)
+    normalized = normalized.replace(/[+-]00(?::00)?$/, 'Z');
+
+    // 3. Jika tidak ada indikator zona waktu, paksa ke UTC (Z)
+    if (!/[Z]|[+-]\d{2}(:?\d{2})?$/.test(normalized)) {
+      normalized += 'Z';
+    }
+
+    const date = new Date(normalized);
+
+    // 4. Validasi apakah tanggal valid
+    if (isNaN(date.getTime())) return "-";
+
+    // 5. Tentukan format string
+    const formatStr = includeDate 
+      ? (timeFormat === '12h' ? 'dd MMM yyyy, hh:mm a' : 'dd MMM yyyy, HH:mm')
+      : (timeFormat === '12h' ? 'hh:mm a' : 'HH:mm');
+
+    // 6. Konversi menggunakan date-fns-tz (Menangani DST otomatis)
+    return formatInTimeZone(date, timezone, formatStr);
+  } catch (error) {
+    console.error("Date formatting error:", error);
+    return "-";
+  }
+}
+
+/** * --- HELPER ANDA SEBELUMNYA (TETAP DIPERTAHANKAN) ---
+ */
+
 export const getDayName = (
     dayIndex: number,
     locale?: string,
     format: "long" | "short" = "long"
 ): string => {
-    // Create a date that falls on the correct day of week
-    // January 4, 2026 is a Sunday (dayIndex 0)
     const baseDate = new Date(2026, 0, 4 + dayIndex)
     return new Intl.DateTimeFormat(locale, { weekday: format }).format(baseDate)
 }
 
-/**
- * Get all day names for a locale
- */
 export const getAllDayNames = (
     locale?: string,
     format: "long" | "short" = "long"
@@ -25,24 +64,10 @@ export const getAllDayNames = (
     return [0, 1, 2, 3, 4, 5, 6].map((day) => getDayName(day, locale, format))
 }
 
-/**
- * Day of week constants following JavaScript Date convention
- * 0 = Sunday, 1 = Monday, ..., 6 = Saturday
- */
 export const DAY_OF_WEEK = {
-    SUNDAY: 0,
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
+    SUNDAY: 0, MONDAY: 1, TUESDAY: 2, WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6,
 } as const
 
-/**
- * Format a Date object as YYYY-MM-DD using local time components
- * to avoid timezone shifts caused by .toISOString()
- */
 export const formatDateLocal = (date: Date): string => {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')

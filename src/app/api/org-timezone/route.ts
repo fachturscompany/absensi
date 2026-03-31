@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getOrganizationTimezoneByUserId } from "@/action/organization";
 
-// Config untuk route
-export const dynamic = 'force-dynamic'; // Atau hapus jika mau default
-export const runtime = 'edge'; // Pilih satu: 'edge' atau 'nodejs'
+// Gunakan 'nodejs' jika database driver Anda tidak mendukung Edge
+export const runtime = 'nodejs'; 
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
@@ -17,9 +17,9 @@ export async function GET(req: Request) {
           message: "Using default timezone" 
         },
         {
+          status: 200,
           headers: {
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-            "CDN-Cache-Control": "public, s-maxage=3600"
           }
         }
       );
@@ -27,12 +27,16 @@ export async function GET(req: Request) {
 
     const timezone = await getOrganizationTimezoneByUserId(userId);
     
+    // Pastikan jika data tidak ditemukan, return default
+    const finalTimezone = timezone || "Asia/Jakarta";
+
     return NextResponse.json(
-      { timezone },
+      { timezone: finalTimezone },
       {
+        status: 200,
         headers: {
+          // 'private' karena data ini spesifik untuk user/organisasi tertentu
           "Cache-Control": "private, max-age=60, stale-while-revalidate=300",
-          "CDN-Cache-Control": "no-cache"
         }
       }
     );
@@ -46,10 +50,7 @@ export async function GET(req: Request) {
         error: "Failed to fetch user timezone" 
       },
       { 
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store"
-        }
+        status: 500
       }
     );
   }

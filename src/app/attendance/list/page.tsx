@@ -1,5 +1,6 @@
 "use client"
-import React, { useCallback, useEffect, useRef, useState, useMemo, useDeferredValue } from "react"
+import React, { useCallback, useEffect, useState, useMemo, useDeferredValue } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { DateFilterBar } from "@/components/analytics/date-filter-bar"
 import { useOrgStore } from "@/store/org-store"
@@ -28,7 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
 import { cn } from "@/lib/utils"
-import { formatLocalTime } from "@/utils/timezone"
+import { formatLocalTime } from "@/utils/date-helper"
 
 interface AttendanceRowProps {
   record: AttendanceListItem
@@ -44,7 +45,7 @@ interface AttendanceRowProps {
 }
 
 const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
-  record, isSelected, onToggleSelect, onEdit, onDelete, showLocation,
+  record, isSelected, onToggleSelect, onEdit, onDelete,
   checkInDisplay, checkOutDisplay, breakInDisplay, breakOutDisplay
 }) => {
   const getStatusColor = (status: string): string => {
@@ -61,18 +62,10 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'present':
-        return <CheckCircle2 className="h-3 w-3" />;
-      case 'late':
-        return <Timer className="h-3 w-3" />;
-      case 'absent':
-        return <XCircle className="h-3 w-3" />;
-      case 'leave':
-      case 'excused':
-      case 'early_leave':
-        return <AlertCircle className="h-3 w-3" />;
-      default:
-        return <AlertCircle className="h-3 w-3" />;
+      case 'present': return <CheckCircle2 className="h-3 w-3" />;
+      case 'late': return <Timer className="h-3 w-3" />;
+      case 'absent': return <XCircle className="h-3 w-3" />;
+      default: return <AlertCircle className="h-3 w-3" />;
     }
   };
 
@@ -81,7 +74,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
       "border-b transition-colors cursor-pointer custom-hover-row",
       isSelected && "bg-blue-50 dark:bg-blue-950/50"
     )}>
-      {/* Checkbox */}
       <td className="p-3">
         <input
           type="checkbox"
@@ -91,7 +83,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         />
       </td>
 
-      {/* Member */}
       <td className="p-3">
         <div className="flex items-center gap-3">
           <UserAvatar
@@ -111,12 +102,10 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </div>
       </td>
 
-      {/* Department */}
       <td className="p-3">
         <p className="font-medium text-xs">{record.member?.department || '-'}</p>
       </td>
 
-      {/* Check In */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
           <span className="font-medium whitespace-nowrap">{checkInDisplay.date}</span>
@@ -129,7 +118,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </div>
       </td>
 
-      {/* Check Out */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
           <span className="font-medium whitespace-nowrap">{checkOutDisplay.date}</span>
@@ -142,7 +130,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </div>
       </td>
 
-      {/* Break In */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
           <span className="font-medium whitespace-nowrap">{breakInDisplay.date}</span>
@@ -155,7 +142,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </div>
       </td>
 
-      {/* Break Out */}
       <td className="p-3">
         <div className="flex flex-col text-xs font-mono">
           <span className="font-medium whitespace-nowrap">{breakOutDisplay.date}</span>
@@ -168,12 +154,10 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </div>
       </td>
 
-      {/* Work Hours */}
       <td className="p-3">
         <span className="font-medium text-xs">{record.workHours || '0h'}</span>
       </td>
 
-      {/* Status */}
       <td className="p-3">
         <Badge className={cn("gap-1 px-2 py-0.5 text-xs", getStatusColor(record.status))}>
           {getStatusIcon(record.status)}
@@ -185,10 +169,6 @@ const AttendanceRowPure: React.FC<AttendanceRowProps> = ({
         </Badge>
       </td>
 
-      {/* Location */}
-      {showLocation && <td className="p-3">-</td>}
-
-      {/* Actions */}
       <td className="p-3">
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" title="Edit" onClick={onEdit}>
@@ -207,6 +187,7 @@ const AttendanceRow = React.memo(AttendanceRowPure)
 
 function ModernAttendanceListCloned() {
   const orgStore = useOrgStore()
+  const queryClient = useQueryClient() // <-- Tambahan untuk manipulasi SWR cache
 
   type QueryParams = {
     orgId: number | null
@@ -239,15 +220,15 @@ function ModernAttendanceListCloned() {
   })
 
   const deferredSearch = useDeferredValue(queryParams.search)
-  const [data, setData] = useState<{ items: AttendanceListItem[], total: number }>({ items: [], total: 0 })
-  const [loading, setLoading] = useState(true)
+
+  // State UI
   const [userTimezone, setUserTimezone] = useState("UTC")
-  const [selectedIds, setSelectedIds] = useState(new Set<string>())
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set<string>())
   const [departments, setDepartments] = useState<string[]>([])
   const [isMounted, setIsMounted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Dialog states
+  // Dialog State
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmState, setConfirmState] = useState<{ mode: "single" | "bulk"; id?: string } | null>(null)
   const [editOpen, setEditOpen] = useState(false)
@@ -256,18 +237,75 @@ function ModernAttendanceListCloned() {
   const [editOut, setEditOut] = useState("")
   const [editRemarks, setEditRemarks] = useState("")
 
-  // Performance refs
+  const orgId = useMemo(() => queryParams.orgId || orgStore.organizationId, [queryParams.orgId, orgStore.organizationId])
 
+  // --- 1. SWR / REACT QUERY FETCHING LOGIC ---
+  const queryKey = ['attendance', {
+    orgId,
+    page: queryParams.page,
+    limit: queryParams.limit,
+    dateFrom: queryParams.dateFrom,
+    dateTo: queryParams.dateTo,
+    status: queryParams.status,
+    department: queryParams.department,
+    search: deferredSearch?.trim() ?? "",
+  }]
 
-  const fetchDataRef = useRef<() => void>(() => { })
-  const queryParamsRef = useRef(queryParams)
-  queryParamsRef.current = queryParams
-  const orgIdRef = useRef(orgStore.organizationId)
-  orgIdRef.current = orgStore.organizationId
-  const queryKeyRef = useRef('')
+  const { data: queryData, isLoading: loading, isFetching, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!orgId) return { items: [], total: 0 }
 
+      const params = new URLSearchParams({
+        page: queryParams.page.toString(),
+        limit: queryParams.limit.toString(),
+        dateFrom: queryParams.dateFrom,
+        dateTo: queryParams.dateTo,
+        organizationId: orgId.toString(),
+        _cb: Date.now().toString(), // Mencegah cache API
+        ...(queryParams.status !== "all" && { status: queryParams.status }),
+        ...(queryParams.department !== "all" && { department: queryParams.department }),
+        ...(deferredSearch?.trim().length >= 2 && { search: deferredSearch.trim() })
+      })
 
-  // Helper functions
+      const res = await fetch(`/api/attendance-records?${params}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
+
+      const result = await res.json() as GetAttendanceResult
+      if (result.success) {
+        return { items: result.data, total: result.meta?.total || result.data.length }
+      }
+      return { items: [], total: 0 }
+    },
+    enabled: !!orgId,
+    staleTime: 5000, // Data valid selama 5 detik, lalu akan ditarik ulang secara gaib di background
+  })
+
+  // Memastikan data selalu memiliki struktur default jika undefined
+  const data = queryData || { items: [], total: 0 }
+
+  // Side Effect: Update Timezone & Departments berdasarkan data terbaru
+  useEffect(() => {
+    if (data.items.length > 0) {
+      const nextTz = data.items[0]?.timezone ?? "UTC"
+      setUserTimezone(prev => prev === nextTz ? prev : nextTz)
+
+      const uniqueDepts = Array.from(new Set(
+        data.items.map(r => r.member?.department).filter((d): d is string => typeof d === 'string' && d !== "" && d !== "No Department")
+      )).sort()
+
+      setDepartments(prev => {
+        const same = prev.length === uniqueDepts.length && prev.every((d, i) => d === uniqueDepts[i])
+        return same ? prev : uniqueDepts
+      })
+    }
+  }, [data.items])
+
   function toOrgYMD(d: Date, tz?: string): string {
     if (!tz || tz === "UTC") {
       const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
@@ -281,129 +319,37 @@ function ModernAttendanceListCloned() {
     }
   }
 
-  // ✅ FIXED QUERY KEY - Stable dependencies
-  const orgId = useMemo(() =>
-    queryParams.orgId || orgStore.organizationId,
-    [queryParams.orgId, orgStore.organizationId]
-  )
-
-  const queryKey = useMemo(() => JSON.stringify({
-    orgId,
-    page: queryParams.page,
-    limit: queryParams.limit,
-    dateFrom: queryParams.dateFrom,
-    dateTo: queryParams.dateTo,
-    status: queryParams.status,
-    department: queryParams.department,
-    search: deferredSearch?.trim() ?? "",
-  }), [orgId, queryParams.page, queryParams.limit, queryParams.dateFrom, queryParams.dateTo,
-    queryParams.status, queryParams.department, deferredSearch])
-
-
-  // Update query helper
   const updateQueryParams = useCallback((updates: Partial<QueryParams>) => {
     setQueryParams(prev => ({ ...prev, ...updates, page: 1 }))
   }, [])
 
-  const fetchData = useCallback(async () => {
-    const qp = queryParamsRef.current
-    const orgId = qp.orgId || orgIdRef.current
-    if (!orgId) {
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-
-    // ✅ NO CACHE - Langsung fetch fresh
-    const params = new URLSearchParams({
-      page: qp.page.toString(),
-      limit: qp.limit.toString(),
-      dateFrom: qp.dateFrom,
-      dateTo: qp.dateTo,
-      organizationId: orgId.toString(),
-      _cb: Date.now().toString(),  // ✅ Cache buster
-      ...(qp.status !== "all" && { status: qp.status }),
-      ...(qp.department !== "all" && { department: qp.department }),
-      ...(qp.search?.trim().length >= 2 && { search: qp.search.trim() })
-    })
-
-    const res = await fetch(`/api/attendance-records?${params}`, {
-      cache: 'no-store',  // ✅ No browser cache
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    })
-
-    const result = await res.json() as GetAttendanceResult
-    handleFetchSuccess(result)
-    setLoading(false)
-  }, [])
-
-  // Keep ref in sync so the realtime callback always calls the latest fetchData
-  // without being a useEffect dependency (prevents infinite re-subscription loop)
-  queryKeyRef.current = queryKey
-  fetchDataRef.current = fetchData
-
-  const handleFetchSuccess = useCallback((result: GetAttendanceResult) => {
-    if (result.success) {
-      const items = (result.data || []) as AttendanceListItem[]
-      setData({ items, total: result.meta?.total || items.length })
-
-      // Only update timezone if it actually changed — avoids re-render cascade
-      if (items.length > 0) {
-        const nextTz = items[0]?.timezone ?? "UTC"
-        setUserTimezone(prev => prev === nextTz ? prev : nextTz)
-      }
-
-      // Only update departments if the list actually changed — avoids re-render cascade
-      const uniqueDepts = Array.from(new Set(
-        items.map(r => r.member?.department)
-          .filter((d): d is string => Boolean(d && d !== "No Department"))
-      )).sort()
-      setDepartments(prev => {
-        const same = prev.length === uniqueDepts.length && prev.every((d, i) => d === uniqueDepts[i])
-        return same ? prev : uniqueDepts
-      })
-    } else {
-      setData({ items: [], total: 0 })
-    }
-  }, [])
-
+  // --- 2. SUPABASE REALTIME --
   useEffect(() => {
     if (!orgId) return
-    console.log('🔍 NO FILTER TEST - orgId:', orgId)
 
     const supabase = createClient()
-    const channel = supabase.channel('test_no_filter')
-
-    // ❌ NO FILTER - dengar SEMUA changes
-    channel
-      .on('postgres_changes',
+    const channel = supabase.channel('attendance_realtime_changes')
+      .on( // <--- Hapus <AttendanceRecordTable> di sini
+        'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'attendance_records'
-          // NO FILTER!
         },
-        (payload: any) => {
-          console.log('🔔 NO FILTER TRIGGERED:', payload)
-          fetchData()
+        () => {
+          // Begitu ada update di database, beritahu React Query bahwa cache ini basi!
+          queryClient.invalidateQueries({ queryKey: ['attendance'] })
         }
       )
-      .subscribe((status: any) => console.log('📶 NO FILTER:', status))
+      .subscribe()
 
-    return () => supabase.removeChannel(channel)
-  }, [orgId, fetchData])
-
+    return () => { supabase.removeChannel(channel) }
+  }, [orgId, queryClient])
 
   useEffect(() => {
-    if (!orgId) return
-    fetchDataRef.current()
-  }, [queryKey, orgId])
+    setIsMounted(true)
+  }, [])
 
-  // Selection handlers
   const toggleSelect = useCallback((id: string, checked: boolean) => {
     setSelectedIds(prev => {
       const next = new Set(prev)
@@ -421,69 +367,24 @@ function ModernAttendanceListCloned() {
     )
   }, [data.items.length])
 
-  // ✅ FIXED VISIBLE ROWS - Precompute outside hooks
   const visibleRows = useMemo(() => {
+    if (!isMounted) return []
+
     return data.items.map((record) => {
-      // Pre-compute displays (NO HOOKS)
-      const checkInDisplay = (() => {
-        if (!record.checkIn) return { date: '-', time: '-', method: '' }
-        try {
-          const formatted = formatLocalTime(record.checkIn, userTimezone, "24h", true)
-          const [datePart, timePart] = formatted.split(', ')
-          return {
-            date: datePart || '-',
-            time: timePart || '-',
-            method: record.checkInMethod || ''
-          }
-        } catch {
-          return { date: '-', time: '-', method: '' }
-        }
-      })()
+      const format = (utc: string | null) => {
+        if (!utc) return { date: '-', time: '-' };
+        const formatted = formatLocalTime(utc, userTimezone, "24h", true);
+        const parts = formatted.split(', ');
+        return {
+          date: parts[0] || '-',
+          time: parts[1] || '-'
+        };
+      };
 
-      const checkOutDisplay = (() => {
-        if (!record.checkOut) return { date: '-', time: '-', method: '' }
-        try {
-          const formatted = formatLocalTime(record.checkOut, userTimezone, "24h", true)
-          const [datePart, timePart] = formatted.split(', ')
-          return {
-            date: datePart || '-',
-            time: timePart || '-',
-            method: record.checkOutMethod || ''
-          }
-        } catch {
-          return { date: '-', time: '-', method: '' }
-        }
-      })()
-
-      const breakInDisplay = (() => {
-        if (!record.actualBreakStart) return { date: '-', time: '-', method: '' }
-        try {
-          const formatted = formatLocalTime(record.actualBreakStart, userTimezone, "24h", true)
-          const [datePart, timePart] = formatted.split(', ')
-          return {
-            date: datePart || '-',
-            time: timePart || '-',
-            method: record.breakInMethod || ''
-          }
-        } catch {
-          return { date: '-', time: '-', method: '' }
-        }
-      })()
-
-      const breakOutDisplay = (() => {
-        if (!record.actualBreakEnd) return { date: '-', time: '-', method: '' }
-        try {
-          const formatted = formatLocalTime(record.actualBreakEnd, userTimezone, "24h", true)
-          const [datePart, timePart] = formatted.split(', ')
-          return {
-            date: datePart || '-',
-            time: timePart || '-',
-            method: record.breakOutMethod || ''
-          }
-        } catch {
-          return { date: '-', time: '-', method: '' }
-        }
-      })()
+      const checkInDisplay = { ...format(record.checkIn), method: record.checkInMethod || '' };
+      const checkOutDisplay = { ...format(record.checkOut), method: record.checkOutMethod || '' };
+      const breakInDisplay = { ...format(record.actualBreakStart), method: record.breakInMethod || '' };
+      const breakOutDisplay = { ...format(record.actualBreakEnd), method: record.breakOutMethod || '' };
 
       return (
         <AttendanceRow
@@ -510,10 +411,8 @@ function ModernAttendanceListCloned() {
         />
       )
     })
-  }, [data.items, userTimezone, selectedIds, toggleSelect])
+  }, [data.items, userTimezone, selectedIds, toggleSelect, isMounted])
 
-  // Event handlers
-  const handleManualRefresh = useCallback(() => fetchData(), [fetchData])
   const handleDeleteMultiple = useCallback(() => {
     if (selectedIds.size === 0) {
       toast.info("No records selected")
@@ -541,7 +440,9 @@ function ModernAttendanceListCloned() {
         setEditIn("")
         setEditOut("")
         setEditRemarks("")
-        fetchData()
+
+        // --- SWR REFRESH: Perbarui data setelah mutasi berhasil ---
+        queryClient.invalidateQueries({ queryKey: ['attendance'] })
       } else {
         toast.error(res.message || "Failed to update record")
       }
@@ -551,13 +452,6 @@ function ModernAttendanceListCloned() {
       setIsSubmitting(false)
     }
   }
-
-  // Effects
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const SHOW_LOCATION = false
 
   return (
     <>
@@ -572,14 +466,12 @@ function ModernAttendanceListCloned() {
         }
       `}</style>
 
-      {/* Toolbar */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Attendance list</h1>
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-2 flex-wrap">
-          {/* Search */}
           <div className="w-full md:flex-1 md:min-w-[200px] relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
@@ -590,7 +482,6 @@ function ModernAttendanceListCloned() {
             />
           </div>
 
-          {/* Date Filter */}
           <div className="w-full md:w-auto shrink-0">
             <DateFilterBar
               dateRange={{
@@ -608,9 +499,7 @@ function ModernAttendanceListCloned() {
             />
           </div>
 
-          {/* Filters */}
           <div className="flex w-full md:w-auto gap-2 shrink-0">
-            {/* Status */}
             <div className="flex-1 md:w-auto">
               {isMounted ? (
                 <Select
@@ -633,7 +522,6 @@ function ModernAttendanceListCloned() {
               )}
             </div>
 
-            {/* Department */}
             <div className="flex-1 md:w-auto">
               {isMounted ? (
                 <Select
@@ -656,15 +544,14 @@ function ModernAttendanceListCloned() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex w-full md:w-auto gap-2 shrink-0">
             <Button
-              onClick={handleManualRefresh}
+              onClick={() => refetch()}
               title="Refresh"
               className="shrink-0 bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90"
-              disabled={loading}
+              disabled={isFetching}
             >
-              <RotateCcw className={cn("w-4 h-4", loading && "animate-spin")} />
+              <RotateCcw className={cn("w-4 h-4", isFetching && "animate-spin")} />
             </Button>
 
             <Link href="/attendance/list/import" className="flex-1 md:flex-none">
@@ -683,15 +570,11 @@ function ModernAttendanceListCloned() {
           </div>
         </div>
 
-        {/* Selected Actions Bar */}
         <AnimatePresence>
           {selectedIds.size > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
-              animate={{
-                opacity: 1,
-                y: 0
-              }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2"
             >
@@ -723,7 +606,6 @@ function ModernAttendanceListCloned() {
         </AnimatePresence>
       </div>
 
-      {/* Table */}
       <div>
         <div className="overflow-x-auto w-full">
           <table className="w-full min-w-[880px]">
@@ -745,7 +627,6 @@ function ModernAttendanceListCloned() {
                 <th className="p-3 text-left text-xs font-medium">Break Out</th>
                 <th className="p-3 text-left text-xs font-medium">Work Hours</th>
                 <th className="p-3 text-left text-xs font-medium">Status</th>
-                {SHOW_LOCATION && <th className="p-3 text-left text-xs font-medium">Location</th>}
                 <th className="p-3 text-left text-xs font-medium">Actions</th>
               </tr>
             </thead>
@@ -770,7 +651,6 @@ function ModernAttendanceListCloned() {
                     <td className="p-3"><Skeleton className="h-5 w-20 rounded-full" /></td>
                     <td className="p-3"><Skeleton className="h-3 w-24" /></td>
                     <td className="p-3"><Skeleton className="h-3 w-24" /></td>
-                    {SHOW_LOCATION && <td className="p-3"><Skeleton className="h-3 w-28" /></td>}
                     <td className="p-3">
                       <div className="flex items-center gap-1">
                         <Skeleton className="h-8 w-8 rounded" />
@@ -781,7 +661,7 @@ function ModernAttendanceListCloned() {
                 ))
               ) : data.items.length === 0 ? (
                 <tr>
-                  <td colSpan={SHOW_LOCATION ? 11 : 10} className="text-center py-6 text-muted-foreground text-sm">
+                  <td colSpan={10} className="text-center py-6 text-muted-foreground text-sm">
                     No attendance records found
                   </td>
                 </tr>
@@ -792,13 +672,12 @@ function ModernAttendanceListCloned() {
           </table>
         </div>
 
-        {/* Pagination */}
         {!loading && data.total > queryParams.limit && (
           <PaginationFooter
             page={queryParams.page}
             totalPages={Math.ceil(data.total / queryParams.limit)}
             onPageChange={(p) => updateQueryParams({ page: Math.max(1, p) })}
-            isLoading={loading}
+            isLoading={isFetching}
             from={(queryParams.page - 1) * queryParams.limit + 1}
             to={Math.min(queryParams.page * queryParams.limit, data.total)}
             total={data.total}
@@ -809,7 +688,6 @@ function ModernAttendanceListCloned() {
         )}
       </div>
 
-      {/* Confirm Dialog */}
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
@@ -830,14 +708,11 @@ function ModernAttendanceListCloned() {
               const ids = Array.from(selectedIds)
               const res = await deleteMultipleAttendanceRecords(ids)
               if (res.success) {
-                // Optimistically remove from UI immediately
-                setData(prev => ({
-                  items: prev.items.filter(r => !ids.includes(r.id)),
-                  total: Math.max(0, prev.total - ids.length)
-                }))
                 setSelectedIds(new Set())
                 toast.success("Selected records deleted")
-                fetchDataRef.current()
+
+                // --- SWR REFRESH ---
+                queryClient.invalidateQueries({ queryKey: ['attendance'] })
               } else {
                 toast.error(res.message || "Failed to delete selected records")
               }
@@ -845,13 +720,10 @@ function ModernAttendanceListCloned() {
               const deletedId = confirmState.id
               const res = await deleteAttendanceRecord(deletedId)
               if (res?.success) {
-                // Optimistically remove from UI immediately
-                setData(prev => ({
-                  items: prev.items.filter(r => r.id !== deletedId),
-                  total: Math.max(0, prev.total - 1)
-                }))
                 toast.success("Record deleted")
-                fetchDataRef.current()
+
+                // --- SWR REFRESH ---
+                queryClient.invalidateQueries({ queryKey: ['attendance'] })
               } else {
                 toast.error(res.message || "Failed to delete record")
               }
@@ -865,7 +737,6 @@ function ModernAttendanceListCloned() {
         }}
       />
 
-      {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={(open) => !isSubmitting && setEditOpen(open)}>
         <DialogContent>
           <DialogHeader>

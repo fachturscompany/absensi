@@ -53,17 +53,12 @@ async function resolveScheduleRuleForMemberDate(
 
   const { data: det, error: detErr } = await supabase
     .from('work_schedule_details')
-    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,is_active,break_start,break_end')
+    .select('day_of_week,is_working_day,start_time,end_time,core_hours_start,core_hours_end,break_start,break_end')
     .eq('work_schedule_id', workScheduleId)
     .eq('day_of_week', dayOfWeek)
     .maybeSingle();
 
   if (detErr || !det) return null;
-  // If it's a non-working day, we still return the record but the UI knows it's an off-day
-  if (!det.is_working_day || !det.is_active) {
-    // We can still return it, but UI buttons will fail because times are empty
-    // Or we can return a partial rule. Let's return it so the UI can toast correctly.
-  }
 
   const rule: ScheduleRule = {
     day_of_week: det.day_of_week,
@@ -74,7 +69,6 @@ async function resolveScheduleRuleForMemberDate(
     break_start: det.break_start,
     break_end: det.break_end,
   };
-  // No strict guard here to allow partial rules (useful for form presets)
   return rule;
 }
 

@@ -11,18 +11,22 @@ export function formatLocalTime(
     return "-";
   }
 
-  // Normalize input: if no timezone info, interpret as UTC
-  // Examples treated as UTC: "2026-01-07 17:20:00", "2026-01-07T17:20:00", "2026-01-07"
-  let normalized = utcString.trim();
-  const hasTZ = /[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized);
-  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(normalized);
-  const isNaiveDateTime = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?$/.test(normalized);
+  // 1. Force UTC parsing to prevent JS Date shifting to system local time
+  let normalized = utcString.trim().replace(' ', 'T');
+  
+  // Fix supabase specific '+00' which JS Date() sometimes fails to parse natively as UTC
+  if (normalized.endsWith('+00')) {
+     normalized = normalized.slice(0, -3) + '+00:00'; 
+  }
 
+  // Check if it's already a date-only string like "yyyy-mm-dd"
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(normalized);
   if (isDateOnly) {
-    normalized = `${normalized}T00:00:00Z`;
-  } else if (!hasTZ && isNaiveDateTime) {
-    // Append Z to mark as UTC
-    normalized = `${normalized.replace(' ', 'T')}Z`;
+    normalized = `${normalized}T00:00:00.000Z`;
+  } 
+  // If it doesn't clearly declare a timezone, append Z to make it strict UTC
+  else if (!normalized.includes('Z') && !/[+-]\d{2}:?\d{2}$/.test(normalized)) {
+    normalized += 'Z';
   }
 
   // Create date and validate BEFORE any operations
