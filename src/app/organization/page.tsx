@@ -103,7 +103,7 @@ export default function OrganizationPage() {
 
       // Set user role
       console.log("[ORG-PAGE] Setting role")
-      authStore.setRole("admin", 1)
+      authStore.setRole("owner", 1)
 
       // Set cookie via API route (server-side) to ensure middleware can read it
       console.log("[ORG-PAGE] Setting cookie via API...")

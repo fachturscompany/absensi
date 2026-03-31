@@ -9,6 +9,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import { Check, ChevronsUpDown } from "lucide-react"
 import { format, differenceInMinutes, parse, isValid, isAfter, isBefore } from "date-fns"
 import { Calendar as CalendarIcon, Clock, HelpCircle, Plus, Trash2, Coffee } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -52,7 +61,7 @@ export function AddTimeEntryDialog({
         startTime: "09:00",
         endTime: "17:00",
         notes: "",
-        source: "manual",
+        source: "web",
         activityPct: 100,
         billable: true,
         reason: "",
@@ -64,6 +73,7 @@ export function AddTimeEntryDialog({
     const [otherReason, setOtherReason] = useState("")
     const [isWorkBreak, setIsWorkBreak] = useState(false)
     const [breaks, setBreaks] = useState<Break[]>([])
+    const [memberPopoverOpen, setMemberPopoverOpen] = useState(false)
 
     const startTimeRef = useRef<HTMLInputElement>(null)
     const endTimeRef = useRef<HTMLInputElement>(null)
@@ -79,7 +89,7 @@ export function AddTimeEntryDialog({
                 startTime: "09:00",
                 endTime: "17:00",
                 notes: "",
-                source: "manual",
+                source: "web",
                 activityPct: 0,
                 billable: true,
                 reason: "",
@@ -220,26 +230,62 @@ export function AddTimeEntryDialog({
                     <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 space-y-2">
                             <div className="text-xs font-semibold text-muted-foreground">MEMBER</div>
-                            <Select
-                                value={formData.memberId}
-                                onValueChange={(v) => setFormData({ ...formData, memberId: v })}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select member" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {members.map(m => (
-                                        <SelectItem key={m.id} value={m.id}>
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-5 w-5">
-                                                    <AvatarFallback className="text-[10px]">{m.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                            <Popover open={memberPopoverOpen} onOpenChange={setMemberPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={memberPopoverOpen}
+                                        className="w-full justify-between font-normal text-sm dark:!bg-black dark:!border-white/10"
+                                    >
+                                        {formData.memberId ? (
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                <Avatar className="h-5 w-5 shrink-0">
+                                                    <AvatarFallback className="text-[10px]">
+                                                        {members.find(m => m.id === formData.memberId)?.name.substring(0, 2).toUpperCase()}
+                                                    </AvatarFallback>
                                                 </Avatar>
-                                                {m.name}
+                                                <span className="truncate">{members.find(m => m.id === formData.memberId)?.name}</span>
                                             </div>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                        ) : (
+                                            <span className="text-muted-foreground">Select member</span>
+                                        )}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="p-0 w-[--trigger-width] dark:bg-black dark:border-white/10" align="start">
+                                    <Command className="dark:bg-black">
+                                        <CommandInput placeholder="Search member..." className="h-9 border-none focus:ring-0 dark:bg-black" />
+                                        <CommandList className="max-h-[250px] overflow-y-auto">
+                                            <CommandEmpty>No member found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {members.map((m) => (
+                                                    <CommandItem
+                                                        key={m.id}
+                                                        value={m.name}
+                                                        onSelect={() => {
+                                                            setFormData({ ...formData, memberId: m.id })
+                                                            setMemberPopoverOpen(false)
+                                                        }}
+                                                        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-1 h-4 w-4 shrink-0",
+                                                                formData.memberId === m.id ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        <Avatar className="h-6 w-6 shrink-0">
+                                                            <AvatarFallback className="text-[10px]">{m.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="truncate flex-1">{m.name}</span>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         </div>
                         <div className="flex items-center gap-2 mt-8">
                             <Switch

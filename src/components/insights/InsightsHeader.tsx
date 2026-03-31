@@ -424,7 +424,7 @@ export function InsightsHeader({
         {!hideFilter && (
           <DropdownMenu open={filterDropdownOpen} onOpenChange={setFilterDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="px-4 py-2 border rounded-md text-sm min-w-[150px] w-full sm:w-auto text-left flex items-center justify-between">
+              <button className="px-4 py-2 border border-border !border-zinc-800 rounded-md text-sm min-w-[150px] w-full sm:w-auto text-left flex items-center justify-between !bg-transparent dark:!bg-black hover:!bg-muted/50 transition-colors shadow-none">
                 {filterLabel}
                 <ChevronDown className="w-4 h-4 opacity-50 ml-2" />
               </button>
@@ -455,7 +455,7 @@ export function InsightsHeader({
               {!hideAllOption && (
                 <div className="mb-2 pb-2 ">
                   <button
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm ${selectedFilter.all && selectedFilter.type === effectiveFilterTab ? "bg-gray-100 dark:bg-gray-800 text-black dark:text-white" : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm ${selectedFilter.all && selectedFilter.type === effectiveFilterTab ? "bg-muted text-black dark:text-white" : "hover:bg-muted/50 text-gray-700 dark:text-gray-300"}`}
                     onClick={() => handleFilterSelect({ type: effectiveFilterTab, all: true })}
                   >
                     <span className={`inline-block w-2 h-2 rounded-full border ${selectedFilter.all && selectedFilter.type === effectiveFilterTab ? "bg-black border-black" : "border-gray-400"}`} />
@@ -470,7 +470,7 @@ export function InsightsHeader({
                   return (
                     <button
                       key={it.id}
-                      className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm ${isActive ? "bg-gray-100 dark:bg-gray-800 text-black dark:text-white" : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm ${isActive ? "bg-muted text-black dark:text-white" : "hover:bg-muted/50 text-gray-700 dark:text-gray-300"}`}
                       onClick={() => handleFilterSelect({ type: effectiveFilterTab, all: false, id: it.id })}
                     >
                       <span className={`inline-block w-2 h-2 rounded-full border ${isActive ? "bg-black border-black" : "border-gray-400"}`} />
@@ -495,7 +495,7 @@ export function InsightsHeader({
         {/* Date range */}
         <DropdownMenu open={dateRangeOpen} onOpenChange={setDateRangeOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="px-4 py-2 w-full sm:w-auto justify-between sm:justify-start">
+            <button className="px-4 py-2 border rounded-md text-sm w-full sm:w-auto flex items-center justify-between sm:justify-start gap-4">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />

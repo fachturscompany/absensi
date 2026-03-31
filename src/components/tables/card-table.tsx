@@ -20,7 +20,7 @@ const CardTable = React.forwardRef<
     HTMLTableElement,
     React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-    <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm w-full">
+    <div className="bg-background dark:!bg-black border border-border !border-zinc-800 rounded-lg shadow-sm w-full">
         <div className="overflow-x-auto">
             <Table ref={ref} className={cn("w-full", className)} {...props} />
         </div>
@@ -32,7 +32,7 @@ const CardTableHeader = React.forwardRef<
     HTMLTableSectionElement,
     React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-    <TableHeader ref={ref} className={cn("bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800", className)} {...props} />
+    <TableHeader ref={ref} className={cn("bg-muted/50 border-b border-border dark:border-border", className)} {...props} />
 ))
 CardTableHeader.displayName = "CardTableHeader"
 
@@ -43,7 +43,7 @@ const CardTableRow = React.forwardRef<
     <TableRow
         ref={ref}
         className={cn(
-            "even:bg-gray-50 dark:even:bg-gray-900/50 hover:!bg-gray-200 dark:hover:!bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0 data-[state=selected]:bg-blue-50 dark:data-[state=selected]:bg-blue-900/20",
+            "hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors border-b border-border dark:border-border last:border-0 data-[state=selected]:bg-muted dark:data-[state=selected]:bg-muted",
             className
         )}
         {...props}
@@ -66,7 +66,14 @@ const CardTableHead = React.forwardRef<
 ))
 CardTableHead.displayName = "CardTableHead"
 
-const CardTableBody = TableBody
+const CardTableBody = React.forwardRef<
+    HTMLTableSectionElement,
+    React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+    <TableBody ref={ref} className={cn("[&>tr:nth-child(even)]:bg-transparent", className)} {...props} />
+))
+CardTableBody.displayName = "CardTableBody"
+
 const CardTableCell = React.forwardRef<
     HTMLTableCellElement,
     React.TdHTMLAttributes<HTMLTableCellElement>

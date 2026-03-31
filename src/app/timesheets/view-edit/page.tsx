@@ -5,24 +5,23 @@ import React, { useState, useMemo, useEffect, useCallback } from "react"
 import { format } from "date-fns"
 import type { SelectedFilter, DateRange } from "@/components/insights/types"
 import { Button } from "@/components/ui/button"
-import { Download, Search, Filter, ChevronDown, ChevronRight, Pencil, Plus, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Download, X } from "lucide-react"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { CardTable, CardTableHeader, CardTableBody, CardTableCell, CardTableHead, CardTableRow } from "@/components/tables/card-table"
-import Link from "next/link"
+
 import { toast } from "sonner"
 import { useTimezone } from "@/components/providers/timezone-provider"
 import { exportToCSV, generateFilename } from "@/lib/export-utils"
 import { TimesheetsFilterSidebar } from "@/components/timesheets/TimesheetsFilterSidebar"
-import { SearchableSelect } from "@/components/ui/searchable-select"
-import { DateRangePicker } from "@/components/insights/DateRangePicker"
-import { Checkbox } from "@/components/ui/checkbox"
+import { InsightsHeader } from "@/components/insights/InsightsHeader"
+
 import { EditTimeEntryDialog } from "@/components/timesheets/EditTimeEntryDialog"
 import { SplitTimeEntryDialog } from "@/components/timesheets/SplitTimeEntryDialog"
 import { DeleteTimeEntryDialog } from "@/components/timesheets/DeleteTimeEntryDialog"
 import { AddTimeEntryDialog } from "@/components/timesheets/AddTimeEntryDialog"
 import { QuickEditTimeDialog } from "@/components/timesheets/QuickEditTimeDialog"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TimesheetsToolbar } from "@/components/timesheets/TimesheetsToolbar"
+import { TimesheetsTable } from "@/components/timesheets/TimesheetsTable"
 import type { TimeEntry } from "@/lib/data/dummy-data"
 import {
     getTimeEntries,
@@ -88,6 +87,9 @@ export default function ViewEditTimesheetsPage() {
         status: "all",
     })
 
+    // Per-user view state for tabs
+    const [viewType, setViewType] = useState("members")
+
     // ── data state ───────────────────────────────────────────────────────────
     const [data, setData] = useState<TimeEntryRow[]>([])
     const [members, setMembers] = useState<TimesheetMember[]>([])
@@ -114,17 +116,18 @@ export default function ViewEditTimesheetsPage() {
     // ── load dropdown data once ───────────────────────────────────────────────
     useEffect(() => {
         async function loadDropdowns() {
+            if (!organizationId) return
             const [membersRes, projectsRes, tasksRes] = await Promise.all([
-                getTimesheetMembers(),
-                getTimesheetProjects(),
-                getTimesheetTasks(),
+                getTimesheetMembers(organizationId),
+                getTimesheetProjects(organizationId),
+                getTimesheetTasks(organizationId),
             ])
             if (membersRes.success) setMembers(membersRes.data)
             if (projectsRes.success) setProjects(projectsRes.data)
             if (tasksRes.success) setTasks(tasksRes.data)
         }
         loadDropdowns()
-    }, [])
+    }, [organizationId])
 
     // ── load entries (re-runs when date range changes) ────────────────────────
     const loadEntries = useCallback(async () => {
@@ -381,276 +384,55 @@ export default function ViewEditTimesheetsPage() {
     // ─── render ───────────────────────────────────────────────────────────────
     return (
         <div className="px-6 pb-6 space-y-3">
-            <h1 className="text-xl font-semibold">View &amp; Edit Timesheets</h1>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-3">
+                <h1 className="text-xl font-semibold text-left">View &amp; Edit Timesheets</h1>
+                
+                <Tabs value={viewType} onValueChange={setViewType} className="w-auto mx-auto sm:mx-0">
+                    <TabsList className="rounded-md h-10 p-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                        <TabsTrigger value="members" className="rounded-sm px-6 data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white">Members</TabsTrigger>
+                        <TabsTrigger value="week" className="rounded-sm px-6 data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white">Week</TabsTrigger>
+                        <TabsTrigger value="day" className="rounded-sm px-6 data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white">Day</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
 
-            <div className="w-full md:w-1/2 lg:w-1/3">
-                <DateRangePicker
-                    dateRange={dateRange}
-                    onDateRangeChange={setDateRange}
-                    timezone={timezone}
+            <InsightsHeader
+                selectedFilter={selectedFilter}
+                onSelectedFilterChange={setSelectedFilter}
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                members={members.map(m => ({ id: m.id, name: m.name }))}
+                teams={[]}
+                hideTeamsTab={true}
+                timezone={timezone}
+            >
+                <TimesheetsToolbar
+                    searchQuery={searchQuery}
+                    onSearchQueryChange={setSearchQuery}
+                    onFilterClick={() => setFilterSidebarOpen(true)}
+                    onAddTimeClick={() => setAddDialogOpen(true)}
                 />
-            </div>
-
-            <div className="w-full md:w-64 space-y-2">
-                <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        MEMBERS
-                    </label>
-                </div>
-                <SearchableSelect
-                    value={selectedFilter.id === "all" || !selectedFilter.id ? "" : selectedFilter.id}
-                    onValueChange={(val) =>
-                        setSelectedFilter({ type: "members", all: !val, id: val || "all" })
-                    }
-                    options={members.map(m => ({ value: m.id, label: m.name }))}
-                    placeholder="Select members"
-                    searchPlaceholder="Search members..."
-                    className="w-full bg-white dark:bg-gray-950 dark:border-gray-800"
-                />
-            </div>
-
-            {/* Toolbar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-2 pt-2">
-                <div className="flex items-center gap-2 w-full md:w-auto">
-                    <div className="flex w-full md:w-64">
-                        <div className="relative flex-grow">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <Input
-                                placeholder="Search..."
-                                className="pl-9 h-10 bg-white dark:bg-gray-950 w-full rounded-r-none border-r-0 focus-visible:ring-0 dark:border-gray-800"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="h-10 rounded-l-none border-l-0 px-3 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800 dark:hover:bg-gray-800"
-                            onClick={() => setFilterSidebarOpen(true)}
-                        >
-                            <Filter className="w-4 h-4 mr-2" />
-                            Filter
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        className="h-9 dark:border-gray-800 dark:hover:bg-gray-800"
-                        onClick={() => setAddDialogOpen(true)}
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Time
-                    </Button>
-                </div>
-            </div>
+            </InsightsHeader>
 
             {/* Table */}
-            <CardTable>
-                <CardTableHeader>
-                    <CardTableRow>
-                        {visibleCols.checkbox && (
-                            <CardTableHead className="w-10">
-                                <Checkbox
-                                    checked={paginatedData.length > 0 && selectedRows.size === paginatedData.length}
-                                    onCheckedChange={toggleAll}
-                                />
-                            </CardTableHead>
-                        )}
-                        {visibleCols.project && <CardTableHead>Project</CardTableHead>}
-                        {visibleCols.activity && <CardTableHead>Activity</CardTableHead>}
-                        {visibleCols.idle && <CardTableHead>Idle</CardTableHead>}
-                        {visibleCols.manual && <CardTableHead>Manual</CardTableHead>}
-                        {visibleCols.duration && <CardTableHead>Duration</CardTableHead>}
-                        {visibleCols.source && <CardTableHead>Source</CardTableHead>}
-                        {visibleCols.time && <CardTableHead>Time</CardTableHead>}
-                        {visibleCols.actions && <CardTableHead>Actions</CardTableHead>}
-                    </CardTableRow>
-                </CardTableHeader>
-                <CardTableBody>
-                    {isLoading ? (
-                        <CardTableRow>
-                            <CardTableCell colSpan={10} className="p-8 text-center text-gray-500">
-                                <div className="flex items-center justify-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />
-                                    Memuat data...
-                                </div>
-                            </CardTableCell>
-                        </CardTableRow>
-                    ) : loadError ? (
-                        <CardTableRow>
-                            <CardTableCell colSpan={10} className="p-6">
-                                <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4">
-                                    <p className="font-semibold text-red-700 dark:text-red-400 mb-1">⛔ Gagal memuat time entries</p>
-                                    <p className="text-sm text-red-600 dark:text-red-300 font-mono">{loadError}</p>
-                                    <button
-                                        onClick={loadEntries}
-                                        className="mt-3 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-red-700 text-red-700 dark:text-red-200 px-3 py-1 rounded"
-                                    >
-                                        Coba Lagi
-                                    </button>
-                                </div>
-                            </CardTableCell>
-                        </CardTableRow>
-                    ) : paginatedData.length === 0 ? (
-                        <CardTableRow>
-                            <CardTableCell colSpan={10} className="p-6">
-                                <div className="text-center text-gray-500 py-4">No time entries found.</div>
-                            </CardTableCell>
-                        </CardTableRow>
-                    ) : (
-                        paginatedData.map((row, index) => {
-                            const showHeader = index === 0 || row.date !== paginatedData[index - 1]?.date
-                            const isCollapsed = collapsedGroups.has(row.date)
-                            const groupRows = paginatedData.filter(r => r.date === row.date)
-                            const isGroupSelected = groupRows.length > 0 && groupRows.every(r => selectedRows.has(r.id))
-                            const isGroupIndeterminate = groupRows.some(r => selectedRows.has(r.id)) && !isGroupSelected
-                            const clientName = row.clientName || "No Client"
-
-                            return (
-                                <React.Fragment key={row.id}>
-                                    {showHeader && (
-                                        <tr
-                                            className="bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors dark:bg-gray-900/50 dark:border-gray-800 dark:hover:bg-gray-900"
-                                            onClick={() => toggleGroup(row.date)}
-                                        >
-                                            <td colSpan={10} className="p-3 font-semibold text-gray-900 dark:text-gray-100">
-                                                <div className="flex items-center gap-2">
-                                                    <div onClick={(e) => e.stopPropagation()}>
-                                                        <Checkbox
-                                                            checked={isGroupSelected || (isGroupIndeterminate ? "indeterminate" : false)}
-                                                            onCheckedChange={() => toggleGroupSelection(row.date, paginatedData)}
-                                                        />
-                                                    </div>
-                                                    {isCollapsed ? (
-                                                        <ChevronRight className="w-4 h-4 text-gray-500" />
-                                                    ) : (
-                                                        <ChevronDown className="w-4 h-4 text-gray-500" />
-                                                    )}
-                                                    {format(new Date(row.date), "EEE, dd MMM yyyy")}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {!isCollapsed && (
-                                        <CardTableRow data-state={selectedRows.has(row.id) ? "selected" : undefined}>
-                                            {visibleCols.checkbox && (
-                                                <CardTableCell>
-                                                    <Checkbox
-                                                        checked={selectedRows.has(row.id)}
-                                                        onCheckedChange={() => toggleRow(row.id)}
-                                                    />
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.project && (
-                                                <CardTableCell>
-                                                    <div className="flex items-start gap-3">
-                                                        <Link href={`/projects/${row.projectId}`}>
-                                                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 font-bold text-xs shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                                                                {getProjectInitial(row.projectName)}
-                                                            </div>
-                                                        </Link>
-                                                        <div className="flex flex-col">
-                                                            <Link
-                                                                href={`/projects/${row.projectId}`}
-                                                                className="font-bold text-gray-900 dark:text-gray-100 hover:text-blue-500 hover:underline cursor-pointer text-sm"
-                                                            >
-                                                                {row.projectName}
-                                                            </Link>
-                                                            <span className="text-[10px] uppercase text-gray-500 dark:text-gray-500 font-semibold tracking-wide">
-                                                                {clientName}
-                                                            </span>
-                                                            <Link
-                                                                href={`/projects/tasks/list?project=${encodeURIComponent(row.projectName)}&q=${encodeURIComponent(row.taskName || "")}`}
-                                                                className="text-xs font-medium text-gray-700 dark:text-gray-400 hover:text-blue-500 hover:underline cursor-pointer"
-                                                            >
-                                                                {row.taskName || "No to-do"}
-                                                            </Link>
-                                                        </div>
-                                                    </div>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.activity && (
-                                                <CardTableCell>
-                                                    <span className="text-gray-900 dark:text-gray-100">{row.activityPct}%</span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.idle && (
-                                                <CardTableCell>
-                                                    <span className="text-gray-900 dark:text-gray-100">{row.isIdle ? "100%" : "0%"}</span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.manual && (
-                                                <CardTableCell>
-                                                    <span className="text-gray-900 dark:text-gray-100">
-                                                        {row.source === "manual" ? "100%" : "0%"}
-                                                    </span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.duration && (
-                                                <CardTableCell>
-                                                    <span
-                                                        className="text-gray-900 dark:text-gray-100 hover:text-blue-500 hover:underline cursor-pointer"
-                                                        onClick={() => handleQuickEdit(row)}
-                                                    >
-                                                        {row.duration}
-                                                    </span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.source && (
-                                                <CardTableCell>
-                                                    <span className="text-gray-900 dark:text-gray-100">
-                                                        {row.source.charAt(0).toUpperCase() + row.source.slice(1)}
-                                                    </span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.time && (
-                                                <CardTableCell>
-                                                    <span
-                                                        className="text-gray-900 dark:text-gray-100 hover:text-blue-500 hover:underline cursor-pointer"
-                                                        onClick={() => handleQuickEdit(row)}
-                                                    >
-                                                        {row.startTime} - {row.endTime}
-                                                    </span>
-                                                </CardTableCell>
-                                            )}
-                                            {visibleCols.actions && (
-                                                <CardTableCell>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-8 w-8 p-0 dark:border-gray-800 dark:hover:bg-gray-800"
-                                                            >
-                                                                <Pencil className="h-3 w-3" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => handleEdit(row)}>
-                                                                Edit time entry
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleSplitTime(row)}>
-                                                                Split time entry
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleDeleteEntryClick(row)}
-                                                                className="text-red-600"
-                                                            >
-                                                                Delete this entry
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </CardTableCell>
-                                            )}
-                                        </CardTableRow>
-                                    )}
-                                </React.Fragment>
-                            )
-                        })
-                    )}
-                </CardTableBody>
-            </CardTable>
+            <TimesheetsTable
+                paginatedData={paginatedData}
+                isLoading={isLoading}
+                loadError={loadError}
+                loadEntries={loadEntries}
+                visibleCols={visibleCols}
+                selectedRows={selectedRows}
+                collapsedGroups={collapsedGroups}
+                toggleAll={toggleAll}
+                toggleRow={toggleRow}
+                toggleGroup={toggleGroup}
+                toggleGroupSelection={toggleGroupSelection}
+                handleQuickEdit={handleQuickEdit}
+                handleEdit={handleEdit}
+                handleSplitTime={handleSplitTime}
+                handleDeleteEntryClick={handleDeleteEntryClick}
+                getProjectInitial={getProjectInitial}
+            />
 
             <div className="mt-4">
                 <PaginationFooter
@@ -755,8 +537,8 @@ export default function ViewEditTimesheetsPage() {
 
             {/* Bulk action bar */}
             {selectedRows.size > 0 && (
-                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white border shadow-lg rounded-full px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-4 z-50 animate-in slide-in-from-bottom-5 max-w-[calc(100vw-2rem)] overflow-x-auto">
-                    <span className="text-sm font-medium text-gray-900 border-r pr-3 sm:pr-4 whitespace-nowrap">
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white dark:bg-black border dark:border-white/10 shadow-lg rounded-full px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-4 z-50 animate-in slide-in-from-bottom-5 max-w-[calc(100vw-2rem)] overflow-x-auto">
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100 border-r dark:border-white/10 pr-3 sm:pr-4 whitespace-nowrap">
                         {selectedRows.size} selected
                     </span>
                     <div className="flex items-center gap-2">

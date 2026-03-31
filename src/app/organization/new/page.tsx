@@ -171,12 +171,11 @@ export default function NewOrganizationPageFix() {
         }
       } else {
         const fallbackRoles = [
-          { id: "1", code: "A001", name: "Admin" },
-          { id: "2", code: "US001", name: "User" },
-          { id: "5", code: "SA001", name: "Super Admin" },
-          { id: "6", code: "SP001", name: "Support" },
-          { id: "7", code: "B001", name: "Billing" },
-          { id: "8", code: "P001", name: "Petugas" },
+          { id: "4", code: "owner", name: "Owner" },
+          { id: "3", code: "admin", name: "Admin" },
+          { id: "2", code: "user", name: "User" },
+          { id: "6", code: "member", name: "Member" },
+          { id: "1", code: "P001", name: "Petugas" },
         ];
         setFormData((prev) => ({
           ...prev,
@@ -187,12 +186,11 @@ export default function NewOrganizationPageFix() {
       console.error("[LOAD-DATA] Error loading initial data:", err);
       toast.error("Failed to load form data");
       const fallbackRoles = [
-        { id: "1", code: "A001", name: "Admin" },
-        { id: "2", code: "US001", name: "User" },
-        { id: "5", code: "SA001", name: "Super Admin" },
-        { id: "6", code: "SP001", name: "Support" },
-        { id: "7", code: "B001", name: "Billing" },
-        { id: "8", code: "P001", name: "Petugas" },
+        { id: "4", code: "owner", name: "Owner" },
+        { id: "3", code: "admin", name: "Admin" },
+        { id: "2", code: "user", name: "User" },
+        { id: "6", code: "member", name: "Member" },
+        { id: "1", code: "P001", name: "Petugas" },
       ];
       setFormData((prev) => ({
         ...prev,
@@ -314,7 +312,7 @@ export default function NewOrganizationPageFix() {
         city: formData.city,
         stateProvince: formData.stateProvince,
         postalCode: formData.postalCode,
-        defaultRoleId: formData.defaultRoleId || "A001",
+        defaultRoleId: formData.defaultRoleId || "owner",
       });
 
       if (!result.success) {
@@ -340,7 +338,7 @@ export default function NewOrganizationPageFix() {
 
         orgStore.setOrganizationId(result.data.organizationId, result.data.organizationName);
         orgStore.setTimezone(formData.timezone);
-        userStore.setRole(formData.defaultRoleId || "A001", result.data.organizationId);
+        userStore.setRole(formData.defaultRoleId || "owner", result.data.organizationId);
 
         toast.dismiss(toastId);
         toast.success(`Organization "${result.data.organizationName}" created successfully!`);

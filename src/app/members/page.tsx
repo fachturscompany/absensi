@@ -55,11 +55,13 @@ import { getOrgRoles } from "@/lib/rbac"
 import { useGroups } from "@/hooks/use-groups"
 import { usePositions } from "@/hooks/use-positions"
 import { useHydration } from "@/hooks/useHydration"
+import { useUserStore } from "@/store/user-store"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getAllInvitations } from "@/action/invitations"
 import { InvitationsTable } from "@/components/tables/invitations-table"
-
+import { JoinRequestsTab } from "@/components/members/JoinRequestsTab"
+import { getJoinRequests } from "@/action/join-organization"
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -150,6 +152,27 @@ const EXPORT_FIELDS: ExportFieldConfig[] = [
 export default function MembersPage() {
   // const router = useRouter()
   const { isHydrated, organizationId } = useHydration()
+  const { userOrganizations } = useUserStore()
+  
+  // Derivasi role spesifik untuk organisasi yang sedang dibuka
+  // Ini menangani kasus user dengan banyak organisasi (multi-org)
+  const currentOrg = React.useMemo(() => {
+    if (!isHydrated || !organizationId) return null
+    return userOrganizations?.find(
+        (org) => Number(org.organization_id) === Number(organizationId)
+    )
+  }, [isHydrated, organizationId, userOrganizations])
+
+  const roleCodes = React.useMemo(() => {
+    return currentOrg?.roles?.map((r: any) => r.code) || []
+  }, [currentOrg])
+
+  const isOwner = roleCodes.includes("owner")
+  const isAdmin = roleCodes.includes("admin") || isOwner
+  
+  // Debugging role issues:
+  console.log("[MEMBERS-PAGE] Org Lookup:", organizationId, "| Roles found:", roleCodes, "| isOwner:", isOwner);
+  
   const queryClient = useQueryClient()
   const [exporting, setExporting] = React.useState(false)
   const [inviteDialogOpen, setInviteDialogOpen] = React.useState(false)
@@ -204,6 +227,15 @@ export default function MembersPage() {
     queryFn: () => getAllInvitations(),
     enabled: isHydrated,
   })
+
+  // Fetch join requests count (owner only)
+  const { data: joinRequestsResult } = useQuery({
+    queryKey: ["join-requests", organizationId],
+    queryFn: () => getJoinRequests(Number(organizationId)),
+    enabled: isHydrated && isOwner,
+    refetchInterval: 30_000,
+  })
+  const pendingJoinCount = joinRequestsResult?.data?.length ?? 0
 
   // Filter members client-side untuk search di semua fields
   // Ini memastikan search bekerja untuk semua field termasuk joined fields (nama, department)
@@ -503,6 +535,19 @@ export default function MembersPage() {
             >
               INVITES ({invitationsResult?.data?.length || 0})
             </TabsTrigger>
+            {isOwner && (
+              <TabsTrigger
+                value="join-requests"
+                className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold"
+              >
+                JOIN REQUESTS
+                {pendingJoinCount > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {pendingJoinCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -791,6 +836,13 @@ export default function MembersPage() {
             />
           </div>
         </TabsContent>
+
+        {/* ── Tab: Join Requests (owner only) ── */}
+        {isOwner && (
+          <TabsContent value="join-requests" className="mt-6">
+            <JoinRequestsTab organizationId={organizationId} />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Global Dialogs */}
