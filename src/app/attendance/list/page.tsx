@@ -157,9 +157,16 @@ function AttendanceListPage() {
     }
   }
 
-  const updateQueryParams = useCallback((updates: Partial<QueryParams>) => {
-    setQueryParams(prev => ({ ...prev, ...updates, page: 1 }))
-  }, [])
+const updateQueryParams = useCallback((updates: Partial<QueryParams>) => {
+  setQueryParams(prev => {
+    const next = { ...prev, ...updates };
+    if (!updates.hasOwnProperty('page')) {
+      next.page = 1;
+    }
+    
+    return next;
+  });
+}, []);
 
   useEffect(() => {
     if (!orgId) return
@@ -414,14 +421,16 @@ function AttendanceListPage() {
           }}
         />
 
-        {!loading && data.total > queryParams.limit && (
-          <div className="mt-4">
+        {/* PAGINATION SECTION DIPERBARUI */}
+        {!loading && (
+          <div className="mt-4 border-t pt-4">
             <PaginationFooter
               page={queryParams.page}
-              totalPages={Math.ceil(data.total / queryParams.limit)}
-              onPageChange={(p) => updateQueryParams({ page: Math.max(1, p) })}
+              totalPages={Math.ceil(data.total / queryParams.limit) || 1}
+              onPageChange={(p) => updateQueryParams({ page: p })} // Tidak perlu manual Math.max lagi
               isLoading={isFetching}
-              from={(queryParams.page - 1) * queryParams.limit + 1}
+              // Agar tidak tampil "Showing 1-0 of 0" jika data kosong
+              from={data.total === 0 ? 0 : (queryParams.page - 1) * queryParams.limit + 1}
               to={Math.min(queryParams.page * queryParams.limit, data.total)}
               total={data.total}
               pageSize={queryParams.limit}

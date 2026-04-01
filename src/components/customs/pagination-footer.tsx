@@ -123,32 +123,34 @@ export type PaginationFooterProps = {
 
 // ALGORITMA DIPERBARUI: (< 1 ... 3 ... 7 >) (< 1 2 ... 7 >)(< 1 .. 6 7 >)
 function getPageNumbers(page: number, totalPages: number): (number | "...")[] {
-  const range: number[] = []
+  // SAFETY PATCH: Pastikan nilai page tidak keluar dari batas
+  const safePage = Math.max(1, Math.min(page, totalPages));
+  const range: number[] = [];
 
   for (let i = 1; i <= totalPages; i++) {
     if (
       i === 1 || // Selalu tampilkan halaman 1
       i === totalPages || // Selalu tampilkan halaman terakhir
-      i === page || // Tampilkan halaman saat ini
-      (page === 1 && i === 2) || // Jika sedang di halaman 1, tampilkan halaman 2
-      (page === totalPages && i === totalPages - 1) // Jika sedang di halaman terakhir, tampilkan halaman sebelumnya
+      i === safePage || // Tampilkan halaman saat ini
+      (safePage === 1 && i === 2) || // Jika sedang di halaman 1, tampilkan halaman 2
+      (safePage === totalPages && i === totalPages - 1) // Jika sedang di halaman terakhir, tampilkan halaman sebelumnya
     ) {
-      range.push(i)
+      range.push(i);
     }
   }
 
-  const rangeWithDots: (number | "...")[] = []
-  let prev: number | undefined
+  const rangeWithDots: (number | "...")[] = [];
+  let prev: number | undefined;
 
   for (const i of range) {
     if (prev !== undefined && i - prev > 1) {
-      rangeWithDots.push("...")
+      rangeWithDots.push("...");
     }
-    rangeWithDots.push(i)
-    prev = i
+    rangeWithDots.push(i);
+    prev = i;
   }
 
-  return rangeWithDots
+  return rangeWithDots;
 }
 
 export function PaginationFooter({
@@ -163,8 +165,13 @@ export function PaginationFooter({
   onPageSizeChange,
   pageSizeOptions = [10, 20, 50],
 }: PaginationFooterProps) {
-  const safeTotalPages = Math.max(1, totalPages || 1)
-  const pages = getPageNumbers(page, safeTotalPages)
+  // SAFETY PATCH: Jaga jika totalPages bernilai 0 atau negatif
+  const safeTotalPages = Math.max(1, totalPages || 1);
+  
+  // SAFETY PATCH: Paksa 'page' menjadi tipe Number yang valid, hindari string atau NaN
+  const safePage = Number(page) || 1; 
+  
+  const pages = getPageNumbers(safePage, safeTotalPages);
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4">
@@ -174,7 +181,7 @@ export function PaginationFooter({
       )}>
         <span>
           Showing{" "}
-          <span className="font-medium text-foreground">{from}–{to}</span>
+          <span className="font-medium text-foreground">{Math.max(0, from)}–{to}</span>
           {" "}of{" "}
           <span className="font-medium text-foreground">{total.toLocaleString()}</span>
           {" "}data
@@ -197,13 +204,13 @@ export function PaginationFooter({
         </div>
       </div>
 
-      {/* Kanan: page buttons — pakai primitives di atas */}
       <Pagination className="w-auto mx-0">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => onPageChange(page - 1)}
-              isDisabled={page <= 1 || isLoading}
+              // Pastikan tombol klik memanggil Math.max agar nilai tidak menjadi 0 atau minus
+              onClick={() => onPageChange(Math.max(1, safePage - 1))}
+              isDisabled={safePage <= 1 || isLoading}
             />
           </PaginationItem>
 
@@ -215,7 +222,7 @@ export function PaginationFooter({
             ) : (
               <PaginationItem key={p}>
                 <PaginationLink
-                  isActive={page === p}
+                  isActive={safePage === p}
                   isDisabled={isLoading}
                   onClick={() => onPageChange(p as number)}
                 >
@@ -227,8 +234,9 @@ export function PaginationFooter({
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => onPageChange(page + 1)}
-              isDisabled={page >= safeTotalPages || isLoading}
+              // Pastikan nilai tidak lebih dari batas maximum total pages
+              onClick={() => onPageChange(Math.min(safeTotalPages, safePage + 1))}
+              isDisabled={safePage >= safeTotalPages || isLoading}
             />
           </PaginationItem>
         </PaginationContent>
