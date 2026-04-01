@@ -28,7 +28,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_ENABLE_PWA: z.string().transform(val => val === 'true').optional(),
 
   // Optional: API Configuration
-  NEXT_PUBLIC_API_TIMEOUT: z.string().transform(Number).optional().default(30000),
+  NEXT_PUBLIC_API_TIMEOUT: z.string().transform(Number).optional().default("30000"),
   NEXT_PUBLIC_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error', 'silent']).optional(),
 });
 
