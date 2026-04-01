@@ -62,7 +62,6 @@ export default function InvitationAcceptPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<AcceptFormValues>({
     resolver: zodResolver(acceptSchema),
@@ -128,67 +127,67 @@ export default function InvitationAcceptPage() {
     }
   }
 
-  // Loading state
+  // Loading state (Monochrome, English)
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
-          <p className="text-gray-300 text-lg">Verifying invitation...</p>
+      <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-4">
+        <div className="flex flex-col items-center space-y-6">
+          <div className="p-5 bg-white rounded-full shadow-sm border border-black/5 animate-spin">
+            <Loader2 className="h-10 w-10 text-black" />
+          </div>
+          <p className="text-black font-normal uppercase tracking-[0.3em] text-xs">Verifying...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
+  // Error state (Monochrome, English)
   if (error || !invitation) {
     return (
-      <div className="min-h-screen bg-[#0F1115] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-2xl bg-[#1A1D23] border-red-500/20 backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div className="p-3 bg-red-500/10 rounded-full">
-                <AlertCircle className="h-8 w-8 text-red-500" />
+      <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-[0_30px_60px_rgba(0,0,0,0.08)] bg-white border border-black/10 overflow-hidden rounded-3xl">
+          <div className="absolute top-0 left-0 w-full h-2 bg-black" />
+          <CardHeader className="pb-4 pt-10 px-10 text-center">
+            <div className="flex flex-col items-center gap-5">
+              <div className="p-4 bg-black rounded-2xl">
+                <AlertCircle className="h-10 w-10 text-white" />
               </div>
-              <div>
-                <CardTitle className="text-xl font-bold text-white">Undangan Tidak Valid</CardTitle>
-                <CardDescription className="text-gray-400 mt-2">
-                  Maaf, sepertinya link undangan ini tidak dapat digunakan.
+              <div className="space-y-2">
+                <CardTitle className="text-2xl font-normal text-black uppercase">Invitation Failed</CardTitle>
+                <CardDescription className="text-black/50 font-normal">
+                  Sorry, this invitation link could not be processed.
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <Alert variant="destructive" className="bg-red-500/5 border-red-500/10 text-red-400">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {error || "Undangan tidak ditemukan"}
-              </AlertDescription>
-            </Alert>
-            <div className="bg-black/20 rounded-lg p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Penyebab Umum:
-              </p>
-              <ul className="text-sm text-gray-400 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gray-600" />
-                  Link sudah kadaluarsa (berlaku 7 hari)
+          <CardContent className="space-y-10 px-10 pb-10">
+            <div className="p-6 bg-black text-white rounded-2xl">
+              <div className="flex gap-4 items-start">
+                <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
+                <p className="text-sm font-normal leading-relaxed">
+                  {error || "Invitation not found or expired"}
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-[10px] font-normal uppercase tracking-widest text-black/30">Common Causes:</p>
+              <ul className="text-sm text-black space-y-4 font-normal">
+                <li className="flex items-start gap-4">
+                  <span className="h-1.5 w-1.5 rounded-full bg-black mt-2 shrink-0" />
+                  <span>The link may have expired or was already used.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gray-600" />
-                  Undangan sudah pernah diterima
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gray-600" />
-                  Undangan telah dibatalkan oleh admin
+                <li className="flex items-start gap-4">
+                  <span className="h-1.5 w-1.5 rounded-full bg-black/20 mt-2 shrink-0" />
+                  <span>Double-check your invitation URL link.</span>
                 </li>
               </ul>
             </div>
             <Button
-              className="w-full bg-white text-black hover:bg-gray-200 transition-colors font-semibold py-6"
+              className="w-full bg-black hover:bg-zinc-800 text-white font-normal py-8 rounded-2xl text-md uppercase tracking-[0.2em] transition-all"
               onClick={() => router.push("/")}
             >
-              Kembali ke Beranda
+              Back to Home
             </Button>
           </CardContent>
         </Card>
@@ -196,224 +195,189 @@ export default function InvitationAcceptPage() {
     );
   }
 
+  // Success state (Strict Monochrome, English)
   return (
-    <div className="min-h-screen bg-[#0F1115] flex items-center justify-center p-4 py-12 selection:bg-blue-500/30">
-      <div className="w-full max-w-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        {/* Invitation Details Card */}
-        <Card className="shadow-2xl bg-[#1A1D23] border-gray-800/50 backdrop-blur-sm overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600" />
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/10 rounded-lg">
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4 py-16 selection:bg-black selection:text-white">
+      <div className="w-full max-w-2xl space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-700">
+        {/* Invitation Info Card */}
+        <Card className="shadow-xl bg-white border border-slate-100 overflow-hidden rounded-2xl">
+          <CardHeader className="pb-4 pt-10 px-10">
+            <div className="flex items-center gap-5">
+              <div className="p-3 bg-black rounded-2xl">
+                <CheckCircle2 className="h-8 w-8 text-white" />
               </div>
-              <div>
-                <CardTitle className="text-2xl font-bold text-white tracking-tight">Bergabung ke Organisasi</CardTitle>
-                <CardDescription className="text-gray-400 text-sm">
-                  Lengkapi profil Anda untuk mulai berkolaborasi
+              <div className="space-y-1">
+                <CardTitle className="text-3xl font-normal text-black uppercase">Join Confirmation</CardTitle>
+                <CardDescription className="text-black/50 font-normal">
+                  You have been invited to join an organization
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Organization Info */}
-            <div className="group relative overflow-hidden flex items-center gap-4 p-5 bg-blue-500/5 hover:bg-blue-500/10 transition-colors rounded-xl border border-blue-500/10">
-              <div className="p-3 bg-blue-500/10 rounded-xl group-hover:scale-110 transition-transform">
-                <Building2 className="h-6 w-6 text-blue-400" />
+          <CardContent className="space-y-10 px-10 pb-10">
+            {/* Main Organization Highlight */}
+            <div className="flex items-center gap-6 p-8 bg-black/5 rounded-3xl border border-black/5 overflow-hidden">
+              <div className="p-0 overflow-hidden bg-black rounded-[1.5rem] shadow-xl w-20 h-20 flex items-center justify-center shrink-0">
+                {(invitation as any).organization?.logo_url ? (
+                  <img 
+                    src={(invitation as any).organization.logo_url} 
+                    alt="Logo" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Building2 className="h-8 w-8 text-white" />
+                )}
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-blue-400/60 transition-colors">Organisasi</p>
-                <p className="text-xl font-bold text-white mt-0.5">
-                  {(invitation as any).organization?.name || "Unknown Organization"}
+                <p className="text-[10px] font-normal uppercase tracking-[0.3em] text-black/40">Organization</p>
+                <p className="text-3xl font-normal text-black leading-tight mt-1">
+                  {(invitation as any).organization?.name || "Undefined"}
                 </p>
               </div>
             </div>
 
-            {/* Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1.5 p-4 bg-gray-800/40 rounded-xl border border-gray-700/30 hover:border-purple-500/30 transition-all group">
-                <Shield className="h-4 w-4 text-purple-400/70 group-hover:text-purple-400 transition-colors" />
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Peran</p>
-                <p className="text-sm font-semibold text-gray-200">{(invitation as any).role?.name || "Member"}</p>
-              </div>
-              
-              <div className="flex flex-col gap-1.5 p-4 bg-gray-800/40 rounded-xl border border-gray-700/30 hover:border-blue-500/30 transition-all group">
-                <Users className="h-4 w-4 text-blue-400/70 group-hover:text-blue-400 transition-colors" />
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Grup</p>
-                <p className="text-sm font-semibold text-gray-200">{(invitation as any).department?.name || "-"}</p>
-              </div>
-              
-              <div className="flex flex-col gap-1.5 p-4 bg-gray-800/40 rounded-xl border border-gray-700/30 hover:border-green-500/30 transition-all group">
-                <Briefcase className="h-4 w-4 text-green-400/70 group-hover:text-green-400 transition-colors" />
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Posisi</p>
-                <p className="text-sm font-semibold text-gray-200">{(invitation as any).position?.title || "-"}</p>
-              </div>
+            {/* Sub Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {[
+                { label: "Role", value: (invitation as any).role?.name || "Member", icon: Shield },
+                { label: "Department", value: (invitation as any).department?.name || "-", icon: Users },
+                { label: "Position", value: (invitation as any).position?.title || "-", icon: Briefcase },
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col gap-3 p-6 bg-white border border-black/10 rounded-2xl hover:border-black transition-all group">
+                  <item.icon className="h-5 w-5 text-black group-hover:scale-110 transition-transform" />
+                  <div>
+                    <p className="text-[10px] font-normal text-black/30 uppercase tracking-[0.25em]">{item.label}</p>
+                    <p className="text-md font-normal text-black h-6 leading-tight mt-1 truncate">{item.value}</p>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {invitation.message && (
-              <div className="relative p-5 bg-gray-800/20 border border-gray-800 rounded-xl italic">
-                <span className="absolute top-0 left-4 -translate-y-1/2 bg-[#1A1D23] px-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                  Pesan Personal
+              <div className="relative p-8 bg-zinc-50 border border-black/5 rounded-3xl">
+                <span className="absolute top-0 left-8 -translate-y-1/2 bg-black text-white px-4 py-1 rounded-full text-[9px] font-normal uppercase tracking-widest">
+                  Message
                 </span>
-                <p className="text-sm text-gray-300 leading-relaxed">"{invitation.message}"</p>
+                <p className="text-md text-black/70 leading-relaxed font-normal italic">"{invitation.message}"</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Accept Form Card */}
-        <Card className="shadow-2xl bg-[#1A1D23] border-gray-800/50 backdrop-blur-sm overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-white">Lengkapi Data Diri</CardTitle>
-            <CardDescription className="text-gray-400">
-              Data ini akan digunakan sebagai identitas akun Anda
+        {/* Profile Completion Card */}
+        <Card className="shadow-xl bg-white border border-slate-100 rounded-2xl overflow-hidden">
+          <CardHeader className="pt-10 px-10">
+            <CardTitle className="text-2xl font-normal text-black uppercase">Profile Details</CardTitle>
+            <CardDescription className="text-black/50 font-normal">
+              This information will be used to create your account
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-10 pb-10 pt-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {/* Email (Read-only) */}
-                <div>
-                  <FormLabel className="text-gray-200">Email Address</FormLabel>
-                  <Input
-                    value={invitation.email}
-                    disabled
-                    className="bg-gray-700/50 border-gray-600 text-gray-400"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">
-                    This will be your login email
-                  </p>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {/* Email Field (Static) */}
+                <div className="space-y-3">
+                  <FormLabel className="text-[11px] font-normal text-black uppercase tracking-[0.2em]">Email Address</FormLabel>
+                  <div className="p-5 bg-black/5 border border-black/10 rounded-2xl text-black font-normal text-lg select-none">
+                    {invitation.email}
+                  </div>
                 </div>
 
-                {/* First Name */}
-                <FormField
-                  control={form.control}
-                  name="first_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-200">First Name *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="John"
-                          {...field}
-                          disabled={submitting}
-                          className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* First Name */}
+                  <FormField
+                    control={form.control}
+                    name="first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-normal text-black uppercase tracking-[0.2em]">First Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John" {...field} className="h-16 bg-white border-black/20 focus:border-black focus:ring-0 transition-all rounded-2xl px-6 font-normal text-black text-md placeholder:text-black/10" />
+                        </FormControl>
+                        <FormMessage className="text-[10px] font-normal text-red-600 uppercase" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Last Name */}
+                  <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-normal text-black uppercase tracking-[0.2em]">Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} className="h-16 bg-white border-black/20 focus:border-black focus:ring-0 transition-all rounded-2xl px-6 font-normal text-black text-md placeholder:text-black/10" />
+                        </FormControl>
+                        <FormMessage className="text-[10px] font-normal text-red-600 uppercase" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                {/* Last Name */}
-                <FormField
-                  control={form.control}
-                  name="last_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-200">Last Name *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Doe"
-                          {...field}
-                          disabled={submitting}
-                          className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Password Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-normal text-black uppercase tracking-[0.2em]">Password</FormLabel>
+                        <FormControl>
+                          <div className="relative group">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="••••••••" 
+                              {...field} 
+                              className="h-16 bg-white border-black/20 focus:border-black focus:ring-0 transition-all rounded-2xl px-6 font-normal text-black text-md placeholder:text-black/10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-5 top-1/2 -translate-y-1/2 text-black/20 hover:text-black transition-colors"
+                            >
+                              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-[10px] font-normal text-red-600 uppercase" />
+                      </FormItem>
+                    )}
+                  />
 
-                {/* Password */}
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-200">Password *</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            {...field}
-                            disabled={submitting}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20 pr-10"
+                  <FormField
+                    control={form.control}
+                    name="confirm_password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-normal text-black uppercase tracking-[0.2em]">Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••••" 
+                            {...field} 
+                            className="h-16 bg-white border-black/20 focus:border-black focus:ring-0 transition-all rounded-2xl px-6 font-normal text-black text-md placeholder:text-black/10"
                           />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-gray-400 hover:text-white"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <p className="text-xs text-gray-400">
-                        Must be at least 8 characters
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        </FormControl>
+                        <FormMessage className="text-[10px] font-normal text-red-600 uppercase" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                {/* Confirm Password */}
-                <FormField
-                  control={form.control}
-                  name="confirm_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-200">Confirm Password *</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            {...field}
-                            disabled={submitting}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20 pr-10"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-gray-400 hover:text-white"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Submit Button */}
+                {/* Monochrome Submit Button (No Bold) */}
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 shadow-xl shadow-blue-900/20 transition-all rounded-xl"
+                  className="w-full h-20 bg-black hover:bg-zinc-800 text-white font-normal shadow-2xl transition-all rounded-3xl mt-10 text-lg uppercase tracking-[0.3em]"
                   size="lg"
                   disabled={submitting}
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Memproses...
+                      <Loader2 className="mr-4 h-6 w-6 animate-spin" />
+                      Processing...
                     </>
                   ) : (
-                    "Terima Undangan & Buat Akun"
+                    "Join Now"
                   )}
                 </Button>
               </form>

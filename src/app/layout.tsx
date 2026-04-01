@@ -20,37 +20,18 @@ import {
   getCachedOrganizationName
 } from "@/lib/data-cache";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google"; // Using Inter instead of Geist
 import { InstallPrompt } from "@/components/common/install-prompt";
 import { OfflineDetector } from "@/components/common/offline-detector";
 import { GlobalTitleManager } from "@/components/common/global-title-manager";
 import { AuthErrorHandler } from "@/components/auth/auth-error-handler";
 import { PWACleanup } from "@/components/common/pwa-cleanup";
 
-
-const geistSans = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
-  fallback: ["system-ui", "arial"],
+  variable: "--font-inter",
   display: "swap",
 });
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
-  fallback: [
-    "ui-monospace",
-    "SFMono-Regular",
-    "Monaco",
-    "Consolas",
-    "Liberation Mono",
-    "Courier New",
-    "monospace",
-  ],
-  display: "swap",
-});
-
-
 
 // Base metadata will be generated dynamically
 export async function generateMetadata(): Promise<Metadata> {
@@ -153,7 +134,7 @@ export default async function RootLayout({
     : "Absensi"
 
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning className={inter.variable}>
       <head>
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
@@ -163,7 +144,7 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content={dynamicShortTitle} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+      <body className="antialiased font-sans" suppressHydrationWarning>
         <PWACleanup />
         <GlobalTitleManager />
         <InstallPrompt />

@@ -254,14 +254,15 @@ export async function createInvitation(data: CreateInvitationData) {
 export async function getInvitationByToken(token: string) {
   try {
     const supabase = await createClient();
+    const adminClient = createAdminClient();
 
-    const { data: invitation, error } = await supabase
+    const { data: invitation, error: dbError } = await adminClient
       .from("member_invitations")
       .select(
         `
         *,
-        organization:organizations(*),
-        role:system_roles(*),
+        organization:organization_id(*),
+        role:role_id(*),
         department:department_id(id, code, name),
         position:position_id(id, code, title)
       `
@@ -269,12 +270,22 @@ export async function getInvitationByToken(token: string) {
       .eq("invitation_token", token)
       .maybeSingle();
 
-    if (error) {
-      return { success: false, message: error.message, data: null };
+    if (dbError) {
+      console.error("[Invitation] Database error fetching invitation:", dbError);
+      return { 
+        success: false, 
+        message: `Database error: ${dbError.message}`, 
+        data: null 
+      };
     }
 
     if (!invitation) {
-      return { success: false, message: "Invitation not found", data: null };
+      console.warn(`[Invitation] No invitation found for token: ${token}`);
+      return { 
+        success: false, 
+        message: "Kode undangan tidak ditemukan di sistem kami. Pastikan link sudah benar.", 
+        data: null 
+      };
     }
 
     // Check if expired
