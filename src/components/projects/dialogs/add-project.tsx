@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Trash2, Loader2 } from "lucide-react"
-import type { NewProjectForm, MemberLimit, IClient, ITeams, ISimpleMember } from "@/interface"
+import type { NewProjectForm, MemberLimit, ITeams, ISimpleMember } from "@/interface"
 
 type AddProjectDialogProps = {
     open: boolean
@@ -20,12 +20,11 @@ type AddProjectDialogProps = {
     onFormChange: React.Dispatch<React.SetStateAction<NewProjectForm>>
     onSave: () => void
     members?: ISimpleMember[]
-    clients?: IClient[]
     teams?: ITeams[]
 }
 
 export default function AddProjectDialog(props: AddProjectDialogProps) {
-    const { open, onOpenChange, form, onFormChange, onSave, members = [], clients = [], teams = [] } = props
+    const { open, onOpenChange, form, onFormChange, onSave, members = [], teams = [] } = props
 
     // ── Track if dialog has been opened at least once (lazy init) ─────────────
     const hasOpened = useRef(false)
@@ -99,33 +98,6 @@ export default function AddProjectDialog(props: AddProjectDialogProps) {
                                     <span className="text-sm">Disable idle time</span>
                                     <Switch checked={form.disableIdle} onCheckedChange={(v) => onFormChange(s => ({ ...s, disableIdle: v }))} />
                                 </label>
-                            </div>
-
-                            {/* ── Client dropdown ────────────────────────────── */}
-                            <div className="space-y-2">
-                                <div className="text-sm font-medium">CLIENT</div>
-                                {clients.length === 0 ? (
-                                    <p className="text-xs text-muted-foreground py-2">
-                                        No clients available. Add a client first.
-                                    </p>
-                                ) : (
-                                    <Select
-                                        value={form.clientId ?? "none"}
-                                        onValueChange={(v) => onFormChange(s => ({ ...s, clientId: v === "none" ? null : v }))}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a client" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">— No client —</SelectItem>
-                                            {clients.map((client) => (
-                                                <SelectItem key={client.id} value={String(client.id)}>
-                                                    {client.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
                             </div>
                         </TabsContent>
 

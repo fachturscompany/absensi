@@ -39,11 +39,6 @@ export function TaskRow({
 }: TaskRowProps) {
     const hasChildren = task.children.length > 0
     const isExpanded = expandedTasks.has(task.id)
-    const clientData = task.project?.client
-    const clientName = Array.isArray(clientData)
-        ? clientData[0]?.name
-        : (clientData as any)?.name
-
     const handleEditClick = () => {
         setEditingTask(task)
         setEditedTitle(task.name)
@@ -101,13 +96,7 @@ export function TaskRow({
                 </div>
             </TableCell>
 
-            <TableCell className="min-w-[150px]">
-                <span className="text-sm line-clamp-2 break-words">{task.project?.name}</span>
-            </TableCell>
 
-            <TableCell className="min-w-[150px]">
-                <span className="text-sm line-clamp-2 break-words">{clientName}</span>
-            </TableCell>
 
             <TableCell className="text-sm">
                 {task.created_at && new Date(task.created_at).toLocaleDateString()}

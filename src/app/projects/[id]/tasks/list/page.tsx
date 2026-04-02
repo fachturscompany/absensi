@@ -71,7 +71,6 @@ export default function ListPage() {
     // ── Filtered tasks ─────────────────────────────────────────────────────────
     const filteredTasks = useMemo(() => {
         return tasks.filter((task: ITask) => {
-            if (task.project_id !== Number(projectId)) return false
 
             const isDone = task.task_status?.code === "done"
             if (activeTab === "active" && isDone) return false

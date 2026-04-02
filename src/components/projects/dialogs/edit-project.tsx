@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Trash2, Search } from "lucide-react"
-import type { NewProjectForm, Project, IClient, ITeams, ISimpleMember, IGroup } from "@/interface"
+import type { NewProjectForm, Project, ITeams, ISimpleMember, IGroup } from "@/interface"
 
 const emptyForm: NewProjectForm = {
     names: "",
@@ -19,7 +19,6 @@ const emptyForm: NewProjectForm = {
     disableActivity: false,
     allowTracking: true,
     disableIdle: false,
-    clientId: null,
     members: [],
     teams: [],
     budgetType: "",
@@ -45,13 +44,12 @@ type EditProjectDialogProps = {
     onSave: (form: NewProjectForm) => void
     initialTab?: "general" | "members" | "budget" | "teams"
     members?: ISimpleMember[]
-    clients?: IClient[]
     teams?: ITeams[]
     groups?: IGroup[]
 }
 
 export default function EditProjectDialog(props: EditProjectDialogProps) {
-    const { open, onOpenChange, project, onSave, initialTab, members = [], clients = [], teams = [], groups = [] } = props
+    const { open, onOpenChange, project, onSave, initialTab, members = [], teams = [], groups = [] } = props
     const [form, setForm] = useState<NewProjectForm>(emptyForm)
     const [tab, setTab] = useState<"general" | "members" | "budget" | "teams">("general")
     const [memberSearch, setMemberSearch] = useState("")
@@ -59,12 +57,9 @@ export default function EditProjectDialog(props: EditProjectDialogProps) {
 
     useEffect(() => {
         if (project) {
-            const matchedClient = clients.find(c => c.name === project.clientName)
-            const clientId = matchedClient ? String(matchedClient.id) : null
             setForm(s => ({
                 ...s,
                 names: project.name,
-                clientId,
                 members: project.members?.map(m => m.id) || [],
                 teams: project.teams?.map(t => {
                     const matched = teams.find(team => team.name === t)
@@ -74,7 +69,7 @@ export default function EditProjectDialog(props: EditProjectDialogProps) {
         } else {
             setForm(emptyForm)
         }
-    }, [project, clients, teams])
+    }, [project, teams])
 
     useEffect(() => {
         if (open) {
@@ -152,25 +147,6 @@ export default function EditProjectDialog(props: EditProjectDialogProps) {
                                 <span className="text-sm">Disable idle time</span>
                                 <Switch checked={form.disableIdle} onCheckedChange={(v) => setForm(s => ({ ...s, disableIdle: v }))} />
                             </label>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="text-sm font-medium">CLIENT</div>
-                            {clients.length === 0 ? (
-                                <p className="text-xs text-muted-foreground py-2">No clients available.</p>
-                            ) : (
-                                <Select
-                                    value={form.clientId ?? "none"}
-                                    onValueChange={(v) => setForm(s => ({ ...s, clientId: v === "none" ? null : v }))}
-                                >
-                                    <SelectTrigger className="w-full"><SelectValue placeholder="Select a client" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="none">— No client —</SelectItem>
-                                        {clients.map((client) => (
-                                            <SelectItem key={client.id} value={String(client.id)}>{client.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
                         </div>
                     </TabsContent>
 

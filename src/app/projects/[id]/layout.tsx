@@ -39,9 +39,6 @@ export default function ProjectLayout({
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-bold tracking-tight">{project?.name || "Project Details"}</h1>
-                        {project?.clientName && (
-                            <p className="text-sm text-muted-foreground">Client: {project.clientName}</p>
-                        )}
                     </div>
                 </div>
             </div>

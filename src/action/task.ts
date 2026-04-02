@@ -28,7 +28,6 @@ export const getTasks = async (organizationId?: string | number) => {
         .from("tasks")
         .select(`
             *,
-            project:projects(id, name, client:clients!projects_client_id_fkey(id, name)),
             assignees:task_assignees(
                 id,
                 organization_member_id,
@@ -96,7 +95,6 @@ export const createTask = async (formData: FormData) => {
 
     const task: Record<string, any> = {
         name: formData.get("name") as string,
-        project_id: Number(formData.get("project_id")),
         organization_id: organizationId,
         priority: (formData.get("priority") as string) || "medium",
         position_in_column: Number(formData.get("position_in_column") || 1),
@@ -132,7 +130,6 @@ export const updateTask = async (formData: FormData) => {
     if (formData.has("status_id")) task.status_id = Number(formData.get("status_id"));
     if (formData.has("position_in_column")) task.position_in_column = Number(formData.get("position_in_column"));
     if (formData.has("priority")) task.priority = formData.get("priority") as string;
-    if (formData.has("project_id")) task.project_id = Number(formData.get("project_id"));
     if (formData.has("description")) task.description = formData.get("description") as string;
 
     const { data, error } = await supabase

@@ -47,17 +47,14 @@ export default function ClientsPage() {
                 address: c.address || "",
                 phone: c.phone || "",
                 emails: c.email ? [c.email] : [],
-                projectCount: c.project_count,
-                taskCount: c.task_count,
                 budgetType: c.budget_type || "",
                 budgetAmount: c.budget_amount || 0,
                 notifyPercentage: c.notify_percentage || 80,
                 invoiceNotes: c.invoice_notes || "",
                 netTermsDays: c.net_terms_days || 30,
                 autoInvoiceFrequency: c.auto_invoice_frequency || "",
-                projectIds: c.projects?.map(p => p.id.toString()) || [],
                 createdAt: c.created_at
-            }))
+            })) 
             setClients(mappedClients)
         } else {
             toast.error(response.message || "Failed to fetch clients")
@@ -105,9 +102,6 @@ export default function ClientsPage() {
         fd.append("net_terms_days", formData.invoiceNetTerms || "30")
         fd.append("auto_invoice_frequency", formData.autoInvoicing === 'custom' ? formData.aiFrequency : "")
 
-        const projectIds = formData.projects.map(id => parseInt(id))
-        fd.append("project_ids", JSON.stringify(projectIds))
-
         const response = await createClientAction(fd)
         if (response.success) {
             toast.success("Client added successfully")
@@ -138,9 +132,6 @@ export default function ClientsPage() {
         fd.append("invoice_notes", formData.invoiceNotes)
         fd.append("net_terms_days", formData.invoiceNetTerms || "30")
         fd.append("auto_invoice_frequency", formData.autoInvoicing === 'custom' ? formData.aiFrequency : "")
-
-        const projectIds = formData.projects.map(id => parseInt(id))
-        fd.append("project_ids", JSON.stringify(projectIds))
 
         const response = await updateClientAction(fd)
         if (response.success) {
@@ -335,7 +326,6 @@ export default function ClientsPage() {
                             phone: editingClient.phone || "",
                             phoneCountry: "id",
                             emails: editingClient.emails?.join(", ") || "",
-                            projects: editingClient.projectIds || [],
                             teams: [],
                             budgetType: editingClient.budgetType || "",
                             budgetBasedOn: editingClient.budgetType?.includes('hours') ? 'hours' : 'cost',
@@ -356,7 +346,7 @@ export default function ClientsPage() {
                             aiFrequency: editingClient.autoInvoiceFrequency || "monthly",
                             aiDelaySending: "0",
                             aiSendReminder: "0",
-                            aiLineItems: "user-project-date",
+                            aiLineItems: "user-date",
                             aiIncludeNonBillable: false,
                             aiIncludeExpenses: false
                         }

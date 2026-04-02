@@ -35,9 +35,8 @@ export async function GET(request: Request) {
         .from("projects")
         .select(`
       *,
-      clients (id, name),
+      organizations (id, name),
       tasks (id),
-      client_projects (clients:name),
       team_projects (team_id)
     `, {
             count: 'exact',
@@ -63,9 +62,7 @@ export async function GET(request: Request) {
     // SAME POST-PROCESSING seperti action/projects.ts
     const processedData = data?.map((p: any) => ({
         ...p,
-        client_count: p.clients?.length || p.client_projects?.length || 0,
-        task_count: p.tasks?.length || 0,
-        clientName: p.clients?.[0]?.name || p.client_projects?.[0]?.clients?.name || null
+        task_count: p.tasks?.length || 0
     })) || [];
 
     return Response.json({

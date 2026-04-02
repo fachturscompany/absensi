@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -11,8 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { DUMMY_TEAMS } from "@/lib/data/dummy-data"
-import { IProject } from "@/interface"
-import { getAllProjects } from "@/action/projects"
 
 interface AddClientDialogProps {
     open: boolean
@@ -27,7 +25,6 @@ export interface ClientFormData {
     phone: string
     phoneCountry: string
     emails: string
-    projects: string[]
     teams: string[]
     budgetType: string
     budgetBasedOn: string
@@ -59,7 +56,6 @@ const defaultForm: ClientFormData = {
     phone: "",
     phoneCountry: "id",
     emails: "",
-    projects: [],
     teams: [],
     budgetType: "",
     budgetBasedOn: "",
@@ -87,18 +83,6 @@ const defaultForm: ClientFormData = {
 
 export function AddClientDialog({ open, onOpenChange, onSave, initialData }: AddClientDialogProps) {
     const [formData, setFormData] = useState<ClientFormData>(initialData || defaultForm)
-    const [allProjects, setAllProjects] = useState<IProject[]>([])
-
-    useEffect(() => {
-        if (!open) return
-        const fetchProjects = async () => {
-            const response = await getAllProjects()  // ✅ fix: pakai getAllProjects
-            if (response.success) {
-                setAllProjects(response.data)
-            }
-        }
-        fetchProjects()
-    }, [open])
 
     const handleSave = () => {
         if (!formData.name.trim()) {
@@ -126,7 +110,6 @@ export function AddClientDialog({ open, onOpenChange, onSave, initialData }: Add
                     <TabsList className="grid w-full grid-cols-6 mb-4">
                         <TabsTrigger value="general">GENERAL</TabsTrigger>
                         <TabsTrigger value="contact">INFO</TabsTrigger>
-                        <TabsTrigger value="projects">PROJECTS</TabsTrigger>
                         <TabsTrigger value="teams">TEAMS</TabsTrigger>
                         <TabsTrigger value="budget">BUDGET</TabsTrigger>
                         <TabsTrigger value="invoicing">INVOICING</TabsTrigger>
@@ -164,39 +147,7 @@ export function AddClientDialog({ open, onOpenChange, onSave, initialData }: Add
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="projects" className="space-y-6 pt-5">
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <div className="text-xs font-semibold text-muted-foreground">PROJECTS / WORK ORDERS</div>
-                                <Button variant="link" className="h-auto p-0 text-gray-900 hover:cursor-pointer" onClick={() => setFormData({ ...formData, projects: allProjects.map(p => p.id.toString()) })}>
-                                    Select all
-                                </Button>
-                            </div>
-                        </div>
-                        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                            <div className="space-y-4">
-                                {allProjects.length === 0 ? (
-                                    <div className="text-sm text-muted-foreground text-center py-4">No projects found</div>
-                                ) : allProjects.map((project) => (
-                                    <div key={project.id} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={project.id.toString()}
-                                            checked={formData.projects.includes(project.id.toString())}
-                                            onCheckedChange={(checked) => {
-                                                const newProjects = checked
-                                                    ? [...formData.projects, project.id.toString()]
-                                                    : formData.projects.filter(p => p !== project.id.toString())
-                                                setFormData({ ...formData, projects: newProjects })
-                                            }}
-                                        />
-                                        <label htmlFor={project.id.toString()} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                            {project.name}
-                                        </label>
-                                    </div>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </TabsContent>
+
 
                     <TabsContent value="teams" className="space-y-6 pt-5">
                         <div className="space-y-2">
@@ -399,12 +350,10 @@ export function AddClientDialog({ open, onOpenChange, onSave, initialData }: Add
                                     </div>
 
                                     <div className="space-y-3">
-                                        <label className="text-xs font-semibold text-muted-foreground uppercase">Line items</label>
                                         <Select value={formData.aiLineItems} onValueChange={(v) => setFormData({ ...formData, aiLineItems: v })}>
                                             <SelectTrigger><SelectValue placeholder="Select line items" /></SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="user-project-date">By user, project, and date</SelectItem>
-                                                <SelectItem value="project">By project</SelectItem>
+                                                <SelectItem value="user-date">By user and date</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

@@ -72,7 +72,6 @@ export default function TimelinePage() {
 
     const filteredTasks = useMemo(() => {
         return tasks.filter(t => {
-            if (t.project_id !== Number(projectId)) return false
             const isDone = t.task_status?.code === "done"
             if (activeTab === "active" && isDone) return false
             if (activeTab === "completed" && !isDone) return false
@@ -194,7 +193,6 @@ export default function TimelinePage() {
                                 ) : <span className="w-3.5 h-3.5 shrink-0 block" />}
                                 <div className="flex-1 min-w-0">
                                     <div className={`text-sm truncate ${hasChildren ? "font-semibold" : "font-medium"}`}>{node.name}</div>
-                                    {node.project?.name && <div className="text-[10px] text-muted-foreground truncate">{node.project.name}</div>}
                                 </div>
                                 {assignees.length > 0 && (
                                     <div className="flex -space-x-1 shrink-0 ml-1">
@@ -227,7 +225,7 @@ export default function TimelinePage() {
                 {days.map(dayHeader)}
                 {rows.length > 0 && renderTodayLine(D_OFF, rows.length)}
                 {isLoading ? loadingRow : rows.length === 0 ? emptyRow : rows.map((row, rowIndex) => {
-                    const { task, isFirst, isLast, parentName, memberId } = row
+                    const { task, isFirst, isLast, memberId } = row
                     const bb = isLast ? "border-b" : ""
                     const barStart = task.created_at ? startOfDay(new Date(task.created_at)) : null
                     const barEnd = (task as any).due_date ? startOfDay(new Date((task as any).due_date)) : null
@@ -243,9 +241,7 @@ export default function TimelinePage() {
                                 </div>
                             )}
                             <div className={`sticky left-[180px] z-30 bg-white dark:bg-background border-r px-3 py-2 flex flex-col justify-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] ${bb}`} style={{ gridRow: rowIndex + 2, gridColumn: T_COL }}>
-                                {parentName && <div className="text-[10px] text-muted-foreground truncate mb-0.5">{parentName} <span className="text-muted-foreground/50">›</span></div>}
                                 <span className="text-xs font-medium truncate">{task.name}</span>
-                                {task.project?.name && <span className="text-[10px] text-muted-foreground truncate">{task.project.name}</span>}
                             </div>
                             {days.map((d, ci) => (
                                 <div key={d.toISOString()} className={`border-r ${bb} ${d.getTime() === startOfDay(new Date()).getTime() ? "bg-blue-50/20" : ""} hover:bg-muted/20 transition-colors`} style={{ gridRow: rowIndex + 2, gridColumn: ci + D_OFF }} />

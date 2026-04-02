@@ -257,7 +257,6 @@ export interface IProject {
     organizations?: { id: number; name: string };
     team_projects?: IProjectTeamProject[];
     tasks?: { count: number }[];
-    client_projects?: IProjectClientProject[];
 }
 
 export interface IProjectMember {
@@ -268,7 +267,6 @@ export interface IProjectMember {
 }
 
 export interface IProjectWithMembers extends IProject {
-    clientName: string | null;
     members: IProjectMember[];
 }
 
@@ -312,7 +310,6 @@ export interface NewProjectForm {
     disableActivity: boolean;
     allowTracking: boolean;
     disableIdle: boolean;
-    clientId: string | null;
     members: string[];
     teams: string[];
     budgetType: string;
@@ -341,7 +338,6 @@ export interface ProjectMember {
 export interface Project {
     id: string;
     name: string;
-    clientName: string | null;
     teams: string[];
     members: ProjectMember[];
     taskCount: number;
@@ -358,7 +354,6 @@ export interface DuplicateProjectOptions {
     keepAllMembers: boolean;
     keepBudget: boolean;
     keepMemberLimits: boolean;
-    keepSameClient: boolean;
 }
 
 // ─── Organization Member ──────────────────────────────────────────────────────
@@ -691,7 +686,6 @@ export interface ITaskStatus {
 
 export interface ITask {
     id: number;
-    project_id: number;
     parent_task_id?: number | null;
     status_id: number;
     position_in_column: number;
@@ -705,11 +699,6 @@ export interface ITask {
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;
-    project?: {
-        id: number;
-        name: string;
-        client?: Array<{ id: number; name: string }> | { id: number; name: string } | null;
-    };
     assignees?: ITaskAssignee[];
     task_status?: ITaskStatus;
 }
@@ -747,7 +736,6 @@ export interface IClient {
     deleted_at?: string | null;
     project_count?: number;
     task_count?: number;
-    projects?: IProject[];
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────

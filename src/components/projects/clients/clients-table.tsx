@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 import { Avatar, AvatarFallback } from "@/components/profile&image/avatar"
 import { ClientActionsDropdown } from "./client-action-dropdown"
 import {
@@ -21,16 +20,12 @@ export interface Client {
     address?: string
     phone?: string
     emails?: string[]
-    projectCount?: number
-    taskCount?: number
-    // New fields for mapping back to form
     budgetType?: string
     budgetAmount?: number
     notifyPercentage?: number
     invoiceNotes?: string
     netTermsDays?: number
     autoInvoiceFrequency?: string
-    projectIds?: string[]
     createdAt?: string
 }
 
@@ -69,8 +64,6 @@ export function ClientsTable({
                         />
                     </TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Projects</TableHead>
-                    <TableHead>Tasks</TableHead>
                     <TableHead>Auto Invoicing</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -92,8 +85,6 @@ export function ClientsTable({
                             .join("")
                             .toUpperCase()
                             .slice(0, 2)
-                        const projectCount = client.projectCount || 0
-                        const taskCount = client.taskCount || 0
 
                         return (
                             <TableRow key={client.id}>
@@ -115,22 +106,6 @@ export function ClientsTable({
                                             <span className="font-medium text-sm block truncate">{client.name}</span>
                                         </div>
                                     </div>
-                                </TableCell>
-                                <TableCell className="text-muted-foreground">
-                                    <Link
-                                        href={`/projects?client=${encodeURIComponent(client.name)}`}
-                                        className="hover:underline hover:text-primary transition-colors"
-                                    >
-                                        {projectCount} project{projectCount !== 1 ? "s" : ""}
-                                    </Link>
-                                </TableCell>
-                                <TableCell className="text-muted-foreground">
-                                    <Link
-                                        href={`/projects/tasks/list?client=${encodeURIComponent(client.name)}`}
-                                        className="hover:underline hover:text-primary transition-colors"
-                                    >
-                                        {taskCount} task{taskCount !== 1 ? "s" : ""}
-                                    </Link>
                                 </TableCell>
                                 <TableCell className="text-muted-foreground">
                                     {client.autoInvoicing ? "On" : "Off"}

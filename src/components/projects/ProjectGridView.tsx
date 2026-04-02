@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -41,9 +41,7 @@ export default function ProjectGridView({ projects, selectedIds, onToggleSelect 
                                         </Badge>
                                     )}
                                 </div>
-                                <CardDescription className="line-clamp-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                                    {project.clientName || "No client"}
-                                </CardDescription>
+
                             </CardHeader>
                             <CardContent className="flex-1 flex flex-col pt-0">
                                 <div className="text-muted-foreground mb-5 text-[11px] font-semibold tracking-tight line-clamp-2">

@@ -7,7 +7,6 @@ export type Member = {
 export type Project = {
   id: string
   name: string
-  clientName?: string | null
   teams: string[]
   members: Member[]
   taskCount: number
@@ -31,7 +30,6 @@ export type NewProjectForm = {
   disableActivity: boolean
   allowTracking: boolean
   disableIdle: boolean
-  clientId: string | null
   members: string[]
   teams: string[]
   // Budget fields
@@ -60,7 +58,6 @@ export interface DuplicateProjectOptions {
   keepAllMembers: boolean
   keepBudget: boolean
   keepMemberLimits: boolean
-  keepSameClient: boolean
 }
 
 export interface DuplicateProjectPayload extends DuplicateProjectOptions {

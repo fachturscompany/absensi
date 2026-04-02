@@ -337,11 +337,10 @@ export default function TasksLayout({
     }, [])
 
     // ── Derived tab counts ─────────────────────────────────────────────────────
-    const projectTasks = tasks.filter(t => t.project_id === Number(projectId))
     const tabCounts: TabCounts = {
-        all: projectTasks.length,
-        active: projectTasks.filter(t => t.task_status?.code !== "done").length,
-        completed: projectTasks.filter(t => t.task_status?.code === "done").length,
+        all: 0,
+        active: 0,
+        completed: 0,
     }
 
     // ── handleCreateTask — setelah create, server sync (id tidak diketahui) ────
@@ -352,7 +351,6 @@ export default function TasksLayout({
     ) => {
         const fd = new FormData()
         fd.append("name", title)
-        fd.append("project_id", projectId)
         if (statusId) fd.append("status_id", statusId.toString())
 
         const res = await createTask(fd)

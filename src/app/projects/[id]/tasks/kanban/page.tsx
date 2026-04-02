@@ -14,7 +14,6 @@ export default function KanbanPage() {
 
     const filteredTasks = useMemo(() => {
         return tasks.filter(task => {
-            if (task.project_id !== Number(projectId)) return false
             const isDone = task.task_status?.code === "done"
             if (activeTab === "active" && isDone) return false
             if (activeTab === "completed" && !isDone) return false

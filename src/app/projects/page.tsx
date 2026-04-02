@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useRef } from "react"
 import Link from "next/link"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -25,11 +25,10 @@ import {
     getAllProjects, createProject, updateProject, deleteProject,
     archiveProject, unarchiveProject, getSimpleMembersForDropdown,
 } from "@/action/projects"
-import { getClients } from "@/action/client"
 import { getTeams } from "@/action/teams"
 import { useOrgStore } from "@/store/org-store"
 import type {
-    IClient, ITeams, IProject, ISimpleMember,
+    ITeams, IProject, ISimpleMember,
     IProjectTeamProject, IProjectTeamMember,
     Project, NewProjectForm,
 } from "@/interface"
@@ -57,12 +56,11 @@ function mapProjectData(p: IProject): Project {
         ?.map((tp: IProjectTeamProject) => tp.teams?.name)
         .filter((n): n is string => Boolean(n)) ?? []
 
-    const clientName = p.client_projects?.[0]?.clients?.name ?? null
+
 
     return {
         id: String(p.id),
         name: p.name,
-        clientName,
         teams: tNames,
         members: Array.from(memberMap.values()),
         taskCount: p.tasks?.[0]?.count ?? 0,
@@ -79,9 +77,7 @@ function mapProjectData(p: IProject): Project {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProjectsPage() {
-    const searchParams = useSearchParams()
     const router = useRouter()
-    const urlClientName = searchParams.get("client")
 
     const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
     const [viewMode, setViewMode] = useState<"list" | "grid">("list")
@@ -93,7 +89,6 @@ export default function ProjectsPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [realMembers, setRealMembers] = useState<ISimpleMember[]>([])
-    const [clients, setClients] = useState<IClient[]>([])
     const [teams, setTeams] = useState<ITeams[]>([])
 
     const { organizationId } = useOrgStore()
@@ -124,13 +119,11 @@ export default function ProjectsPage() {
         if (dropdownsFetched.current) return
         dropdownsFetched.current = true
 
-        const [membersRes, clientsRes, teamsRes] = await Promise.all([
+        const [membersRes, teamsRes] = await Promise.all([
             getSimpleMembersForDropdown(organizationId),
-            getClients(String(organizationId)),
             getTeams(Number(organizationId)),
         ])
         if (membersRes.success) setRealMembers(membersRes.data)
-        if (clientsRes.success) setClients(clientsRes.data)
         if (teamsRes.success) setTeams(teamsRes.data)
     }, [organizationId])
 
@@ -173,7 +166,6 @@ export default function ProjectsPage() {
         disableActivity: false,
         allowTracking: true,
         disableIdle: false,
-        clientId: null,
         members: [],
         teams: [],
         budgetType: "",
@@ -197,9 +189,8 @@ export default function ProjectsPage() {
         let result = data.filter(p => activeTab === "active" ? !p.archived : p.archived)
         const q = search.trim().toLowerCase()
         if (q) result = result.filter(p => p.name.toLowerCase().includes(q))
-        if (urlClientName) result = result.filter(p => p.clientName?.toLowerCase() === urlClientName.toLowerCase())
         return result
-    }, [activeTab, data, search, urlClientName])
+    }, [activeTab, data, search])
 
     const paginated = useMemo(() => {
         const start = (currentPage - 1) * pageSize
@@ -300,7 +291,6 @@ export default function ProjectsPage() {
                                             <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="rounded border-gray-300" />
                                         </TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>Client</TableHead>
                                         <TableHead>Teams</TableHead>
                                         <TableHead>Members</TableHead>
                                         <TableHead>Tasks</TableHead>
@@ -323,11 +313,6 @@ export default function ProjectsPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <Link href={`/projects/${p.id}/tasks/list`} className="font-medium text-sm hover:underline block truncate">{p.name}</Link>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {p.clientName
-                                                    ? <Link href={`/projects/clients?q=${encodeURIComponent(p.clientName)}`} className="hover:underline hover:text-foreground transition-colors" onClick={e => e.stopPropagation()}>{p.clientName}</Link>
-                                                    : "—"}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">{p.teams.length === 0 ? "None" : p.teams.join(", ")}</TableCell>
                                             <TableCell><span className="text-sm text-muted-foreground">{p.members.length} members</span></TableCell>
@@ -399,16 +384,15 @@ export default function ProjectsPage() {
                     <AddProjectDialog
                         open={addOpen} onOpenChange={setAddOpen}
                         form={form} onFormChange={setForm}
-                        members={realMembers} clients={clients} teams={teams}
+                        members={realMembers} teams={teams}
                         onSave={async () => {
                             const names = form.names.split("\n").map(n => n.trim()).filter(Boolean)
-                            const clientName = clients.find(c => String(c.id) === form.clientId)?.name ?? null
                             for (const name of names) {
                                 await createProject({
                                     name,
                                     is_billable: form.billable,
                                     teams: form.teams.map(t => parseInt(t.replace(/\D/g, ""))).filter(t => !isNaN(t)),
-                                    metadata: { ...form, names: undefined, teams: undefined, clientName }
+                                    metadata: { ...form, names: undefined, teams: undefined }
                                 }, organizationId ?? undefined)
                             }
                             await fetchProjects()
@@ -421,7 +405,7 @@ export default function ProjectsPage() {
                     <EditProjectDialog
                         open={Boolean(editing)} onOpenChange={(o: boolean) => { if (!o) setEditing(null) }}
                         project={editing} initialTab={editTab}
-                        members={realMembers} clients={clients} teams={teams}
+                        members={realMembers} teams={teams}
                         onSave={async (updatedForm) => {
                             if (editing) {
                                 await updateProject(Number(editing.id), {
@@ -432,8 +416,7 @@ export default function ProjectsPage() {
                                     metadata: {
                                         ...updatedForm,
                                         names: undefined,
-                                        teams: undefined,
-                                        clientName: clients.find(c => String(c.id) === updatedForm.clientId)?.name ?? null
+                                        teams: undefined
                                     }
                                 })
                                 await fetchProjects()

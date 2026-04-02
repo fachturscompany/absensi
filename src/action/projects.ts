@@ -7,7 +7,6 @@ import type {
     IProject,
     IProjectTeamProject,
     IProjectTeamMember,
-    IProjectClientProject,
     IProjectWithMembers,
     IProjectMember,
     ISimpleMember,
@@ -35,8 +34,7 @@ export const getAllProjects = async (organizationId?: number | string) => {
             *,
             organizations(id, name),
             team_projects(team_id, teams(id, name)),
-            tasks(count),
-            client_projects(client_id, clients(id, name))
+            tasks(count)
         `)
         .eq("organization_id", finalOrgId)
         .neq("lifecycle_status", "deleted")
@@ -152,8 +150,7 @@ export const getProjectWithMembers = async (
         .from("projects")
         .select(`
             *,
-            organizations(id, name),
-            client_projects(client_id, clients(id, name))
+            organizations(id, name)
         `)
         .eq("id", id)
         .single();
@@ -168,10 +165,9 @@ export const getProjectWithMembers = async (
         .eq("project_id", id);
 
     const teamIds = (tpData ?? []).map((tp: { team_id: number }) => tp.team_id);
-    const clientName = (project.client_projects as IProjectClientProject[] | null)?.[0]?.clients?.name ?? null;
 
     if (teamIds.length === 0) {
-        return { success: true, data: { ...project, clientName, members: [] } };
+        return { success: true, data: { ...project, members: [] } };
     }
 
     const { data: teamMembers, error: tmError } = await adminClient
@@ -216,7 +212,7 @@ export const getProjectWithMembers = async (
 
     return {
         success: true,
-        data: { ...project, clientName, members: Array.from(memberMap.values()) }
+        data: { ...project, members: Array.from(memberMap.values()) }
     };
 };
 

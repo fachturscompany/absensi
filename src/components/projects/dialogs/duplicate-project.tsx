@@ -25,7 +25,6 @@ export default function DuplicateProjectDialog({ open, projectName, onOpenChange
     const [keepAllMembers, setKeepAllMembers] = useState(false)
     const [keepBudget, setKeepBudget] = useState(false)
     const [keepMemberLimits, setKeepMemberLimits] = useState(false)
-    const [keepSameClient, setKeepSameClient] = useState(false)
 
     useEffect(() => {
         if (open) {
@@ -36,7 +35,6 @@ export default function DuplicateProjectDialog({ open, projectName, onOpenChange
             setKeepAllMembers(false)
             setKeepBudget(false)
             setKeepMemberLimits(false)
-            setKeepSameClient(false)
         }
     }, [open, defaultName])
 
@@ -50,7 +48,6 @@ export default function DuplicateProjectDialog({ open, projectName, onOpenChange
             keepAllMembers,
             keepBudget,
             keepMemberLimits,
-            keepSameClient,
         })
     }
 
@@ -97,10 +94,6 @@ export default function DuplicateProjectDialog({ open, projectName, onOpenChange
                         <label className="flex items-center gap-3 py-1">
                             <Checkbox checked={keepMemberLimits} onCheckedChange={(v) => setKeepMemberLimits(Boolean(v))} />
                             <span>Members limits</span>
-                        </label>
-                        <label className="flex items-center gap-3 py-1">
-                            <Checkbox checked={keepSameClient} onCheckedChange={(v) => setKeepSameClient(Boolean(v))} />
-                            <span>Belongs to same client</span>
                         </label>
                     </div>
                 </div>

@@ -54,11 +54,7 @@ export const getClients = async (organizationId?: string | number) => {
     const { data, error } = await supabase
         .from("clients")
         .select(`
-            *,
-            client_projects(
-                project_id,
-                projects:projects(id, name, tasks(id))
-            )
+            *
         `)
         .eq("organization_id", targetOrgId)
         .order("name", { ascending: true });
@@ -69,15 +65,10 @@ export const getClients = async (organizationId?: string | number) => {
     }
 
     const mapped = (data as ClientRow[]).map((client) => {
-        const projects = client.client_projects?.map(cp => cp.projects).filter(Boolean) ?? []
-        const task_count = projects.reduce(
-            (acc, proj) => acc + (proj?.tasks?.length ?? 0), 0
-        )
         return {
             ...client,
-            client_projects: undefined,
-            project_count: projects.length,
-            task_count,
+            project_count: 0,
+            task_count: 0,
         } as unknown as IClient
     })
 
