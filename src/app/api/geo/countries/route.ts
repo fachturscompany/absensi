@@ -10,7 +10,6 @@ let cachedCountries: CountryOption[] | null = null;
 interface GeonamesCountryEntry {
   countryCode: string;
   countryName: string;
-  phone: string;
 }
 
 interface GeonamesCountryResponse {
@@ -38,7 +37,6 @@ async function fetchAllCountries(): Promise<CountryOption[]> {
     .map((c) => ({
       value: c.countryCode,
       label: c.countryName,
-      phone: c.phone,
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }

@@ -23,5 +23,4 @@ export interface GeoCountry {
 export interface CountryOption {
   value: string;  // e.g. "ID"
   label: string;  // e.g. "Indonesia"
-  phone?: string; // e.g. "62"
 }
