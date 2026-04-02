@@ -58,9 +58,17 @@ import {
 import type { IOrganization_member, IUser } from "@/interface"
 import { cn } from "@/lib/utils"
 // Server Actions
-import { getOrganizationMembersById } from "@/action/members"
+import { getOrganizationMembersById, updateMemberInfo } from "@/action/members"
 import { PageSkeleton } from "@/components/ui/loading-skeleton"
 import { toast } from "sonner"
+import manifest from "@/lib/data/geo/manifest.json"
+
+const COUNTRIES = manifest.countries.map(c => ({
+  code: `+${c.phone_code}`,
+  flag: `https://flagcdn.com/w20/${c.code.toLowerCase()}.png`,
+  name: c.name,
+  countryCode: c.code
+}))
 
 type TabType = "info" | "employment" | "roles" | "pay" | "worktime" | "settings"
 
@@ -222,23 +230,6 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
   const [isSaving, setIsSaving] = useState(false)
   const [member, setMember] = useState<IOrganization_member | null>(null)
   const [loading, setLoading] = useState(true)
-  const [allCountries, setAllCountries] = useState<ICountry[]>([])
-  const [phoneSearch, setPhoneSearch] = useState("")
-
-  // Fetch Countries
-  useEffect(() => {
-    fetch("/api/geo/countries")
-      .then(res => res.json())
-      .then((data: CountryOption[]) => {
-        const mapped = data.map(c => ({
-          code: c.value,
-          name: c.label,
-          phone: c.phone || ""
-        }))
-        setAllCountries(mapped)
-      })
-      .catch(err => console.error("Failed to fetch countries", err))
-  }, [])
 
   // Fetch Data
   useEffect(() => {
@@ -248,7 +239,27 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
         console.log("Member fetch result:", { id, success: memberRes.success, hasData: !!memberRes.data });
 
         if (memberRes && memberRes.success && memberRes.data) {
-          setMember(memberRes.data as unknown as IOrganization_member)
+          const data = memberRes.data as unknown as IOrganization_member
+          setMember(data)
+          
+          // Initialize form data
+          const user = data.user
+          const dob = user?.date_of_birth ? new Date(user.date_of_birth) : null
+          
+          setFormData({
+            employee_id: data.employee_id || "",
+            work_location: data.work_location || "",
+            hire_date: data.hire_date || "",
+            first_name: user?.first_name || "",
+            last_name: user?.last_name || "",
+            display_name: user?.display_name || "",
+            phone: user?.phone || "",
+            mobile: user?.mobile || "",
+            date_of_birth: user?.date_of_birth || "",
+            birth_day: dob ? String(dob.getDate()) : "",
+            birth_month: dob ? String(dob.getMonth() + 1) : "",
+            birth_year: dob ? String(dob.getFullYear()) : ""
+          })
         } else {
           console.log("Member not found or fetch failed:", memberRes.message);
           toast.error(`Fetch failed for ID ${id}: ${memberRes.message || 'Unknown error'}`);
@@ -261,6 +272,26 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
     }
     fetchData()
   }, [id])
+
+  // Geo Detection
+  useEffect(() => {
+    const detectGeo = async () => {
+      // Only detect if both phones are currently default/empty
+      if (formData.phone || formData.mobile) return
+
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        if (data.country_calling_code) {
+          const code = data.country_calling_code
+          setFormData(prev => ({ ...prev, phone_code: code, mobile_code: code }))
+        }
+      } catch (e) {
+        console.warn("Geo detection failed", e);
+      }
+    }
+    detectGeo()
+  }, [])
 
 
   if (loading) {
@@ -297,8 +328,38 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
 
 
   const handleSave = async () => {
+    if (!member || !member.user_id) return
+    
     setIsSaving(true)
-    setTimeout(() => setIsSaving(false), 1000)
+    try {
+      // Reconstruct date_of_birth from birth selects if changed
+      let finalDob = formData.date_of_birth
+      if (formData.birth_day && formData.birth_month && formData.birth_year) {
+        finalDob = `${formData.birth_year}-${formData.birth_month.padStart(2, '0')}-${formData.birth_day.padStart(2, '0')}`
+      }
+
+      const res = await updateMemberInfo(id, member.user_id, {
+        employee_id: formData.employee_id,
+        work_location: formData.work_location,
+        hire_date: formData.hire_date,
+        phone: formData.phone,
+        mobile: formData.mobile,
+        date_of_birth: finalDob
+      })
+
+      if (res.success) {
+        toast.success("Member information updated successfully")
+        // Update member state locally or re-fetch
+        router.refresh()
+      } else {
+        toast.error(res.message || "Failed to update member")
+      }
+    } catch (error) {
+      console.error("Save error:", error)
+      toast.error("An unexpected error occurred while saving")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const tabs = [
@@ -339,7 +400,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button className="bg-black hover:bg-zinc-800 text-white h-10 px-6 rounded-md transition-colors shadow-sm" onClick={handleSave} disabled={isSaving}>
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white h-10 px-6 rounded-md transition-colors shadow-sm" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
@@ -394,7 +455,15 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <FormField label="EMPLOYEE ID" placeholder="No employee ID" />
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">EMPLOYEE ID</Label>
+                  <Input 
+                    placeholder="No employee ID" 
+                    className="h-11 border-slate-200" 
+                    value={formData.employee_id}
+                    onChange={(e) => setFormData(prev => ({ ...prev, employee_id: e.target.value }))}
+                  />
+                </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-1">
                     <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">IP ADDRESS</Label>
@@ -415,34 +484,44 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">BIRTHDAY</Label>
                   <div className="flex gap-3">
-                    <Select>
+                    <Select
+                      value={formData.birth_month}
+                      onValueChange={(val) => setFormData(prev => ({ ...prev, birth_month: val }))}
+                    >
                       <SelectTrigger className="w-full h-11 border-slate-200">
                         <SelectValue placeholder="Select a month" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">January</SelectItem>
-                        <SelectItem value="2">February</SelectItem>
-                        {/* ... other months */}
+                        {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, i) => (
+                          <SelectItem key={month} value={String(i + 1)}>{month}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    <Select>
+                    <Select
+                      value={formData.birth_day}
+                      onValueChange={(val) => setFormData(prev => ({ ...prev, birth_day: val }))}
+                    >
                       <SelectTrigger className="w-full h-11 border-slate-200">
                         <SelectValue placeholder="Select a day" />
                       </SelectTrigger>
                       <SelectContent>
                         {Array.from({ length: 31 }, (_, i) => (
-                          <SelectItem key={i + 1} value={(i + 1).toString()}>{i + 1}</SelectItem>
+                          <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <Select>
+                    <Select
+                      value={formData.birth_year}
+                      onValueChange={(val) => setFormData(prev => ({ ...prev, birth_year: val }))}
+                    >
                       <SelectTrigger className="w-full h-11 border-slate-200">
                         <SelectValue placeholder="Select a year" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from({ length: 100 }, (_, i) => (
-                          <SelectItem key={2026 - i} value={(2026 - i).toString()}>{2026 - i}</SelectItem>
-                        ))}
+                        {Array.from({ length: 100 }, (_, i) => {
+                          const year = new Date().getFullYear() - i
+                          return <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -460,24 +539,29 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <Input defaultValue="Wed, Apr 1, 2026" disabled className="bg-slate-50 border-slate-200 text-slate-500" />
+                  <Input 
+                    className="h-11 border-slate-200" 
+                    type="date"
+                    value={formData.hire_date ? formData.hire_date.split('T')[0] : ""} 
+                    onChange={(e) => setFormData(prev => ({ ...prev, hire_date: e.target.value }))}
+                  />
                 </div>
               </div>
 
               {/* Hubstaff People BETA Banner */}
-              <div className="relative p-6 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden mt-8">
+              <div className="relative p-6 bg-blue-50/30 border border-blue-100 rounded-xl overflow-hidden mt-8">
                 <div className="flex items-start gap-4">
-                  <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-50">
+                  <div className="p-2 bg-white rounded-lg shadow-sm border border-blue-50">
                     <div className="flex items-center scale-75 origin-left">
-                      <span className="font-bold italic tracking-tighter text-black">7</span>
-                      <span className="font-bold tracking-tighter italic text-black">Hubstaff</span>
+                      <span className="font-bold italic tracking-tighter text-blue-600">7</span>
+                      <span className="font-bold tracking-tighter italic text-blue-600">Hubstaff</span>
                       <span className="ml-1 font-bold text-slate-800">People</span>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-semibold text-slate-800">Hubstaff People</p>
-                      <Badge className="bg-slate-100 text-slate-600 border-none text-[8px] font-bold h-4">BETA</Badge>
+                      <Badge className="bg-blue-100 text-blue-600 border-none text-[8px] font-bold h-4">BETA</Badge>
                     </div>
                     <p className="text-xs text-slate-600">Try these new features for free while Hubstaff People is in BETA</p>
                     <ul className="text-xs text-slate-500 list-disc list-inside space-y-1 pt-2">
@@ -493,7 +577,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
             <div className="space-y-6 pt-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <h2 className="text-lg font-medium text-slate-800">Contact</h2>
-                <button className="text-sm text-primary font-medium hover:underline">Edit work address</button>
+                <button className="text-sm text-slate-900 font-medium hover:underline">Edit work address</button>
               </div>
 
               <div className="grid gap-12 md:grid-cols-2">
@@ -503,7 +587,12 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                       <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">WORK ADDRESS</Label>
                       <Info className="h-3 w-3 text-muted-foreground" />
                     </div>
-                    <Input placeholder="No address" className="h-11 border-slate-200 bg-slate-50" />
+                    <Input 
+                      placeholder="No address" 
+                      className="h-11 border-slate-200 bg-slate-50" 
+                      value={formData.work_location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, work_location: e.target.value }))}
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -517,49 +606,11 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">WORK PHONE</Label>
                     <div className="flex items-center gap-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <div className="flex items-center gap-2 h-11 px-3 border border-slate-200 rounded-md bg-white hover:bg-slate-50 cursor-pointer transition-all active:scale-[0.98]">
-                            <img
-                              src={`https://flagcdn.com/w20/${(allCountries.find(c => `+${c.phone}` === "+1")?.code || "us").toLowerCase()}.png`}
-                              alt="Flag"
-                              className="h-3 w-5 object-cover"
-                            />
-                            <ChevronDown className="h-3 w-3 text-slate-400" />
-                            <span className="text-sm">+1</span>
-                          </div>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-[280px] p-0 shadow-xl border-slate-200">
-                          <div className="p-2 border-b bg-slate-50/50 sticky top-0 z-10">
-                            <div className="relative">
-                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-                              <Input
-                                placeholder="Search country or code..."
-                                className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-200"
-                                value={phoneSearch}
-                                onChange={(e) => setPhoneSearch(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          <div className="max-h-[300px] overflow-y-auto py-1 custom-scrollbar">
-                            {allCountries
-                              .filter(c =>
-                                c.name.toLowerCase().includes(phoneSearch.toLowerCase()) ||
-                                c.phone.includes(phoneSearch)
-                              )
-                              .map((c) => (
-                                <DropdownMenuItem
-                                  key={c.code}
-                                  className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-slate-50 focus:bg-slate-50"
-                                >
-                                  <img src={`https://flagcdn.com/w20/${c.code.toLowerCase()}.png`} alt={c.name} className="h-3 w-5" />
-                                  <span className="flex-1 text-sm text-slate-700">{c.name}</span>
-                                  <span className="text-xs text-slate-400 font-medium">+{c.phone}</span>
-                                </DropdownMenuItem>
-                              ))}
-                          </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center gap-2 h-11 px-3 border border-slate-200 rounded-md bg-white">
+                        <img src="https://flagcdn.com/w20/us.png" alt="US" className="h-3 w-5" />
+                        <ChevronDown className="h-3 w-3 text-slate-400" />
+                        <span className="text-sm">+1</span>
+                      </div>
                       <Input placeholder="201-555-0123" className="h-11 border-slate-200" />
                     </div>
                   </div>
@@ -580,54 +631,19 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                     <Input placeholder="Search for an address" className="h-11 border-slate-200" />
                   </div>
 
-                  <FormField label="PERSONAL EMAIL" placeholder="name@example.com" />
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">PERSONAL EMAIL</Label>
+                    <Input placeholder="name@example.com" className="h-11 border-slate-200" />
+                  </div>
 
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">PERSONAL PHONE</Label>
                     <div className="flex items-center gap-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <div className="flex items-center gap-2 h-11 px-3 border border-slate-200 rounded-md bg-white hover:bg-slate-50 cursor-pointer transition-all active:scale-[0.98]">
-                            <img
-                              src={`https://flagcdn.com/w20/${(allCountries.find(c => `+${c.phone}` === "+1")?.code || "us").toLowerCase()}.png`}
-                              alt="Flag"
-                              className="h-3 w-5 object-cover"
-                            />
-                            <ChevronDown className="h-3 w-3 text-slate-400" />
-                            <span className="text-sm">+1</span>
-                          </div>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-[280px] p-0 shadow-xl border-slate-200">
-                          <div className="p-2 border-b bg-slate-50/50 sticky top-0 z-10">
-                            <div className="relative">
-                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-                              <Input
-                                placeholder="Search country or code..."
-                                className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-200"
-                                value={phoneSearch}
-                                onChange={(e) => setPhoneSearch(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          <div className="max-h-[300px] overflow-y-auto py-1 custom-scrollbar">
-                            {allCountries
-                              .filter(c =>
-                                c.name.toLowerCase().includes(phoneSearch.toLowerCase()) ||
-                                c.phone.includes(phoneSearch)
-                              )
-                              .map((c) => (
-                                <DropdownMenuItem
-                                  key={c.code}
-                                  className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-slate-50 focus:bg-slate-50"
-                                >
-                                  <img src={`https://flagcdn.com/w20/${c.code.toLowerCase()}.png`} alt={c.name} className="h-3 w-5" />
-                                  <span className="flex-1 text-sm text-slate-700">{c.name}</span>
-                                  <span className="text-xs text-slate-400 font-medium">+{c.phone}</span>
-                                </DropdownMenuItem>
-                              ))}
-                          </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center gap-2 h-11 px-3 border border-slate-200 rounded-md bg-white">
+                        <img src="https://flagcdn.com/w20/us.png" alt="US" className="h-3 w-5" />
+                        <ChevronDown className="h-3 w-3 text-slate-400" />
+                        <span className="text-sm">+1</span>
+                      </div>
                       <Input placeholder="201-555-0123" className="h-11 border-slate-200" />
                     </div>
                   </div>
@@ -639,7 +655,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                   <span className="text-sm font-medium text-slate-700">Custom fields</span>
                   <Info className="h-3 w-3 text-slate-400" />
                 </div>
-                <button className="text-sm text-primary font-medium hover:underline">Manage custom fields</button>
+                <button className="text-sm text-slate-900 font-medium hover:underline">Manage custom fields</button>
               </div>
             </div>
           </div>
@@ -736,11 +752,11 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                         <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">END DATE</Label>
                         <Info className="h-3 w-3 text-muted-foreground" />
                       </div>
-                      <button className="text-xs text-primary font-medium hover:underline">Begin offboarding</button>
+                      <button className="text-xs text-slate-900 font-medium hover:underline">Begin offboarding</button>
                     </div>
                     <div className="relative">
                       <Input className="h-11 border-slate-200 bg-slate-50" disabled />
-                      <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-300" />
+                      <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                     </div>
                   </div>
 
@@ -784,7 +800,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                       <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Projects</Label>
                       <Info className="h-3 w-3 text-muted-foreground" />
                     </div>
-                    <button className="text-xs text-primary font-medium hover:underline">Select all</button>
+                    <button className="text-xs text-slate-900 font-medium hover:underline">Select all</button>
                   </div>
                   <p className="text-xs text-slate-500 mb-2">Able to track time on these projects</p>
                   <Select>
@@ -809,7 +825,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                       <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Teams</Label>
                       <Info className="h-3 w-3 text-muted-foreground" />
                     </div>
-                    <button className="text-xs text-primary font-medium hover:underline">Select all</button>
+                    <button className="text-xs text-slate-900 font-medium hover:underline">Select all</button>
                   </div>
                   <p className="text-xs text-slate-500 mb-2">Member in these teams</p>
                   <Select>
@@ -826,7 +842,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-slate-500">Manages these teams as <span className="font-bold text-slate-800">Team lead</span></p>
-                    <button className="text-xs text-primary font-medium hover:underline">Select all</button>
+                    <button className="text-xs text-slate-900 font-medium hover:underline">Select all</button>
                   </div>
                   <Select>
                     <SelectTrigger className="h-12 border-slate-200 bg-white">
@@ -852,7 +868,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                 <div className="flex items-center justify-center p-3">
                   <div className="flex items-center">
                     <span className="text-2xl font-bold italic tracking-tighter">7</span>
-                    <span className="text-2xl font-bold tracking-tighter text-black italic">Wise</span>
+                    <span className="text-2xl font-bold tracking-tighter text-blue-500 italic">Wise</span>
                   </div>
                 </div>
                 <div>
@@ -860,8 +876,8 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <button className="text-sm text-slate-600 font-medium hover:underline">Learn More</button>
-                <Button variant="default" className="bg-black hover:bg-zinc-800 text-white rounded-md px-6">Try out</Button>
+                <button className="text-sm text-blue-500 font-medium hover:underline">Learn More</button>
+                <Button variant="default" className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-6">Try out</Button>
               </div>
               <button className="absolute top-2 right-2 text-slate-300 hover:text-slate-500">
                 <X className="h-4 w-4" />
@@ -925,14 +941,14 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                   <div className="relative">
                     <Input className="h-11 pl-10 border-slate-200" defaultValue="Wed, Apr 1, 2026" />
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400">
+                    <button className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500">
                       <Calendar className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
               </div>
 
-              <button className="flex items-center gap-2 text-sm text-slate-600 hover:underline">
+              <button className="flex items-center gap-2 text-sm text-blue-500 hover:underline">
                 <Plus className="h-4 w-4" />
                 Add note
               </button>
@@ -941,14 +957,14 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-normal text-slate-800">Pay rate history</h3>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1 text-[10px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded font-bold">
+                    <div className="flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded font-bold">
                       <div className="flex items-center scale-75">
                         <span className="font-bold italic tracking-tighter">7</span>
                         <span className="font-bold tracking-tighter italic">Hubstaff</span>
                       </div>
                       PEOPLE
                     </div>
-                    <Badge className="bg-slate-100 text-slate-600 border-none text-[9px] font-bold py-0 h-4">BETA</Badge>
+                    <Badge className="bg-blue-100 text-blue-600 border-none text-[9px] font-bold py-0 h-4">BETA</Badge>
                   </div>
                 </div>
 
@@ -1215,6 +1231,6 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
           </div>
         )}
       </div>
-    </div >
+    </div>
   )
 }

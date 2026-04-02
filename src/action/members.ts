@@ -974,3 +974,60 @@ export const getAllOrganizationMemberIds = async ({
     data: allIds
   };
 };
+
+export const updateMemberInfo = async (
+  memberId: string | number,
+  userId: string,
+  data: {
+    // organization_members fields
+    employee_id?: string;
+    work_location?: string;
+    hire_date?: string;
+    // user_profiles fields
+    first_name?: string;
+    last_name?: string;
+    display_name?: string;
+    phone?: string;
+    mobile?: string;
+    date_of_birth?: string;
+  }
+) => {
+  const adminClient = createAdminClient();
+
+  try {
+    const { 
+      employee_id, work_location, hire_date,
+      ...profileData 
+    } = data;
+
+    // 1. Update organization_members
+    const memberUpdate: any = {};
+    if (employee_id !== undefined) memberUpdate.employee_id = employee_id;
+    if (work_location !== undefined) memberUpdate.work_location = work_location;
+    if (hire_date !== undefined) memberUpdate.hire_date = hire_date;
+
+    if (Object.keys(memberUpdate).length > 0) {
+      const { error: memberError } = await adminClient
+        .from("organization_members")
+        .update(memberUpdate)
+        .eq("id", memberId);
+
+      if (memberError) throw memberError;
+    }
+
+    // 2. Update user_profiles
+    if (Object.keys(profileData).length > 0) {
+      const { error: profileError } = await adminClient
+        .from("user_profiles")
+        .update(profileData)
+        .eq("id", userId);
+
+      if (profileError) throw profileError;
+    }
+
+    return { success: true, message: "Member information updated successfully" };
+  } catch (error: any) {
+    memberLogger.error("updateMemberInfo error:", error);
+    return { success: false, message: error.message || "Failed to update member information" };
+  }
+};
