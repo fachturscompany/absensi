@@ -67,53 +67,55 @@ export default function AttendancePage() {
   const loading = membersLoading || batch.isSubmitting
 
   return (
-    <div className="flex flex-1 flex-col p-4 md:p-6 w-full">
+    <>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Add Attendance</h1>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "single" | "batch")} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="single">Single Entry</TabsTrigger>
-          <TabsTrigger value="batch">Batch Entry</TabsTrigger>
-        </TabsList>
+      <div>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "single" | "batch")} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="single">Single Entry</TabsTrigger>
+            <TabsTrigger value="batch">Batch Entry</TabsTrigger>
+          </TabsList>
 
-        <SingleForm
-          activeTab="single"
-          form={singleForm}
+          <SingleForm
+            activeTab="single"
+            form={singleForm}
+            members={members}
+            loading={loading}
+            timezone={orgTimezone}
+            dialogHandlers={batch}
+            selectedMemberId={selectedMemberId}
+            onMemberSelect={setSelectedMemberId}
+          />
+
+          <BatchForm
+            onSubmit={async () => { await batch.submitBatch() }}
+            onCancel={() => router.back()}
+            batch={batch}
+          />
+        </Tabs>
+
+        {/* Action Buttons Global */}
+        <div className="flex items-center justify-end gap-3 pt-4 border-t">
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+        </div>
+
+        <MemberDialog
           members={members}
-          loading={loading}
-          timezone={orgTimezone}
-          dialogHandlers={batch}
-          selectedMemberId={selectedMemberId}
-          onMemberSelect={setSelectedMemberId}
-        />
-
-        <BatchForm
-          onSubmit={async () => { await batch.submitBatch() }}
-          onCancel={() => router.back()}
+          departments={departments}
+          loading={membersLoading}
+          form={singleForm}
           batch={batch}
         />
-      </Tabs>
-
-      {/* Action Buttons Global */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
       </div>
-
-      <MemberDialog
-        members={members}
-        departments={departments}
-        loading={membersLoading}
-        form={singleForm}
-        batch={batch}
-      />
-    </div>
+    </>
   )
 }

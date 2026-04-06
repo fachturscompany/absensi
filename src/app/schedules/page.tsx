@@ -106,115 +106,119 @@ export default function WorkSchedulesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Work schedules</h1>
+    <>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Work schedules</h1>
+        </div>
       </div>
 
-      <ScheduleTableToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        typeFilter={typeFilter}
-        onTypeChange={setTypeFilter}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        organizationId={String(organizationId)}
-        organizationName={organizationName || ""}
-        onAddSuccess={handleFormSuccess}
-      />
+      <div className="mt-4 space-y-4">
+        <ScheduleTableToolbar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          typeFilter={typeFilter}
+          onTypeChange={setTypeFilter}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          organizationId={String(organizationId)}
+          organizationName={organizationName || ""}
+          onAddSuccess={handleFormSuccess}
+        />
 
-      <ScheduleTable
-        items={paginatedItems}
-        isLoading={isLoading}
-        selectedIds={selectedIds}
-        onToggleSelect={toggleSelect}
-        onToggleSelectAll={toggleSelectAll}
-        allSelected={filteredItems.length > 0 && selectedIds.size === filteredItems.length}
-        onEdit={(ws) => {
-          setEditingDetail(ws)
-          setIsEditOpen(true)
-        }}
-        onDeleteSuccess={handleDeleteSuccess}
-        // Pagination props
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        from={from}
-        to={to}
-        totalCount={filteredItems.length}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-      />
+        <ScheduleTable
+          items={paginatedItems}
+          isLoading={isLoading}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onToggleSelectAll={toggleSelectAll}
+          allSelected={filteredItems.length > 0 && selectedIds.size === filteredItems.length}
+          onEdit={(ws) => {
+            setEditingDetail(ws)
+            setIsEditOpen(true)
+          }}
+          onDeleteSuccess={handleDeleteSuccess}
+          // Pagination props
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          from={from}
+          to={to}
+          totalCount={filteredItems.length}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+        />
 
-      <ScheduleBatchActions
-        selectedCount={selectedIds.size}
-        onClear={clearSelection}
-        onEditStatus={() => {
-          setBatchStatusValue(true)
-          setBatchStatusOpen(true)
-        }}
-        onDelete={() => setBatchDeleteOpen(true)}
-      />
+        <ScheduleBatchActions
+          selectedCount={selectedIds.size}
+          onClear={clearSelection}
+          onEditStatus={() => {
+            setBatchStatusValue(true)
+            setBatchStatusOpen(true)
+          }}
+          onDelete={() => setBatchDeleteOpen(true)}
+        />
 
-      <ScheduleFormDialog
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        organizationId={String(organizationId)}
-        organizationName={organizationName || ""}
-        editingDetail={editingDetail}
-        onSuccess={handleFormSuccess}
-      />
+        <ScheduleFormDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          organizationId={String(organizationId)}
+          organizationName={organizationName || ""}
+          editingDetail={editingDetail}
+          onSuccess={handleFormSuccess}
+        />
 
-      {/* Batch Status Dialog */}
-      <Dialog open={batchStatusOpen} onOpenChange={setBatchStatusOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Update Status</DialogTitle>
-            <DialogDescription>
-              Change the active status for {selectedIds.size} selected schedules.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
-            <span className="text-sm font-medium">Active Status</span>
-            <Switch
-              checked={batchStatusValue}
-              onCheckedChange={setBatchStatusValue}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setBatchStatusOpen(false)}>Cancel</Button>
-            <Button
-              onClick={handleBatchStatusUpdate}
-              disabled={isSubmitting}
-              className="bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900"
-            >
-              {isSubmitting ? "Updating..." : "Update Status"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* Batch Status Dialog */}
+        <Dialog open={batchStatusOpen} onOpenChange={setBatchStatusOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Update Status</DialogTitle>
+              <DialogDescription>
+                Change the active status for {selectedIds.size} selected schedules.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+              <span className="text-sm font-medium">Active Status</span>
+              <Switch
+                checked={batchStatusValue}
+                onCheckedChange={setBatchStatusValue}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBatchStatusOpen(false)}>Cancel</Button>
+              <Button
+                onClick={handleBatchStatusUpdate}
+                disabled={isSubmitting}
+                className="bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900"
+              >
+                {isSubmitting ? "Updating..." : "Update Status"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* Batch Delete Confirmation */}
-      <AlertDialog open={batchDeleteOpen} onOpenChange={setBatchDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete {selectedIds.size} Schedules?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete the selected schedules? This action cannot be undone and will remove all associated work hour configurations.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBatchDelete}
-              disabled={isSubmitting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isSubmitting ? "Deleting..." : "Delete Permanently"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+        {/* Batch Delete Confirmation */}
+        <AlertDialog open={batchDeleteOpen} onOpenChange={setBatchDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete {selectedIds.size} Schedules?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete the selected schedules? This action cannot be undone and will remove all associated work hour configurations.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleBatchDelete}
+                disabled={isSubmitting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isSubmitting ? "Deleting..." : "Delete Permanently"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </>
   )
 }

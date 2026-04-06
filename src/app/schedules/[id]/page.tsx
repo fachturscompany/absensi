@@ -1,11 +1,11 @@
-﻿"use client"
+"use client"
 
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Globe, Save, RotateCcw, Copy, Search, Plus, Minus } from "lucide-react"
+import { Globe, Save, RotateCcw, Copy, Search, Plus, Minus, Clock, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { TableSkeleton } from "@/components/ui/loading-skeleton"
 import { formatTime } from "@/utils/format-time"
@@ -13,11 +13,10 @@ import { useTimeFormat } from "@/store/time-format-store"
 import { getTimezoneLabel, getTimezoneOffset } from "@/constants/attendance-status"
 import { getDayName } from "@/utils/date-helper"
 import { useOrgStore } from "@/store/org-store"
-import { IWorkScheduleDetail } from "@/interface"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  getWorkScheduleDetails,
+  getWorkScheduleById,
   upsertWorkScheduleDetails,
 } from "@/action/schedule"
 import { getAllOrganization_member } from "@/action/members"
@@ -27,10 +26,9 @@ import { useFormatDate } from "@/hooks/use-format-date"
 // Day keys for iteration
 type DayIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6
 const DAYS: DayIndex[] = [0, 1, 2, 3, 4, 5, 6]
-const WORKDAYS: DayIndex[] = [1, 2, 3, 4, 5] // Mon-Fri
-const WEEKEND: DayIndex[] = [0, 6] // Sun, Sat
+const WORKDAYS: DayIndex[] = [1, 2, 3, 4, 5]
+const WEEKEND: DayIndex[] = [0, 6]
 
-// Rule item for local state
 interface RuleItem {
   day_of_week: DayIndex
   label: string
@@ -45,7 +43,6 @@ interface RuleItem {
   notes: string
 }
 
-// Preset configurations
 const PRESETS = {
   normal: {
     label: "Normal Working Hours",
@@ -109,7 +106,6 @@ const PRESETS = {
   },
 }
 
-// Default rule creator
 const createDefaultRule = (day: DayIndex): RuleItem => {
   const isWeekend = WEEKEND.includes(day)
   return {
@@ -127,27 +123,30 @@ const createDefaultRule = (day: DayIndex): RuleItem => {
   }
 }
 
+// Day abbreviations for compact display
+const DAY_ABBR: Record<DayIndex, string> = {
+  0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat",
+}
+
 export default function WorkScheduleDetailsPage() {
   const params = useParams()
   const scheduleId = Number(params.id)
   const { format: timeFormat } = useTimeFormat()
   const orgStore = useOrgStore()
 
-  // Inisialisasi hook timezone di sini
   const { timezone } = useFormatDate()
   const organizationTimezone = timezone || "UTC"
 
-  // State
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [rules, setRules] = useState<RuleItem[]>(() => DAYS.map(createDefaultRule))
   const [origRules, setOrigRules] = useState<RuleItem[]>([])
-  const [selectedDay, setSelectedDay] = useState<DayIndex>(1) // Monday default
+  const [scheduleName, setScheduleName] = useState<string>("")
+  const [selectedDay, setSelectedDay] = useState<DayIndex>(1)
   const [daysDialogOpen, setDaysDialogOpen] = useState(false)
   const [tempDays, setTempDays] = useState<DayIndex[]>([])
   const [panelBump, setPanelBump] = useState(0)
 
-  // Assignment states (below two panels)
   type MemberOption = { id: string; label: string; department: string }
   const [members, setMembers] = useState<MemberOption[]>([])
   const [memberSearch, setMemberSearch] = useState("")
@@ -156,17 +155,17 @@ export default function WorkScheduleDetailsPage() {
   const [departments, setDepartments] = useState<string[]>([])
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
 
-  // Fetch schedule details
   const loadDetails = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await getWorkScheduleDetails(scheduleId)
-      const typedRes = res as { success: boolean; data: IWorkScheduleDetail[]; message?: string }
-
-      if (typedRes.success && typedRes.data) {
-        // Convert IWorkScheduleDetail[] to RuleItem[]
+      const res = await getWorkScheduleById(String(scheduleId))
+      
+      if (res.success && res.data) {
+        setScheduleName(res.data.name)
+        const details = res.data.work_schedule_details || []
+        
         const loadedRules: RuleItem[] = DAYS.map((day) => {
-          const detail = typedRes.data.find((d) => Number(d.day_of_week) === day)
+          const detail = details.find((d) => Number(d.day_of_week) === day)
           if (detail) {
             return {
               day_of_week: day,
@@ -186,6 +185,8 @@ export default function WorkScheduleDetailsPage() {
         })
         setRules(loadedRules)
         setOrigRules(JSON.parse(JSON.stringify(loadedRules)))
+      } else {
+        toast.error(res.message || "Failed to load schedule")
       }
     } catch (error) {
       toast.error("Failed to load schedule details")
@@ -195,10 +196,14 @@ export default function WorkScheduleDetailsPage() {
   }, [scheduleId])
 
   useEffect(() => {
+    const title = scheduleName?.trim() || (scheduleId ? `Schedule #${scheduleId}` : "Work Schedule")
+    document.title = `${title} | Attendance`
+  }, [scheduleName, scheduleId])
+
+  useEffect(() => {
     loadDetails()
   }, [loadDetails])
 
-  // Load members for assignment, and init effective date to today
   useEffect(() => {
     const init = async () => {
       try {
@@ -255,7 +260,6 @@ export default function WorkScheduleDetailsPage() {
           })
         setMembers(opts)
 
-        // derive departments (groups) sorted, unique
         const deptNames = Array.from(new Set(opts.map(m => m.department).filter(Boolean))).sort()
         setDepartments(deptNames)
         setDepartmentFilter("all")
@@ -269,25 +273,21 @@ export default function WorkScheduleDetailsPage() {
     init()
   }, [orgStore.organizationId])
 
-  // Selected rule
   const selectedRule = useMemo(
     () => rules.find((r) => r.day_of_week === selectedDay) || null,
     [rules, selectedDay]
   )
 
-  // Dirty check
   const isDirty = useMemo(
     () => JSON.stringify(rules) !== JSON.stringify(origRules),
     [rules, origRules]
   )
 
-  // Update rule
   const updateRule = (day: DayIndex, patch: Partial<RuleItem>) => {
     setRules((prev) =>
       prev.map((r) => {
         if (r.day_of_week !== day) return r
         const updated = { ...r, ...patch }
-        // Clear times if not working day
         if (!updated.is_working_day) {
           updated.start_time = ""
           updated.end_time = ""
@@ -300,12 +300,13 @@ export default function WorkScheduleDetailsPage() {
       })
     )
   }
+
   const applyPreset = (presetKey: keyof typeof PRESETS) => {
     const preset = PRESETS[presetKey]
     updateRule(selectedDay, preset)
     setPanelBump((k) => k + 1)
   }
-  // Copy to days
+
   const copyToDays = (targetDays: DayIndex[]) => {
     if (!selectedRule) return
     setRules((prev) =>
@@ -359,7 +360,6 @@ export default function WorkScheduleDetailsPage() {
 
       if (selectedMemberIds.length > 0) {
         if (!effectiveDate) {
-
         } else {
           const bulk = await createMemberSchedulesBulk(String(scheduleId), selectedMemberIds, effectiveDate)
           if (!bulk.success) {
@@ -367,16 +367,14 @@ export default function WorkScheduleDetailsPage() {
           } else {
             const inserted = bulk.data?.inserted ?? 0
             const updated = bulk.data?.updated ?? 0
-
             let msg = `Assigned to ${inserted} member(s)`
             if (updated > 0) msg += `, updated ${updated} existing schedule(s)`
-
             toast.success(msg)
           }
         }
       }
 
-      await loadDetails() // refresh dari DB agar UI sesuai DB
+      await loadDetails()
     } catch (error) {
       toast.error("Failed to save schedule")
     } finally {
@@ -384,20 +382,17 @@ export default function WorkScheduleDetailsPage() {
     }
   }
 
-  // Discard changes
   const discardChanges = () => {
     setRules(JSON.parse(JSON.stringify(origRules)))
     toast.info("Changes discarded")
   }
 
-  // Reset to defaults
   const resetToDefaults = () => {
     const defaults = DAYS.map(createDefaultRule)
     setRules(defaults)
     toast.info("Reset to default schedule")
   }
 
-  // Format time for display
   const formatTimeDisplay = (time: string) => {
     if (!time) return "—"
     return formatTime(time, timeFormat)
@@ -411,468 +406,564 @@ export default function WorkScheduleDetailsPage() {
     )
   }
 
-  return (
-    <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 w-full">
+  // Count working days for summary
+  const workingDaysCount = rules.filter(r => r.is_working_day).length
 
-      {/* Two-Panel Editor */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {/* Day Selector (Left Panel) */}
-        <div className="border rounded-lg p-2 md:col-span-1 bg-card h-full">
-          {/* Timezone Banner */}
-          <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg border" role="status">
-            <Globe className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <span className="text-sm text-muted-foreground">
-              Timezone: <strong>{getTimezoneLabel(organizationTimezone)}</strong>
-              <span className="ml-1 text-xs">({getTimezoneOffset(organizationTimezone)})</span>
-            </span>
+  return (
+    <>
+      <div>
+        {/* ── Page Header ── */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold">
+              {scheduleName?.trim() || (scheduleId ? `Schedule #${scheduleId}` : (params?.id ? `Schedule #${params.id}` : "Work Schedule"))}
+            </h1>
+          </div>
+
+          {/* Summary chips */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              {workingDaysCount} working days/week
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+              <Globe className="h-3.5 w-3.5" />
+              {getTimezoneOffset(organizationTimezone)}
+            </div>
             {(isDirty || selectedMemberIds.length > 0) && (
-              <Badge variant="outline" className="ml-auto text-slate-500 border-orange-300">
-                Unsaved Changes
+              <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
+                Unsaved changes
               </Badge>
             )}
           </div>
-          <div className="divide-y">
-            {DAYS.map((day) => {
-              const rule = rules.find((r) => r.day_of_week === day)
-              const active = selectedDay === day
-              const hours = rule?.is_working_day
-                ? `${formatTimeDisplay(rule.start_time)} - ${formatTimeDisplay(rule.end_time)}`
-                : "No schedule"
+        </div>
+      </div>
 
-              return (
-                <div
-                  key={day}
-                  role="button"
-                  tabIndex={0}
-                  className={`w-full text-left p-3 flex items-center justify-between transition-colors cursor-pointer ${active ? "bg-accent" : "hover:bg-muted/50"
-                    }`}
-                  onClick={() => setSelectedDay(day)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      setSelectedDay(day)
-                    }
-                  }}
-                >
-                  <div>
-                    <div className="font-medium">{getDayName(day)}</div>
-                    <div className="text-xs text-muted-foreground">{hours}</div>
-                  </div>
-                  <button
-                    className={`text-xs px-2 py-1 rounded-full font-medium transition-all hover:opacity-80 ${rule?.is_working_day
-                      ? "bg-gray-900 dark:bg-gray-900 text-white hover:bg-gray-900"
-                      : "bg-gray-500 dark:bg-gray-600 text-white hover:bg-gray-600"
-                      }`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      updateRule(day, { is_working_day: !rule?.is_working_day })
-                    }}
-                    title={`Click to toggle ${getDayName(day)} status`}
-                  >
-                    {rule?.is_working_day ? "Working" : "Off"}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+      <div className="mt-4 space-y-4">
+        {/* ── Main Content ── */}
+
+        {/* ── Timezone info bar ── */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-muted/30 text-sm text-muted-foreground">
+          <Globe className="h-4 w-4 shrink-0" />
+          <span>
+            All times are in <strong className="text-foreground font-medium">{getTimezoneLabel(organizationTimezone)}</strong>
+            <span className="ml-1.5 text-xs">({getTimezoneOffset(organizationTimezone)})</span>
+          </span>
+          {/* Mobile unsaved badge */}
+          {(isDirty || selectedMemberIds.length > 0) && (
+            <Badge variant="outline" className="ml-auto md:hidden text-amber-600 border-amber-300 bg-amber-50">
+              Unsaved
+            </Badge>
+          )}
         </div>
 
-        {/* Day Editor (Right Panel) */}
-        <div className="border rounded-lg p-4 md:col-span-2 lg:col-span-3 bg-card h-full flex flex-col">
-          {selectedRule && (
-            <div key={`${selectedDay}-${panelBump}`}>
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-lg font-semibold">{getDayName(selectedDay)}</div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Status:</span>
+        {/* ── Two-Panel Editor ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+          {/* ── Left Panel: Day Selector ── */}
+          <div className="md:col-span-1 border rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="px-4 py-3 border-b bg-muted/30">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Weekly Schedule
+              </p>
+            </div>
+            <div className="divide-y">
+              {DAYS.map((day) => {
+                const rule = rules.find((r) => r.day_of_week === day)
+                const active = selectedDay === day
+                const hours = rule?.is_working_day
+                  ? `${formatTimeDisplay(rule.start_time)} – ${formatTimeDisplay(rule.end_time)}`
+                  : "Day off"
+
+                return (
+                  <div
+                    key={day}
+                    role="button"
+                    tabIndex={0}
+                    className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors cursor-pointer group ${
+                      active
+                        ? "bg-primary/5 border-l-2 border-l-primary"
+                        : "hover:bg-muted/40 border-l-2 border-l-transparent"
+                    }`}
+                    onClick={() => setSelectedDay(day)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedDay(day)
+                      }
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <div className={`text-sm font-medium ${active ? "text-primary" : "text-foreground"}`}>
+                        {getDayName(day)}
+                      </div>
+                      <div className={`text-xs mt-0.5 ${rule?.is_working_day ? "text-muted-foreground" : "text-muted-foreground/60"}`}>
+                        {hours}
+                      </div>
+                    </div>
+                    <button
+                      className={`ml-2 shrink-0 text-xs px-2.5 py-1 rounded-full font-medium transition-all ${
+                        rule?.is_working_day
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        updateRule(day, { is_working_day: !rule?.is_working_day })
+                      }}
+                      title={`Toggle ${getDayName(day)} status`}
+                    >
+                      {rule?.is_working_day ? "Working" : "Off"}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* ── Right Panel: Day Editor ── */}
+          <div className="border rounded-xl bg-card shadow-sm md:col-span-2 lg:col-span-3">
+            {selectedRule && (
+              <div key={`${selectedDay}-${panelBump}`}>
+                {/* Panel Header */}
+                <div className="px-5 py-4 border-b flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold ${
+                      selectedRule.is_working_day
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground"
+                    }`}>
+                      {DAY_ABBR[selectedDay]}
+                    </div>
+                    <div>
+                      <div className="font-semibold">{getDayName(selectedDay)}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {selectedRule.is_working_day
+                          ? `${formatTimeDisplay(selectedRule.start_time)} – ${formatTimeDisplay(selectedRule.end_time)}`
+                          : "Not scheduled"}
+                      </div>
+                    </div>
+                  </div>
                   <Badge
-                    variant={selectedRule.is_working_day ? "default" : "secondary"}
-                    className={`${selectedRule.is_working_day
-                      ? "bg-gray-900 hover:bg-gray-900 text-white"
-                      : "bg-gray-500 hover:bg-gray-500 text-white"
-                      } cursor-default`}
+                    variant="outline"
+                    className={`text-xs font-medium ${
+                      selectedRule.is_working_day
+                        ? "border-emerald-300 text-emerald-700 bg-emerald-50"
+                        : "border-muted text-muted-foreground bg-muted/50"
+                    }`}
                   >
                     {selectedRule.is_working_day ? "Working Day" : "Day Off"}
                   </Badge>
                 </div>
-              </div>
 
-              {/* Presets */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Button variant="outline" size="sm" onClick={() => applyPreset("normal")}>
-                  Normal Hours
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => applyPreset("morning")}>
-                  Morning Shift
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => applyPreset("evening")}>
-                  Evening Shift
-                </Button>
-                {/* <Button variant="outline" size="sm" onClick={() => applyPreset("flexible")}>
-                  Flexible
-                </Button> */}
-                <Button variant="outline" size="sm" onClick={() => applyPreset("off")}>
-                  Day Off
-                </Button>
-              </div>
-
-              {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Time Settings */}
-                <div className="space-y-3 md:col-span-2">
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Check In</div>
-                      <Input
-                        key={`start-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.start_time}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { start_time: e.target.value })}
-                      />
-                    </label>
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Check Out</div>
-                      <Input
-                        key={`end-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.end_time}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { end_time: e.target.value })}
-                      />
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Break Start</div>
-                      <Input
-                        key={`bstart-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.break_start}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { break_start: e.target.value })}
-                      />
-                    </label>
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Break End</div>
-                      <Input
-                        key={`bend-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.break_end}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { break_end: e.target.value })}
-                      />
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Core Hours Start</div>
-                      <Input
-                        key={`cstart-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.core_hours_start}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { core_hours_start: e.target.value })}
-                      />
-                    </label>
-                    <label className="space-y-1">
-                      <div className="text-sm font-medium">Core Hours End</div>
-                      <Input
-                        key={`cend-${selectedDay}`}
-                        type="time"
-                        value={selectedRule.core_hours_end}
-                        disabled={!selectedRule.is_working_day}
-                        onChange={(e) => updateRule(selectedDay, { core_hours_end: e.target.value })}
-                      />
-                    </label>
-                  </div>
-                  {/* Removed Grace Settings as per simplification rule */}
-                </div>
-
-                {/* Flexible Hours Toggle */}
-                {/* <div className="md:col-span-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedRule.flexible_hours}
-                      disabled={!selectedRule.is_working_day}
-                      onChange={(e) => updateRule(selectedDay, { flexible_hours: e.target.checked })}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm font-medium">Flexible Hours</span>
-                    <span className="text-xs text-muted-foreground">(Allow adjustable work hours)</span>
-                  </label>
-                </div> */}
-
-                {/* Copy Actions */}
-                <div className="md:col-span-2 pt-4 border-t">
-                  <div className="text-sm font-medium mb-2">Copy to other days:</div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setTempDays(WORKDAYS.filter((d) => d !== selectedDay)) // default: semua selain hari aktif
-                        setDaysDialogOpen(true)
-                      }}
-                      className="gap-1"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Select Days
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToDays(WORKDAYS)}
-                      className="gap-1"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Copy to Weekdays
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToDays(DAYS.filter((d) => d !== selectedDay))}
-                      className="gap-1"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Copy to All Days
-                    </Button>
-                  </div>
-                  <Dialog open={daysDialogOpen} onOpenChange={setDaysDialogOpen}>
-                    <DialogContent className="max-w-sm">
-                      <DialogHeader>
-                        <DialogTitle>Select days</DialogTitle>
-                      </DialogHeader>
-
-                      <div className="space-y-2">
-                        {DAYS.map((d) => (
-                          <label key={d} className="flex items-center gap-2">
-                            <Checkbox
-                              checked={tempDays.includes(d)}
-                              disabled={d === selectedDay}
-                              onCheckedChange={(c) => {
-                                setTempDays((prev) =>
-                                  c === true ? (prev.includes(d) ? prev : [...prev, d]) : prev.filter((x) => x !== d)
-                                )
-                              }}
-                            />
-                            <span>{getDayName(d)}</span>
-                          </label>
-                        ))}
-
-                        <div className="flex gap-2 pt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setTempDays(DAYS.filter((d) => d !== selectedDay))}
-                          >
-                            Select All
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setTempDays([])}
-                          >
-                            Clear
-                          </Button>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setDaysDialogOpen(false)}>
-                          Cancel
-                        </Button>
+                <div className="p-5 space-y-5">
+                  {/* Quick Presets */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">
+                      Quick Presets
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(["normal", "morning", "evening", "off"] as const).map((key) => (
                         <Button
-                          onClick={() => {
-                            if (tempDays.length === 0) {
-                              // Kosong => set Day Off untuk weekdays (Mon–Fri) kecuali hari aktif
-                              const targets = WORKDAYS.filter((d) => d !== selectedDay)
-                              setRules((prev) =>
-                                prev.map((r) =>
-                                  targets.includes(r.day_of_week)
-                                    ? {
-                                      ...r,
-                                      is_working_day: false,
-                                      start_time: "",
-                                      end_time: "",
-                                      break_start: "",
-                                      break_end: "",
-                                      flexible_hours: false,
-                                      label: "Day Off",
-                                      notes: "",
-                                    }
-                                    : r
-                                )
-                              )
-                            } else {
-                              // Ada pilihan hari = salin jadwal
-                              copyToDays(tempDays)
-                            }
-                            setDaysDialogOpen(false)
-                          }}
+                          key={key}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyPreset(key)}
+                          className="text-xs h-8 rounded-full hover:cursor-pointer"
                         >
-                          Apply
+                          {PRESETS[key].label}
                         </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Time Fields */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                      Time Configuration
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                      {/* Check In / Out */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Check In
+                        </label>
+                        <Input
+                          key={`start-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.start_time}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { start_time: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Check Out
+                        </label>
+                        <Input
+                          key={`end-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.end_time}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { end_time: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+
+                      {/* Break */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Break Start
+                        </label>
+                        <Input
+                          key={`bstart-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.break_start}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { break_start: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Break End
+                        </label>
+                        <Input
+                          key={`bend-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.break_end}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { break_end: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+
+                      {/* Core Hours */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Core Hours Start
+                        </label>
+                        <Input
+                          key={`cstart-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.core_hours_start}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { core_hours_start: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Core Hours End
+                        </label>
+                        <Input
+                          key={`cend-${selectedDay}`}
+                          type="time"
+                          value={selectedRule.core_hours_end}
+                          disabled={!selectedRule.is_working_day}
+                          onChange={(e) => updateRule(selectedDay, { core_hours_end: e.target.value })}
+                          className="h-9"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Copy Actions */}
+                  <div className="pt-1">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 mt-4">
+                      Copy to Other Days
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setTempDays(WORKDAYS.filter((d) => d !== selectedDay))
+                          setDaysDialogOpen(true)
+                        }}
+                        className="gap-1.5 h-8 text-xs rounded-full"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Select Days
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToDays(WORKDAYS)}
+                        className="gap-1.5 h-8 text-xs rounded-full"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copy to Weekdays
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToDays(DAYS.filter((d) => d !== selectedDay))}
+                        className="gap-1.5 h-8 text-xs rounded-full"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copy to All Days
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-      {/* Assign Members to this Schedule */}
-      <div className="border rounded-lg p-4 bg-white">
-        <div className="flex items-center justify-between mb-3">
-          <div className="font-semibold">Assign members to this schedule</div>
-          <div className="text-xs text-muted-foreground">Schedule ID: {scheduleId}</div>
-        </div>
-
-        {/* Toolbar */}
-        <div className="flex flex-col md:flex-row gap-3 items-start md:items-center mb-3">
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={memberSearch}
-              onChange={(e) => setMemberSearch(e.target.value)}
-              placeholder="Search member to add..."
-              className="pl-8"
-            />
-          </div>
-
-          {/* Group filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">Group</label>
-            <select
-              className="appearance-none border rounded px-3 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-              value={departmentFilter}
-              onChange={(e) => setDepartmentFilter(e.target.value)}
-            >
-              <option value="all">All groups</option>
-              {departments.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Add all members (respecting search + group filter) */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              const term = memberSearch.trim().toLowerCase()
-              const filtered = members.filter(m => {
-                const byGroup = departmentFilter === "all" || m.department === departmentFilter
-                const bySearch = term === "" || m.label.toLowerCase().includes(term) || m.department.toLowerCase().includes(term)
-                return byGroup && bySearch
-              })
-              if (filtered.length === 0) {
-                toast.info("No members match current filter")
-                return
-              }
-              const ids = filtered.map(m => m.id)
-              setSelectedMemberIds(prev => Array.from(new Set([...prev, ...ids])))
-            }}
-          >
-            <Plus className="mr-1 h-3 w-3" />Add all
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">Effective date</label>
-            <Input type="date" value={effectiveDate} onChange={(e) => setEffectiveDate(e.target.value)} className="w-[160px]" />
+            )}
           </div>
         </div>
 
-        {/* Quick list */}
-        <div className="space-y-2">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-48 overflow-y-auto pt-1">
-            {members
-              .filter(m => {
-                const term = memberSearch.toLowerCase()
-                const byGroup = departmentFilter === "all" || m.department === departmentFilter
-                const bySearch = term === "" || m.label.toLowerCase().includes(term) || m.department.toLowerCase().includes(term)
-                return byGroup && bySearch
-              })
-              .map(m => {
-                const selected = selectedMemberIds.includes(m.id)
-                return (
-                  <Button
-                    key={m.id}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className={`justify-start h-8 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 shadow-sm ${selected ? 'ring-1 ring-blue-300' : ''}`}
-                    onClick={() => {
-                      setSelectedMemberIds(prev => selected ? prev.filter(x => x !== m.id) : [...prev, m.id])
+        {/* ── Copy Days Dialog ── */}
+        <Dialog open={daysDialogOpen} onOpenChange={setDaysDialogOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Copy to Selected Days</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              {DAYS.map((d) => (
+                <label key={d} className="flex items-center gap-3 py-1.5 cursor-pointer">
+                  <Checkbox
+                    checked={tempDays.includes(d)}
+                    disabled={d === selectedDay}
+                    onCheckedChange={(c) => {
+                      setTempDays((prev) =>
+                        c === true ? (prev.includes(d) ? prev : [...prev, d]) : prev.filter((x) => x !== d)
+                      )
                     }}
-                  >
-                    <Plus className="mr-1 h-3 w-3" />
-                    <span className="truncate text-xs">{m.label}{m.department ? ` (${m.department})` : ''}</span>
-                  </Button>
-                )
-              })}
+                  />
+                  <span className={`text-sm ${d === selectedDay ? "text-muted-foreground" : ""}`}>
+                    {getDayName(d)}
+                    {d === selectedDay && <span className="ml-1.5 text-xs">(current)</span>}
+                  </span>
+                </label>
+              ))}
+              <div className="flex gap-2 pt-2 border-t">
+                <Button variant="outline" size="sm" onClick={() => setTempDays(DAYS.filter((d) => d !== selectedDay))}>
+                  Select All
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setTempDays([])}>
+                  Clear
+                </Button>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDaysDialogOpen(false)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  if (tempDays.length === 0) {
+                    const targets = WORKDAYS.filter((d) => d !== selectedDay)
+                    setRules((prev) =>
+                      prev.map((r) =>
+                        targets.includes(r.day_of_week)
+                          ? { ...r, is_working_day: false, start_time: "", end_time: "", break_start: "", break_end: "", flexible_hours: false, label: "Day Off", notes: "" }
+                          : r
+                      )
+                    )
+                  } else {
+                    copyToDays(tempDays)
+                  }
+                  setDaysDialogOpen(false)
+                }}
+              >
+                Apply
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Assign Members ── */}
+        <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
+          {/* Section Header */}
+          <div className="px-5 py-4 bg-muted/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">Assign Members</span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {scheduleName?.trim() || `Schedule ID: ${scheduleId}`}
+            </span>
           </div>
 
-          {/* Selected chips */}
-          <div className="pt-2">
-            <div className="text-xs font-semibold text-muted-foreground mb-1">
-              Selected Member(s) ({selectedMemberIds.length})
+          <div className="p-5 space-y-4">
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  placeholder="Search members..."
+                  className="pl-9 h-9"
+                />
+              </div>
+
+              <select
+                className="h-9 appearance-none border rounded-lg px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
+              >
+                <option value="all">All groups</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-9 gap-1.5 shrink-0"
+                onClick={() => {
+                  const term = memberSearch.trim().toLowerCase()
+                  const filtered = members.filter(m => {
+                    const byGroup = departmentFilter === "all" || m.department === departmentFilter
+                    const bySearch = term === "" || m.label.toLowerCase().includes(term) || m.department.toLowerCase().includes(term)
+                    return byGroup && bySearch
+                  })
+                  if (filtered.length === 0) {
+                    toast.info("No members match current filter")
+                    return
+                  }
+                  const ids = filtered.map(m => m.id)
+                  setSelectedMemberIds(prev => Array.from(new Set([...prev, ...ids])))
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add All
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 gap-1.5 shrink-0 text-muted-foreground hover:text-destructive transition-colors"
+                onClick={() => {
+                  if (selectedMemberIds.length > 0) {
+                    setSelectedMemberIds([])
+                    toast.info("All members unselected")
+                  }
+                }}
+              >
+                <Minus className="h-3.5 w-3.5" />
+                Unselect All
+              </Button>
+
+              <div className="flex items-center gap-2 shrink-0 ml-auto">
+                <label className="text-sm text-muted-foreground whitespace-nowrap">Effective date</label>
+                <Input
+                  type="date"
+                  value={effectiveDate}
+                  onChange={(e) => setEffectiveDate(e.target.value)}
+                  className="w-[148px] h-9"
+                />
+              </div>
             </div>
-            <div className="max-h-48 overflow-y-auto overscroll-contain border rounded-md p-2 bg-white">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {selectedMemberIds.map(id => {
-                  const mm = members.find(x => x.id === id)
-                  const lbl = mm ? `${mm.label}${mm.department ? ` (${mm.department})` : ''}` : id
-                  return (
-                    <button
-                      key={id}
-                      className="inline-flex items-center gap-1 text-xs px-3 py-1.5 w-full rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                      onClick={() => setSelectedMemberIds(prev => prev.filter(x => x !== id))}
-                      title="Remove"
-                    >
-                      <Minus className="h-3 w-3" />
-                      <span className="truncate">{lbl}</span>
-                    </button>
-                  )
-                })}
-                {selectedMemberIds.length === 0 && (
-                  <span className="text-xs text-muted-foreground">No members selected</span>
+
+            {/* Member list */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Available Members
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-44 overflow-y-auto pr-1">
+                {members
+                  .filter(m => {
+                    const term = memberSearch.toLowerCase()
+                    const byGroup = departmentFilter === "all" || m.department === departmentFilter
+                    const bySearch = term === "" || m.label.toLowerCase().includes(term) || m.department.toLowerCase().includes(term)
+                    return byGroup && bySearch
+                  })
+                  .map(m => {
+                    const selected = selectedMemberIds.includes(m.id)
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium text-left transition-all ${
+                          selected
+                            ? "border-primary/40 bg-primary/5 text-primary"
+                            : "border-border bg-background text-foreground hover:bg-muted/50"
+                        }`}
+                        onClick={() => {
+                          setSelectedMemberIds(prev => selected ? prev.filter(x => x !== m.id) : [...prev, m.id])
+                        }}
+                      >
+                        <Plus className={`h-3 w-3 shrink-0 transition-transform ${selected ? "rotate-45" : ""}`} />
+                        <span className="truncate">{m.label}{m.department ? ` · ${m.department}` : ''}</span>
+                      </button>
+                    )
+                  })}
+              </div>
+            </div>
+
+            {/* Selected members */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Selected Members
+                </p>
+                <span className="text-xs text-muted-foreground">{selectedMemberIds.length} selected</span>
+              </div>
+              <div className="min-h-[56px] max-h-44 overflow-y-auto border rounded-lg p-2 bg-muted/20">
+                {selectedMemberIds.length === 0 ? (
+                  <div className="flex items-center justify-center h-10 text-xs text-muted-foreground">
+                    No members selected
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {selectedMemberIds.map(id => {
+                      const mm = members.find(x => x.id === id)
+                      const lbl = mm ? `${mm.label}${mm.department ? ` · ${mm.department}` : ''}` : id
+                      return (
+                        <button
+                          key={id}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-medium hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+                          onClick={() => setSelectedMemberIds(prev => prev.filter(x => x !== id))}
+                          title="Remove"
+                        >
+                          <Minus className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{lbl}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons - Moved to Bottom */}
-      <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={resetToDefaults}
-          className="gap-2"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Reset to Default
-        </Button>
-        <Button
-          variant="outline"
-          onClick={discardChanges}
-          disabled={!isDirty}
-          className="gap-2 text-slate-500 border-orange-300 hover:bg-orange-50 disabled:text-muted-foreground disabled:border-muted"
-        >
-          Discard Changes
-        </Button>
-        <Button
-          onClick={saveAll}
-          disabled={((!isDirty && selectedMemberIds.length === 0) || saving)}
-          className="gap-2 min-w-[140px]"
-        >
-          <Save className="h-4 w-4" />
-          {saving ? "Saving..." : "Save"}
-        </Button>
+        {/* ── Action Bar ── */}
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetToDefaults}
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset to Default
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={discardChanges}
+            disabled={!isDirty}
+            className="gap-2 text-amber-600 border-amber-300 hover:bg-amber-50 disabled:text-muted-foreground disabled:border-muted"
+          >
+            Discard Changes
+          </Button>
+          <Button
+            onClick={saveAll}
+            disabled={((!isDirty && selectedMemberIds.length === 0) || saving)}
+            className="gap-2 min-w-[120px]"
+          >
+            <Save className="h-4 w-4" />
+            {saving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+
       </div>
-    </div>
+    </>
   )
 }

@@ -133,13 +133,17 @@ export async function getWorkScheduleById(id: string) {
         .from("work_schedules")
         .select("*, work_schedule_details(*)")
         .eq("id", id)
-        .single()
+        .maybeSingle()
 
     if (error) {
-        return { success: false, message: error.message, data: [] };
+        return { success: false, message: error.message, data: null };
     }
 
-    return { success: true, data: data as IWorkSchedule[] };
+    if (!data) {
+        return { success: false, message: "Schedule not found", data: null };
+    }
+
+    return { success: true, data: data as IWorkSchedule };
 }
 export async function getWorkScheduleDetails(workScheduleId: number) {
     const supabase = await createClient();

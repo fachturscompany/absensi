@@ -465,27 +465,31 @@ export default function pageDashboard() {
   }
 
   return (
-    <div className="ml-5 mt-5 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center   md:justify-between gap-4">
-        <div>
-          {orgLoading ? (
-            <Skeleton className="h-9 w-80 mb-2" />
-          ) : (
-            <h1 className="text-3xl font-bold tracking-tight">
-              Dashboard{(organizationName || orgStore.organizationName) && ` — ${organizationName || orgStore.organizationName}`}
-            </h1>
-          )}
-          <p className="text-muted-foreground text-sm mt-1">
-            {format(currentTime, 'EEEE, MMMM dd, yyyy • HH:mm:ss')}
-          </p>
-        </div>
+    <>
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            {orgLoading ? (
+              <Skeleton className="h-9 w-80 mb-2" />
+            ) : (
+              <h1 className="text-xl font-bold tracking-tight">
+                Dashboard{(organizationName || orgStore.organizationName) && ` — ${organizationName || orgStore.organizationName}`}
+              </h1>
+            )}
+            <p className="text-muted-foreground text-sm mt-1">
+              {format(currentTime, 'EEEE, MMMM dd, yyyy • HH:mm:ss')}
+            </p>
+          </div>
 
-        <DateFilterBar
-          dateRange={dateRange}
-          onDateRangeChange={setDateRange}
-        />
+          <DateFilterBar
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+          />
+        </div>
       </div>
+
+      <div className="mt-4 space-y-6">
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -688,6 +692,7 @@ export default function pageDashboard() {
           />
         </motion.div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

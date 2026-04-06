@@ -10,7 +10,7 @@ import { TabsContent } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import {
   LogIn, LogOut, Coffee, Clock, Search,
-  AlertCircle, CheckCircle2, Loader2, CalendarOff, ChevronRight,
+  AlertCircle, CheckCircle2, Loader2, CalendarOff,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -409,9 +409,6 @@ export function SingleForm({
                   </p>
                   <p className="text-[10px] opacity-60 truncate uppercase tracking-wider">{m.department}</p>
                 </div>
-                {m.id === externalMemberId && (
-                  <ChevronRight className="h-3 w-3 opacity-40" />
-                )}
               </button>
             ))}
           </div>

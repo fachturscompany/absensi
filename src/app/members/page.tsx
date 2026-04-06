@@ -244,41 +244,42 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="px-6 pb-6 space-y-6 w-full">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4">
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl font-semibold capitalize">
-              {activeTab === 'invites' ? 'Invites' : 'Members'}
-            </h1>
-            <div className="flex items-center gap-4">
-              <Link href="/members/onboarding" className="flex items-center text-sm font-medium text-muted-foreground">
-                <Users className="w-4 h-4 mr-2" /> Onboarding status
+    <>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-semibold capitalize">
+            {activeTab === 'invites' ? 'Invites' : 'Members'}
+          </h1>
+          <div className="flex items-center gap-4">
+            <Link href="/members/onboarding" className="flex items-center text-sm font-medium text-muted-foreground">
+              <Users className="w-4 h-4 mr-2" /> Onboarding status
+            </Link>
+            {activeTab === 'invites' && (
+              <Link href="/settings" className="text-sm font-medium flex items-center gap-1">
+                <Settings className="w-4 h-4" /> Settings
               </Link>
-              {activeTab === 'invites' && (
-                <Link href="/settings" className="text-sm font-medium flex items-center gap-1">
-                  <Settings className="w-4 h-4" /> Settings
-                </Link>
-              )}
-            </div>
-          </div>
-
-          <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none h-auto">
-            <TabsTrigger value="members" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
-              MEMBERS ({total})
-            </TabsTrigger>
-            <TabsTrigger value="invites" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
-              INVITES ({invitationsResult?.data?.length || 0})
-            </TabsTrigger>
-            {isOwner && (
-              <TabsTrigger value="join-requests" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
-                JOIN REQUESTS {pendingJoinCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold">{pendingJoinCount}</span>}
-              </TabsTrigger>
             )}
-          </TabsList>
+          </div>
         </div>
 
-        <TabsContent value="members" className="mt-6 space-y-4">
+        <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none h-auto">
+          <TabsTrigger value="members" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
+            MEMBERS ({total})
+          </TabsTrigger>
+          <TabsTrigger value="invites" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
+            INVITES ({invitationsResult?.data?.length || 0})
+          </TabsTrigger>
+          {isOwner && (
+            <TabsTrigger value="join-requests" className="rounded-none border-b-2 border-transparent px-4 py-2 uppercase text-xs font-semibold">
+              JOIN REQUESTS {pendingJoinCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold">{pendingJoinCount}</span>}
+            </TabsTrigger>
+          )}
+        </TabsList>
+      </div>
+
+      <div className="mt-4">
+        <TabsContent value="members" className="space-y-4">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start lg:items-center">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
@@ -410,9 +411,10 @@ export default function MembersPage() {
             <JoinRequestsTab organizationId={organizationId} />
           </TabsContent>
         )}
-      </Tabs>
+      </div>
+    </Tabs>
 
-      <Dialog open={inviteDialogOpen} onOpenChange={(o) => { setInviteDialogOpen(o); if(!o) inviteForm.reset(); }}>
+    <Dialog open={inviteDialogOpen} onOpenChange={(o) => { setInviteDialogOpen(o); if(!o) inviteForm.reset(); }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader><DialogTitle>Invite New Member</DialogTitle><DialogDescription>Send email invitation.</DialogDescription></DialogHeader>
           <Form {...inviteForm}>
@@ -439,6 +441,6 @@ export default function MembersPage() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   )
 }

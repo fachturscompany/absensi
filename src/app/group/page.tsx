@@ -332,17 +332,20 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 pt-0">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Groups</h1>
-        <Button size="sm" onClick={openAdd}>
-          <Plus className="h-4 w-4" /> Add Group
-        </Button>
+    <>
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Groups</h1>
+          <Button size="sm" onClick={openAdd}>
+            <Plus className="h-4 w-4" /> Add Group
+          </Button>
+        </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+      <div className="mt-4 space-y-4">
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <Input
@@ -432,6 +435,7 @@ export default function GroupsPage() {
         target={deleteTarget}
         onConfirm={handleDelete}
       />
-    </div>
+      </div>
+    </>
   )
 }
