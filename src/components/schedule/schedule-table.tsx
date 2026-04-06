@@ -67,7 +67,7 @@ export default function ScheduleTable({
     return (
         <div className="space-y-4">
             <div>
-                <div className="overflow-x-auto w-full">
+                <div className="overflow-x-auto w-full mb-4">
                     <table className="w-full min-w-[880px]">
                         <thead className="sticky top-0 z-10 bg-muted/50">
                             <tr>
@@ -138,8 +138,10 @@ export default function ScheduleTable({
                                                 aria-label={`Select ${ws.name}`}
                                             />
                                         </td>
-                                        <td className="p-3">
-                                            <p className="font-medium text-sm">{ws.name}</p>
+                                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                            <Link href={`/schedules/${ws.id}`} className="hover:underline font-medium text-sm text-primary">
+                                                {ws.name}
+                                            </Link>
                                         </td>
                                         <td className="p-3">
                                             <p className="font-medium text-xs text-muted-foreground">{ws.description || "-"}</p>
@@ -211,6 +213,7 @@ export default function ScheduleTable({
                 {/* Pagination Footer */}
                 {!isLoading && totalCount > 0 && (
                     <PaginationFooter
+                        className="mt-4"
                         page={currentPage}
                         totalPages={totalPages}
                         onPageChange={onPageChange}

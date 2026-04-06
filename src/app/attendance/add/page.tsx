@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation"
 import { useMembers } from "@/hooks/attendance/add/use-members"
 import { useBatchAttendance } from "@/hooks/attendance/add/use-batch-attendance"
 import { useFormatDate } from "@/hooks/use-format-date"
+import { useOrganizationId } from "@/hooks/use-organization-id"
 import { Button } from "@/components/ui/button"
 
 dayjs.extend(utc)
@@ -23,6 +24,7 @@ dayjs.extend(timezone)
 export default function AttendancePage() {
   const router = useRouter()
   const { timezone: orgTimezone } = useFormatDate()
+  const { data: organizationId } = useOrganizationId()
   const [selectedMemberId, setSelectedMemberId] = useState<string>("")
   const [activeTab, setActiveTab] = useState<"single" | "batch">("single")
 
@@ -39,6 +41,21 @@ export default function AttendancePage() {
 
   const { members, departments, loading: membersLoading } = useMembers()
   const batch = useBatchAttendance()
+
+  // Reset form when organization changes
+  useEffect(() => {
+    if (organizationId) {
+      singleForm.reset({
+        memberId: "",
+        checkInDate: dayjs().tz(orgTimezone).format("YYYY-MM-DD"),
+        checkInTime: "",
+        status: "present",
+        remarks: ""
+      })
+      batch.clearAllEntries()
+      setSelectedMemberId("")
+    }
+  }, [organizationId, orgTimezone])
 
   const watchedMemberId = singleForm.watch("memberId")
   useEffect(() => {

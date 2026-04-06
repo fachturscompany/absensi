@@ -34,8 +34,10 @@ export function useMembers() {
   // ✅ TRANSFORM DATA:
   const members: MemberOption[] = query.data?.map((m: IOrganization_member) => ({
     id: m.id.toString(),
+    userId: m.user_id,
     label: m.computed_name || `Member ${m.id}`,
-    department: m.groupName || "General"
+    department: m.groupName || "General",
+    avatar: m.user?.profile_photo_url || null
   })) || []
 
   const departments = Array.from(new Set(members.map(m => m.department))).sort()

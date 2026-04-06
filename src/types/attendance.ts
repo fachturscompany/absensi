@@ -56,8 +56,10 @@ export interface AttendanceEntry {
 
 export interface MemberOption {
   id: string
+  userId?: string
   label: string
   department: string
+  avatar?: string | null
 }
 
 export interface RawMember {
@@ -88,8 +90,10 @@ export interface BatchEntry {
 
 export interface MemberOption { 
   id: string;
+  userId?: string;
   label: string;
   department: string;
+  avatar?: string | null;
 }
 
 export interface ScheduleRule {

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { MemberOption, BatchEntry } from "@/types/attendance"
 import type { UseFormReturn } from "react-hook-form"
 import type { SingleFormValues } from "@/types/attendance" // Adjust path
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 
 // ✅ PROPER TYPES - NO ANY!
 export interface DialogHandlers {
@@ -96,7 +97,7 @@ export function MemberDialog({
                 <Button
                   key={member.id}
                   variant="ghost"
-                  className="w-full justify-start text-left font-normal h-auto py-2"
+                  className="w-full justify-start text-left font-normal h-auto py-2 pr-4 pl-3 rounded-xl transition-all hover:bg-muted"
                   onClick={() => {
                     // ✅ MONOLITH EXACT - Proper single/batch logic
                     if (batch.activeBatchEntryId && batch.updateBatchEntry) {
@@ -118,9 +119,17 @@ export function MemberDialog({
                     batch.setActiveBatchEntryId(null)
                   }}
                 >
-                  <div className="flex flex-col">
-                    <span>{member.label}</span>
-                    <span className="text-xs text-muted-foreground">{member.department}</span>
+                  <div className="flex items-center gap-3 w-full">
+                    <UserAvatar
+                      name={member.label}
+                      photoUrl={member.avatar}
+                      userId={member.userId}
+                      className="h-9 w-9 border border-border shadow-sm shrink-0"
+                    />
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-semibold truncate">{member.label}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">{member.department}</span>
+                    </div>
                   </div>
                 </Button>
               ))

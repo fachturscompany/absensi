@@ -208,7 +208,6 @@ export function useBatchAttendance() {
   // ✅ UTILITY: Clear all entries
   const clearAllEntries = useCallback(() => {
     setBatchEntries([])
-    toast.info("All entries cleared")
   }, [])
 
   // ✅ UTILITY: Get entry count by status

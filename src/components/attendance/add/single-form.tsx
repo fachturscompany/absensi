@@ -23,6 +23,7 @@ import {
 import type { MemberOption, ScheduleRule, AttendanceFormValues } from "@/types/attendance"
 import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
 import { PaginationFooterCompact } from "@/components/customs/pagination-footer-compact"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 
 dayjs.extend(utc)
 dayjs.extend(timezonePlugin)
@@ -104,7 +105,7 @@ function ActionBtn({
         done
           ? "border-border bg-muted/40 text-muted-foreground"
           : active
-            ? "border-foreground bg-foreground text-background shadow-lg scale-[1.02]"
+            ? "border-border bg-muted text-foreground hover:cursor-pointer"
             : "border-border bg-background text-foreground hover:border-foreground/40 hover:bg-muted/30",
         !disabled && !done && !active && "active:scale-[0.97]",
       )}
@@ -115,7 +116,7 @@ function ActionBtn({
       <span className={cn("transition-all", loading ? "opacity-0" : "opacity-100")}>
         {icon}
       </span>
-      {loading && <Loader2 className="absolute h-5 w-5 animate-spin" />}
+      {loading && <Loader2 className="absolute h-5 w-5 animate-spin pb-1" />}
       <span className="text-[11px] font-semibold tracking-wide uppercase leading-none">
         {label}
       </span>
@@ -359,18 +360,18 @@ export function SingleForm({
 
   return (
     <TabsContent value="single" asChild>
-      <div className="flex gap-4 h-[600px] overflow-hidden mt-2">
+      <div className="flex gap-4 h-[600px] overflow-hidden mb-2 mt-2">
 
-        <div className="hidden md:flex w-[280px] shrink-0 flex-col gap-3 h-full border-r pr-2 border-border pb-1">
+        <div className="hidden md:flex w-[280px] shrink-0 flex-col gap-3 h-full border-r pr-2 border-border pb-1 mt-2 mb-2">
           <div className="relative shrink-0">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               ref={searchRef}
               type="text"
               placeholder="Search member..."
               value={memberSearch}
               onChange={e => setMemberSearch(e.target.value)}
-              className="w-full rounded-xl border bg-background pl-8 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              className="w-full rounded-2xl border-2 bg-background pl-10 pr-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all border-border"
             />
           </div>
 
@@ -389,21 +390,24 @@ export function SingleForm({
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
                   m.id === externalMemberId
-                    ? "bg-foreground text-background"
-                    : "hover:bg-muted/60 text-foreground",
+                    ? "bg-muted text-foreground"
+                    : "bg-background text-foreground hover:border-foreground/40 hover:bg-muted/30",
                 )}
               >
-                <div className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                  m.id === externalMemberId ? "bg-background/20" : "bg-muted",
-                )}>
-                  {m.label.charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar
+                  name={m.label}
+                  photoUrl={m.avatar}
+                  userId={m.userId}
+                  className={cn(
+                    "h-9 w-9 border border-border shadow-sm shrink-0",
+                    m.id === externalMemberId ? "bg-background" : "bg-muted",
+                  )}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold truncate leading-tight">
                     {m.label}
                   </p>
-                  <p className="text-[10px] opacity-60 truncate">{m.department}</p>
+                  <p className="text-[10px] opacity-60 truncate uppercase tracking-wider">{m.department}</p>
                 </div>
                 {m.id === externalMemberId && (
                   <ChevronRight className="h-3 w-3 opacity-40" />
@@ -433,14 +437,17 @@ export function SingleForm({
             >
               {selectedMember ? (
                 <>
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background text-xs font-bold">
-                    {selectedMember.label.charAt(0).toUpperCase()}
-                  </div>
+                  <UserAvatar
+                    name={selectedMember.label}
+                    photoUrl={selectedMember.avatar}
+                    userId={selectedMember.userId}
+                    className="h-9 w-9 border border-border shadow-sm shrink-0"
+                  />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold truncate">
                       {selectedMember.label}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-xs text-muted-foreground truncate uppercase tracking-wider">
                       {selectedMember.department}
                     </p>
                   </div>
@@ -470,12 +477,12 @@ export function SingleForm({
                     {scheduleError}
                   </span>
                 ) : schedule ? (
-                  <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Clock className="h-3 w-3 opacity-50" />
+                  <span className="flex items-center gap-1 text-foreground font-bold uppercase tracking-wide">
+                    <Clock className="h-3.5 w-3.5 opacity-50 mr-1" />
                     {schedule.start_time.slice(0, 5)} - {schedule.end_time.slice(0, 5)}
                     {schedule.break_start && (
-                      <span className="text-muted-foreground font-normal ml-2">
-                        Break {schedule.break_start.slice(0, 5)} - {schedule.break_end?.slice(0, 5)}
+                      <span className="text-muted-foreground font-medium ml-2 border-l pl-2 border-border">
+                        BREAK {schedule.break_start.slice(0, 5)} - {schedule.break_end?.slice(0, 5)}
                       </span>
                     )}
                   </span>
@@ -487,7 +494,7 @@ export function SingleForm({
 
           {externalMemberId ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-2 sm:gap-3 shrink-0">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 shrink-0">
                 <ActionBtn
                   label="Check In"
                   icon={<LogIn className="h-5 w-5" />}

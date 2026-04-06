@@ -17,6 +17,7 @@ import { type BatchAttendanceReturn } from "@/types/attendance"
 import { getMemberSchedule } from "@/action/attendance"
 import { cn } from "@/lib/utils"
 import { type BatchEntry } from "@/types/attendance"
+import { UserAvatar } from "@/components/profile&image/user-avatar"
 
 interface BatchAttendanceFormProps {
   onSubmit: () => Promise<void>
@@ -315,14 +316,17 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                     <div key={entry.id} className="p-4 border rounded-xl bg-zinc-50 dark:bg-zinc-900/40 space-y-3 relative group">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold">
-                            {member?.label?.charAt(0) || '?'}
-                          </div>
+                          <UserAvatar
+                            name={member?.label || "?"}
+                            photoUrl={member?.avatar}
+                            userId={member?.userId}
+                            className="h-8 w-8 border border-border shadow-sm shrink-0"
+                          />
                           <div>
                             <p className="font-semibold text-sm">
-                              {member?.label || 'Select Member...'}
+                              {member?.label || "Select Member..."}
                             </p>
-                            <p className="text-[10px] text-muted-foreground uppercase">{member?.department || '-'}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase">{member?.department || "-"}</p>
                             {sched && (
                               <p className="text-[9px] text-emerald-600 font-medium">
                                 📅 {sched.start_time?.slice(0, 5)} - {sched.end_time?.slice(0, 5)}
