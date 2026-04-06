@@ -27,7 +27,7 @@ export function StatsCard({ title, value, loading, icon: Icon, trend, color = "b
           <div className="text-2xl font-bold">
             {value.toLocaleString()}
             {trend && (
-              <span className={`ml-2 text-sm ${trend === "up" ? "text-green-600" : "text-red-600"}`}>
+              <span className={`ml-2 text-sm ${trend === "up" ? "text-slate-700" : "text-red-600"}`}>
                 {trend === "up" ? <TrendingUp className="w-4 h-4 inline" /> : <TrendingDown className="w-4 h-4 inline" />}
               </span>
             )}

@@ -372,7 +372,7 @@ export default function OnboardingSetupPage() {
                                 <div className="flex flex-col items-center">
                                     <div
                                         className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${isCompleted
-                                            ? "bg-green-500 border-green-500 text-white"
+                                            ? "bg-slate-600 border-green-500 text-white"
                                             : isActive
                                                 ? "bg-primary border-primary text-primary-foreground shadow-md shadow-primary/30"
                                                 : "bg-white border-slate-200 text-slate-400"
@@ -386,7 +386,7 @@ export default function OnboardingSetupPage() {
                                     </div>
                                     <div className="mt-1.5 text-center w-24">
                                         <p
-                                            className={`text-xs font-semibold leading-tight ${isActive ? "text-primary" : isCompleted ? "text-green-600" : "text-slate-400"
+                                            className={`text-xs font-semibold leading-tight ${isActive ? "text-primary" : isCompleted ? "text-slate-700" : "text-slate-400"
                                                 }`}
                                         >
                                             {step.title}

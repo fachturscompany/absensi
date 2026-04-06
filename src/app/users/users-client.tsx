@@ -67,7 +67,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
       cell: ({ row }) => {
         const active = row.getValue("is_active") as boolean
         return active ? (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-600 text-white">
             <Check className="w-3 h-3 mr-1" /> Active
           </span>
         ) : (

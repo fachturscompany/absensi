@@ -330,10 +330,10 @@ export default function NewLocationPage() {
           </Card>
 
           {/* Device Type Info (Read Only) */}
-          <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-100">
+          <div className="p-4 bg-slate-50/50 rounded-lg border border-blue-100">
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-blue-100 rounded-md">
-                <Smartphone className="h-4 w-4 text-blue-600" />
+              <div className="p-2 bg-slate-100 rounded-md">
+                <Smartphone className="h-4 w-4 text-slate-700" />
               </div>
               <div>
                 <p className="text-sm font-medium text-blue-900">Mobile Attendance Point</p>

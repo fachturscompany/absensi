@@ -279,7 +279,7 @@ export function FlexibleImportDialog({
             <div className="flex-1 flex flex-col gap-4">
               <div
                 className={`flex-1 flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 ${isDragActive
-                    ? "border-blue-500 bg-blue-50/60 dark:bg-blue-400/10"
+                    ? "border-blue-500 bg-slate-50/60 dark:bg-blue-400/10"
                     : "border-muted"
                   }`}
                 onDragEnter={handleDragEnter}
@@ -326,7 +326,7 @@ export function FlexibleImportDialog({
                 <a
                   href="/templates/members-import-template.xlsx"
                   download
-                  className="text-blue-600 hover:underline font-semibold"
+                  className="text-slate-700 hover:underline font-semibold"
                 >
                   Download Template
                 </a>

@@ -330,7 +330,7 @@ export default function WorkBreaksPage() {
                                             <td className="p-4">
                                                 <span className={cn(
                                                     "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                                                    item.status === 'Compliant' ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                                                    item.status === 'Compliant' ? "bg-slate-100 text-green-800" : "bg-red-100 text-red-800"
                                                 )}>
                                                     {item.status || '-'}
                                                 </span>

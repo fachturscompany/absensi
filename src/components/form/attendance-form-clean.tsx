@@ -55,11 +55,11 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour)
 const MINUTES = Array.from({ length: 12 }, (_, idx) => idx * 5)
 
 const STATUSES = [
-  { value: "present", label: "Present", color: "bg-green-100 text-green-800" },
+  { value: "present", label: "Present", color: "bg-slate-100 text-green-800" },
   { value: "absent", label: "Absent", color: "bg-red-100 text-red-800" },
   { value: "late", label: "Late", color: "bg-yellow-100 text-yellow-800" },
-  { value: "excused", label: "Excused", color: "bg-blue-100 text-blue-800" },
-  { value: "early_leave", label: "Early Leave", color: "bg-purple-100 text-purple-800" },
+  { value: "excused", label: "Excused", color: "bg-slate-100 text-blue-800" },
+  { value: "early_leave", label: "Early Leave", color: "bg-slate-100 text-purple-800" },
 ]
 
 const formSchema = z.object({

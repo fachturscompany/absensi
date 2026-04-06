@@ -801,7 +801,7 @@ export default function FingerPage() {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="flex items-center gap-3 px-4 py-3 bg-card rounded-lg shadow-sm border">
-              <div className="p-2 rounded-lg bg-green-500/10">
+              <div className="p-2 rounded-lg bg-slate-600/10">
                 <Check className="w-5 h-5 text-primary" />
               </div>
               <div>

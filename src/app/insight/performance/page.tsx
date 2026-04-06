@@ -345,7 +345,7 @@ export default function PerformancePage() {
                     {filteredUtilization && filteredUtilization.dailyWorkHours < filteredUtilization.targetHours ? "Below target" : "On target"}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-black"></div>
                     Avg. daily target: {filteredUtilization?.avgDailyTarget.toFixed(1) || '8.0'}
                   </div>
                 </div>
@@ -358,7 +358,7 @@ export default function PerformancePage() {
                 </div>
                 <div className="h-1 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 rounded-full"
+                    className="h-full bg-black rounded-full"
                     style={{ width: `${Math.min(utilizationPercentage, 100)}%` }}
                   ></div>
                 </div>
@@ -416,7 +416,7 @@ export default function PerformancePage() {
                   return (
                     <div key={idx} className="flex-1 flex flex-col items-center gap-1">
                       <div className="w-full bg-gray-200 rounded-t" style={{ height: `${(total / 8) * 100}%`, minHeight: '20px' }}>
-                        <div className="w-full bg-green-500 rounded-t" style={{ height: `${focusPercent}%` }}></div>
+                        <div className="w-full bg-slate-600 rounded-t" style={{ height: `${focusPercent}%` }}></div>
                       </div>
                       <span className="text-xs text-gray-500">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</span>
                     </div>
@@ -427,7 +427,7 @@ export default function PerformancePage() {
               </div>
               <div className="mt-4 flex items-center justify-center gap-4 text-xs">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded"></div>
+                  <div className="w-3 h-3 bg-slate-600 rounded"></div>
                   <span className="text-gray-600">Focus time</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -500,7 +500,7 @@ export default function PerformancePage() {
                     </svg>
                     Sign in with Google
                   </button>
-                  <button className="w-full max-w-xs flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                  <button className="w-full max-w-xs flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded hover:bg-blue-700 text-sm">
                     <svg className="w-5 h-5" viewBox="0 0 21 21" fill="white">
                       <rect width="10" height="10" fill="white" />
                       <rect x="11" width="10" height="10" fill="white" />
@@ -550,7 +550,7 @@ export default function PerformancePage() {
               <p className="text-sm text-gray-700 mb-4">
                 Connect your organization's communication platform to measure how your teams are engaging in collaboration
               </p>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded hover:bg-blue-700 text-sm">
                 <svg className="w-5 h-5" viewBox="0 0 21 21" fill="white">
                   <rect width="10" height="10" fill="white" />
                   <rect x="11" width="10" height="10" fill="white" />

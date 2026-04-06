@@ -91,7 +91,7 @@ export function InvitationsTable({ invitations, isLoading = false, onUpdate }: I
     const getStatusBadge = (status: string) => {
         const variants = {
             pending: { icon: Clock, color: "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400" },
-            accepted: { icon: CheckCircle2, color: "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400" },
+            accepted: { icon: CheckCircle2, color: "bg-slate-100 dark:bg-green-900/20 text-green-800 dark:text-green-400" },
             expired: { icon: XCircle, color: "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400" },
             cancelled: { icon: Ban, color: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300" },
         } as const;

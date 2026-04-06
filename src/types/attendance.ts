@@ -35,10 +35,10 @@ export interface StatusOption {
 }
 
 export const QUICK_STATUSES = [
-  { value: "present", label: "Present", color: "bg-green-100 text-green-800" },
+  { value: "present", label: "Present", color: "bg-slate-100 text-green-800" },
   { value: "absent", label: "Absent", color: "bg-red-100 text-red-800" },
   { value: "late", label: "Late", color: "bg-yellow-100 text-yellow-800" },
-  { value: "excused", label: "Excused", color: "bg-blue-100 text-blue-800" },
+  { value: "excused", label: "Excused", color: "bg-slate-100 text-blue-800" },
 ] as const
 
 export interface AttendanceEntry {

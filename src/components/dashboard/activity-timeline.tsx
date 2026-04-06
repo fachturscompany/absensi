@@ -27,39 +27,39 @@ interface ActivityTimelineProps {
 const statusConfig = {
   present: {
     label: 'Hadir',
-    color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400',
+    color: 'bg-slate-600/10 text-slate-700 dark:bg-slate-600/20 dark:text-green-400',
     icon: CheckCircle2,
-    iconColor: 'text-green-600 dark:text-green-400',
+    iconColor: 'text-slate-700 dark:text-green-400',
   },
   on_time: {
     label: 'Hadir',
-    color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400',
+    color: 'bg-slate-600/10 text-slate-700 dark:bg-slate-600/20 dark:text-green-400',
     icon: CheckCircle2,
-    iconColor: 'text-green-600 dark:text-green-400',
+    iconColor: 'text-slate-700 dark:text-green-400',
   },
   late: {
     label: 'Terlambat',
-    color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400',
+    color: 'bg-slate-400/10 text-slate-500 dark:bg-slate-400/20 dark:text-orange-400',
     icon: AlertCircle,
-    iconColor: 'text-orange-600 dark:text-orange-400',
+    iconColor: 'text-slate-500 dark:text-orange-400',
   },
   early_leave: {
     label: 'Pulang Awal',
-    color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400',
+    color: 'bg-slate-400/10 text-slate-500 dark:bg-slate-400/20 dark:text-orange-400',
     icon: AlertCircle,
-    iconColor: 'text-orange-600 dark:text-orange-400',
+    iconColor: 'text-slate-500 dark:text-orange-400',
   },
   late_and_early: {
     label: 'Telat & Pulang Awal',
-    color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400',
+    color: 'bg-slate-400/10 text-slate-500 dark:bg-slate-400/20 dark:text-orange-400',
     icon: AlertCircle,
-    iconColor: 'text-orange-600 dark:text-orange-400',
+    iconColor: 'text-slate-500 dark:text-orange-400',
   },
   excused_absence: {
     label: 'Izin/Cuti',
-    color: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
+    color: 'bg-black/10 text-slate-700 dark:bg-black/20 dark:text-blue-400',
     icon: Clock,
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    iconColor: 'text-slate-700 dark:text-blue-400',
   },
   absent: {
     label: 'Tidak Hadir',
@@ -272,7 +272,7 @@ export function ActivityTimeline({
                     </div>
 
                     {activity.lateMinutes && activity.lateMinutes > 0 && (
-                      <div className="mt-1 text-xs text-orange-600 dark:text-orange-400">
+                      <div className="mt-1 text-xs text-slate-500 dark:text-orange-400">
                         Late by {activity.lateMinutes} minutes
                       </div>
                     )}

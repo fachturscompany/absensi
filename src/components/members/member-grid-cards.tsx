@@ -203,11 +203,11 @@ export function MemberGridCards({ members, onView, onEdit, onDelete }: MemberGri
               {/* Stats */}
               <div className="w-full mt-4 pt-4 border-t grid grid-cols-3 gap-2">
                 <div className="text-center">
-                  <div className="text-xl font-bold text-green-600">{stats.attendance}%</div>
+                  <div className="text-xl font-bold text-slate-700">{stats.attendance}%</div>
                   <div className="text-xs text-muted-foreground">Attendance</div>
                 </div>
                 <div className="text-center border-x">
-                  <div className="text-xl font-bold text-blue-600">{stats.present}</div>
+                  <div className="text-xl font-bold text-slate-700">{stats.present}</div>
                   <div className="text-xs text-muted-foreground">Present</div>
                 </div>
                 <div className="text-center">

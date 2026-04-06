@@ -112,7 +112,7 @@ export const TodaySummaryHero = memo(function TodaySummaryHero({
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <Badge variant="secondary" className="bg-green-500/80 text-white hover:bg-green-500 border-0">
+                  <Badge variant="secondary" className="bg-slate-600/80 text-white hover:bg-slate-600 border-0">
                     <UserCheck className="h-3 w-3 mr-1" />
                     On-time: {summaryData.onTime}
                   </Badge>

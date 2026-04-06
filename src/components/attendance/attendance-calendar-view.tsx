@@ -57,13 +57,13 @@ export function AttendanceCalendarView({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'present':
-        return 'bg-green-500';
+        return 'bg-slate-600';
       case 'late':
         return 'bg-amber-500';
       case 'absent':
         return 'bg-red-500';
       case 'excused':
-        return 'bg-blue-500';
+        return 'bg-black';
       default:
         return 'bg-gray-200';
     }
@@ -114,10 +114,10 @@ export function AttendanceCalendarView({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Present Days</p>
-                <p className="text-3xl font-bold text-green-600">{stats.present}</p>
+                <p className="text-3xl font-bold text-slate-700">{stats.present}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-950 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+              <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-green-950 flex items-center justify-center">
+                <TrendingUp className="h-6 w-6 text-slate-700" />
               </div>
             </div>
           </CardContent>
@@ -158,8 +158,8 @@ export function AttendanceCalendarView({
                 <p className="text-sm font-medium text-muted-foreground">Avg Hours/Day</p>
                 <p className="text-3xl font-bold">{(stats.avgDuration / 60).toFixed(1)}h</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-blue-600" />
+              <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-blue-950 flex items-center justify-center">
+                <Clock className="h-6 w-6 text-slate-700" />
               </div>
             </div>
           </CardContent>
@@ -293,7 +293,7 @@ export function AttendanceCalendarView({
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-slate-600" />
                   <span className="text-xs text-muted-foreground">Present</span>
                 </div>
                 <div className="flex items-center gap-1">

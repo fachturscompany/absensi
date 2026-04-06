@@ -189,9 +189,9 @@ export function ActivateDeviceDialog({
                                     </FormControl>
                                     <FormMessage />
                                     {selectedDeviceCode && field.value && (
-                                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
                                             <p className="text-xs text-gray-600">Preview Full Serial Number:</p>
-                                            <p className="text-sm font-semibold text-blue-600 mt-1">{selectedDeviceCode}-{field.value}</p>
+                                            <p className="text-sm font-semibold text-slate-700 mt-1">{selectedDeviceCode}-{field.value}</p>
                                         </div>
                                     )}
                                 </FormItem>

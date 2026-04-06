@@ -91,9 +91,9 @@ export function ModernProfileCard({
   className,
 }: ProfileCardProps) {
   const statusColors = {
-    active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    active: 'bg-slate-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
     inactive: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-    'on-leave': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    'on-leave': 'bg-slate-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   };
 
   if (variant === 'compact') {
@@ -268,7 +268,7 @@ export function ModernProfileCard({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{profile.attendanceRate}%</span>
                 {profile.attendanceRate >= 95 ? (
-                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  <TrendingUp className="h-4 w-4 text-slate-700" />
                 ) : profile.attendanceRate >= 80 ? (
                   <Activity className="h-4 w-4 text-amber-600" />
                 ) : (
@@ -285,7 +285,7 @@ export function ModernProfileCard({
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">On Time</p>
-                  <p className="text-sm font-semibold text-green-600">
+                  <p className="text-sm font-semibold text-slate-700">
                     {profile.stats.onTime}
                   </p>
                 </div>
@@ -330,7 +330,7 @@ export function ModernProfileCard({
                 <p className="text-sm font-medium">Today's Activity</p>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                    <div className="h-2 w-2 rounded-full bg-slate-600" />
                     <span className="text-muted-foreground">Check In</span>
                   </div>
                   <span className="font-mono">
@@ -339,7 +339,7 @@ export function ModernProfileCard({
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                    <div className="h-2 w-2 rounded-full bg-black" />
                     <span className="text-muted-foreground">Check Out</span>
                   </div>
                   <span className="font-mono">

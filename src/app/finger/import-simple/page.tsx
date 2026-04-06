@@ -466,9 +466,9 @@ export default function FingerImportSimplePage() {
                       <>
                         <div className="flex justify-center">
                           <div className="relative">
-                            <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-2xl"></div>
-                            <div className="relative bg-purple-100 dark:bg-purple-900/30 rounded-full p-8">
-                              <FileText className="h-16 w-16 text-purple-600 dark:text-purple-400" />
+                            <div className="absolute inset-0 bg-slate-500/20 rounded-full blur-2xl"></div>
+                            <div className="relative bg-slate-100 dark:bg-purple-900/30 rounded-full p-8">
+                              <FileText className="h-16 w-16 text-slate-600 dark:text-purple-400" />
                             </div>
                           </div>
                         </div>
@@ -480,7 +480,7 @@ export default function FingerImportSimplePage() {
                           <a
                             href="/templates/finger-import-template.xlsx"
                             download
-                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                            className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Download className="h-4 w-4" />
@@ -738,8 +738,8 @@ export default function FingerImportSimplePage() {
 
                     {/* Test Results */}
                     {testSummary && (
-                      <Alert className={testSummary.failed === 0 ? "border-green-500/50 bg-green-500/5" : "border-destructive/50 bg-destructive/5"}>
-                        <AlertCircle className={`h-4 w-4 ${testSummary.failed === 0 ? "text-green-600" : "text-destructive"}`} />
+                      <Alert className={testSummary.failed === 0 ? "border-green-500/50 bg-slate-600/5" : "border-destructive/50 bg-destructive/5"}>
+                        <AlertCircle className={`h-4 w-4 ${testSummary.failed === 0 ? "text-slate-700" : "text-destructive"}`} />
                         <AlertDescription>
                           <div className="space-y-2">
                             <div className="flex items-center gap-4">
@@ -892,10 +892,10 @@ export default function FingerImportSimplePage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 border rounded-lg bg-green-50 dark:bg-green-950">
                           <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="h-5 w-5 text-slate-700" />
                             <span className="font-semibold">Success</span>
                           </div>
-                          <p className="text-2xl font-bold text-green-600">{importSummary.success}</p>
+                          <p className="text-2xl font-bold text-slate-700">{importSummary.success}</p>
                         </div>
                         <div className="p-4 border rounded-lg bg-red-50 dark:bg-red-950">
                           <div className="flex items-center gap-2 mb-2">
@@ -940,8 +940,8 @@ export default function FingerImportSimplePage() {
                                           <TableCell className="min-w-[200px]">
                                             {isSuccess ? (
                                               <div className="flex items-center gap-2">
-                                                <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                                                <span className="text-sm text-green-600 font-medium">Success</span>
+                                                <CheckCircle2 className="h-4 w-4 text-slate-700 shrink-0" />
+                                                <span className="text-sm text-slate-700 font-medium">Success</span>
                                               </div>
                                             ) : (
                                               <div className="flex items-start gap-2">

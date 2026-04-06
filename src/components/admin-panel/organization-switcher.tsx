@@ -86,7 +86,7 @@ export function OrganizationSwitcher({ isOpen }: OrganizationSwitcherProps) {
                         </div>
                         <div className="flex flex-col gap-0.5 leading-none px-1">
                             <div className="font-medium text-sm text-foreground">{org.name}</div>
-                            <div className={cn("text-xs", org.status === "Active" ? "text-green-600 font-medium" : "text-muted-foreground")}>
+                            <div className={cn("text-xs", org.status === "Active" ? "text-slate-700 font-medium" : "text-muted-foreground")}>
                                 {org.status}
                             </div>
                         </div>

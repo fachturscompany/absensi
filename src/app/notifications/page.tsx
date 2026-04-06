@@ -65,7 +65,7 @@ const categoryBadgeMeta: Record<
   attendance: {
     label: "Attendance",
     className:
-      "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-400/10 dark:text-blue-200",
+      "bg-slate-50 text-blue-800 border-slate-200 dark:bg-blue-400/10 dark:text-blue-200",
   },
   schedule: {
     label: "Schedule",

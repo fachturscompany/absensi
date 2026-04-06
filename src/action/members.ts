@@ -988,7 +988,9 @@ export const updateMemberInfo = async (
     last_name?: string;
     display_name?: string;
     phone?: string;
+    phone_code?: string;
     mobile?: string;
+    mobile_code?: string;
     date_of_birth?: string;
   }
 ) => {
@@ -1031,3 +1033,100 @@ export const updateMemberInfo = async (
     return { success: false, message: error.message || "Failed to update member information" };
   }
 };
+
+export const updateMemberEmployment = async (
+  memberId: string | number,
+  data: {
+    department_id?: string | null;
+    position_id?: string | null;
+    contract_type?: string | null;
+    work_location?: string | null;
+    hire_date?: string | null;
+    termination_date?: string | null;
+    tax_id_number?: string | null;
+    tax_type?: string | null;
+    account_code?: string | null;
+    employment_status?: string | null;
+    employment_comments?: string | null;
+  }
+) => {
+  const adminClient = createAdminClient();
+  try {
+    const updatePayload: Record<string, unknown> = {};
+    if (data.department_id !== undefined) updatePayload.department_id = data.department_id;
+    if (data.position_id !== undefined) updatePayload.position_id = data.position_id;
+    if (data.contract_type !== undefined) updatePayload.contract_type = data.contract_type;
+    if (data.work_location !== undefined) updatePayload.work_location = data.work_location;
+    if (data.hire_date !== undefined) updatePayload.hire_date = data.hire_date;
+    if (data.termination_date !== undefined) updatePayload.termination_date = data.termination_date;
+    if (data.tax_id_number !== undefined) updatePayload.tax_id_number = data.tax_id_number;
+    if (data.tax_type !== undefined) updatePayload.tax_type = data.tax_type;
+    if (data.account_code !== undefined) updatePayload.account_code = data.account_code;
+    if (data.employment_status !== undefined) updatePayload.employment_status = data.employment_status;
+    if (data.employment_comments !== undefined) updatePayload.employment_comments = data.employment_comments;
+
+    if (Object.keys(updatePayload).length > 0) {
+      const { error } = await adminClient
+        .from("organization_members")
+        .update(updatePayload)
+        .eq("id", memberId);
+      if (error) throw error;
+    }
+
+    return { success: true, message: "Employment data updated successfully" };
+  } catch (error: any) {
+    memberLogger.error("updateMemberEmployment error:", error);
+    return { success: false, message: error.message || "Failed to update employment data" };
+  }
+};
+
+export const updateMemberRole = async (
+  memberId: string,
+  roleId: string
+) => {
+  const adminClient = createAdminClient();
+  try {
+    // Delete existing roles
+    await adminClient
+      .from("organization_member_roles")
+      .delete()
+      .eq("organization_member_id", memberId);
+
+    // Insert new role
+    const { error } = await adminClient
+      .from("organization_member_roles")
+      .insert({ organization_member_id: memberId, role_id: roleId });
+
+    if (error) throw error;
+
+    return { success: true, message: "Role updated successfully" };
+  } catch (error: any) {
+    memberLogger.error("updateMemberRole error:", error);
+    return { success: false, message: error.message || "Failed to update role" };
+  }
+};
+
+export const getDepartmentsList = async (organizationId: string) => {
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient
+    .from("departments")
+    .select("id, name, code")
+    .eq("organization_id", organizationId)
+    .order("name", { ascending: true });
+
+  if (error) return { success: false, data: [] as { id: string; name: string; code?: string }[] };
+  return { success: true, data: (data ?? []) as { id: string; name: string; code?: string }[] };
+};
+
+export const getPositionsList = async (organizationId: string) => {
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient
+    .from("positions")
+    .select("id, title, code")
+    .eq("organization_id", organizationId)
+    .order("title", { ascending: true });
+
+  if (error) return { success: false, data: [] as { id: string; title: string; code?: string }[] };
+  return { success: true, data: (data ?? []) as { id: string; title: string; code?: string }[] };
+};
+

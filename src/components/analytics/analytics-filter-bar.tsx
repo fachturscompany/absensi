@@ -91,10 +91,10 @@ const DATE_PRESETS = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'present', label: 'Present', color: 'bg-green-500' },
+  { value: 'present', label: 'Present', color: 'bg-slate-600' },
   { value: 'late', label: 'Late', color: 'bg-amber-500' },
   { value: 'absent', label: 'Absent', color: 'bg-red-500' },
-  { value: 'leave', label: 'Leave', color: 'bg-blue-500' },
+  { value: 'leave', label: 'Leave', color: 'bg-black' },
 ];
 
 export function AnalyticsFilterBar({

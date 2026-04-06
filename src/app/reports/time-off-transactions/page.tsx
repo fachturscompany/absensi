@@ -306,15 +306,15 @@ export default function TimeOffTransactionsPage() {
                                                 </td>
                                                 <td className="p-3">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize
-                                                        ${item.transactionType === 'accrual' ? 'bg-green-100 text-green-800' :
+                                                        ${item.transactionType === 'accrual' ? 'bg-slate-100 text-green-800' :
                                                             item.transactionType === 'usage' ? 'bg-red-100 text-red-800' :
-                                                                item.transactionType === 'adjustment' ? 'bg-blue-100 text-blue-800' :
-                                                                    item.transactionType === 'cancellation' ? 'bg-orange-100 text-orange-800' :
+                                                                item.transactionType === 'adjustment' ? 'bg-slate-100 text-blue-800' :
+                                                                    item.transactionType === 'cancellation' ? 'bg-slate-100 text-orange-800' :
                                                                         'bg-gray-100 text-gray-800'}`}>
                                                         {item.transactionType}
                                                     </span>
                                                 </td>
-                                                <td className={`p-3 text-right font-medium ${item.amount > 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                                                <td className={`p-3 text-right font-medium ${item.amount > 0 ? 'text-slate-700' : 'text-gray-900'}`}>
                                                     {item.amount > 0 ? "+" : ""}{item.amount}
                                                 </td>
                                                 <td className="p-3 text-right text-gray-900 font-medium">

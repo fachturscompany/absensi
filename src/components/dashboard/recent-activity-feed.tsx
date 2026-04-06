@@ -22,13 +22,13 @@ interface RecentActivityFeedProps {
 const getStatusIcon = (status?: string) => {
   switch (status?.toLowerCase()) {
     case 'present':
-      return <Check className="h-4 w-4 text-green-600" />
+      return <Check className="h-4 w-4 text-slate-700" />
     case 'late':
       return <AlertCircle className="h-4 w-4 text-amber-600" />
     case 'absent':
       return <AlertCircle className="h-4 w-4 text-red-600" />
     case 'excused':
-      return <Clock className="h-4 w-4 text-blue-600" />
+      return <Clock className="h-4 w-4 text-slate-700" />
     default:
       return <Clock className="h-4 w-4 text-gray-400" />
   }
@@ -43,7 +43,7 @@ const getStatusColor = (status?: string) => {
     case 'absent':
       return 'bg-red-50 text-red-700 border-red-200'
     case 'excused':
-      return 'bg-blue-50 text-blue-700 border-blue-200'
+      return 'bg-slate-50 text-blue-700 border-slate-200'
     default:
       return 'bg-gray-50 text-gray-700 border-gray-200'
   }

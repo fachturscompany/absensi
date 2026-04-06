@@ -400,13 +400,13 @@ export default function ScreenshotsLayout({ children }: { children: React.ReactN
                                     style={{ maxHeight: "calc(100vh - 220px)" }}
                                 >
                                     <div className="border-b border-slate-100 px-6 py-5">
-                                        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-blue-500">Filters</p>
+                                        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-600">Filters</p>
                                     </div>
                                     <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
                                         <div className="space-y-2 rounded-2xl border border-slate-200 bg-[#f5f8ff] px-4 py-3">
                                             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Member</p>
                                             <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)]">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-600">
                                                     <User className="h-4 w-4" />
                                                 </div>
                                                 <div className="text-sm font-semibold text-slate-700">

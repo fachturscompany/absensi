@@ -161,7 +161,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                     <div className="relative">
                         <Button
                             ref={addButtonRef}
-                            className="rounded-full bg-blue-500 px-4 py-2 text-white shadow-lg hover:bg-blue-600 focus-visible:ring focus-visible:ring-blue-200 flex items-center gap-2"
+                            className="rounded-full bg-black px-4 py-2 text-white shadow-lg hover:bg-slate-900 focus-visible:ring focus-visible:ring-slate-200 flex items-center gap-2"
                             onClick={() => setIsAddMenuOpen((prev) => !prev)}
                         >
                             <span className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Total Pegawai</p>
                                 <h3 className="text-2xl font-bold">156</h3>
                             </div>
-                            <div className="p-3 rounded-full text-blue-600 bg-blue-100">
+                            <div className="p-3 rounded-full text-slate-700 bg-slate-100">
                                 <Users className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -213,7 +213,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                     {view === 'me' ? 'Hadir' : '142'}
                                 </h3>
                             </div>
-                            <div className="p-3 rounded-full text-green-600 bg-green-100">
+                            <div className="p-3 rounded-full text-slate-700 bg-slate-100">
                                 <UserCheck className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -226,7 +226,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Terlambat</p>
                                 <h3 className="text-2xl font-bold">8</h3>
                             </div>
-                            <div className="p-3 rounded-full text-orange-600 bg-orange-100">
+                            <div className="p-3 rounded-full text-slate-500 bg-slate-100">
                                 <Clock className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -239,7 +239,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Izin / Sakit</p>
                                 <h3 className="text-2xl font-bold">4</h3>
                             </div>
-                            <div className="p-3 rounded-full text-purple-600 bg-purple-100">
+                            <div className="p-3 rounded-full text-slate-600 bg-slate-100">
                                 <FileText className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -248,13 +248,13 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {visibleWidgets.earned_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned this week</p><h3 className="text-2xl font-bold">Rp 3.450.000</h3></div><div className="p-3 rounded-full bg-blue-100 text-blue-600"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.earned_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned today</p><h3 className="text-2xl font-bold">Rp 550.000</h3></div><div className="p-3 rounded-full bg-blue-100 text-blue-600"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.worked_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked this week</p><h3 className="text-2xl font-bold">38h 25m</h3></div><div className="p-3 rounded-full bg-emerald-100 text-emerald-600"><Clock className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.worked_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked today</p><h3 className="text-2xl font-bold">6h 40m</h3></div><div className="p-3 rounded-full bg-emerald-100 text-emerald-600"><Clock className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.projects_worked && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Projects worked</p><h3 className="text-2xl font-bold">5</h3></div><div className="p-3 rounded-full bg-purple-100 text-purple-600"><Briefcase className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.activity_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Today&apos;s activity</p><h3 className="text-2xl font-bold">Normal</h3></div><div className="p-3 rounded-full bg-cyan-100 text-cyan-600"><Activity className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.activity_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Weekly activity</p><h3 className="text-2xl font-bold">↑ 12%</h3></div><div className="p-3 rounded-full bg-cyan-100 text-cyan-600"><Activity className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.earned_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned this week</p><h3 className="text-2xl font-bold">Rp 3.450.000</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.earned_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned today</p><h3 className="text-2xl font-bold">Rp 550.000</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.worked_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked this week</p><h3 className="text-2xl font-bold">38h 25m</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><Clock className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.worked_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked today</p><h3 className="text-2xl font-bold">6h 40m</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><Clock className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.projects_worked && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Projects worked</p><h3 className="text-2xl font-bold">5</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-600"><Briefcase className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.activity_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Today&apos;s activity</p><h3 className="text-2xl font-bold">Normal</h3></div><div className="p-3 rounded-full bg-slate-50 text-slate-400"><Activity className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.activity_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Weekly activity</p><h3 className="text-2xl font-bold">↑ 12%</h3></div><div className="p-3 rounded-full bg-slate-50 text-slate-400"><Activity className="w-6 h-6" /></div></CardContent></Card>}
             </div>
 
             {/* Map Section */}
@@ -283,7 +283,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <div className="flex-shrink-0">
                                     <h3 className="text-3xl font-bold">57%</h3>
                                     <div className="flex items-center gap-2 text-sm mt-1">
-                                        <span className="text-emerald-600">▲ 1%</span>
+                                        <span className="text-slate-700">▲ 1%</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 h-16">
@@ -314,7 +314,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <div className="flex-shrink-0">
                                     <h3 className="text-3xl font-bold">4:56:48</h3>
                                     <div className="flex items-center gap-2 text-sm mt-1">
-                                        <span className="text-emerald-600">▲ 4:56:48</span>
+                                        <span className="text-slate-700">▲ 4:56:48</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 h-16">
@@ -348,7 +348,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 <div className="flex-shrink-0">
                                     <h3 className="text-3xl font-bold">$237.44</h3>
                                     <div className="flex items-center gap-2 text-sm mt-1">
-                                        <span className="text-emerald-600">▲ $237.44</span>
+                                        <span className="text-slate-700">▲ $237.44</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 h-16">
@@ -408,7 +408,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                         <Card className="shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                                    <Activity className="h-5 w-5 text-blue-500" />
+                                    <Activity className="h-5 w-5 text-slate-600" />
                                     Recent Activity
                                 </CardTitle>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -418,7 +418,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                             <CardContent>
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-sm ring-2 ring-blue-100">
+                                        <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center text-white shadow-sm ring-2 ring-slate-100">
                                             <Users className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -426,7 +426,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                             <p className="text-xs text-muted-foreground">Software Engineer</p>
                                         </div>
                                     </div>
-                                    <Link href="#" className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium transition-colors">
+                                    <Link href="#" className="text-sm text-slate-700 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium transition-colors">
                                         View all <ArrowRight className="h-3 w-3" />
                                     </Link>
                                 </div>
@@ -494,7 +494,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                     <p className="text-muted-foreground text-sm capitalize">{today}</p>
                                 </div>
                                 <Link href="/attendance/list">
-                                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50 gap-2 h-8 text-xs">
+                                    <Button variant="outline" size="sm" className="text-slate-700 border-slate-200 hover:bg-slate-50 gap-2 h-8 text-xs">
                                         Lihat Riwayat Absensi
                                         <ArrowRight className="h-3 w-3" />
                                     </Button>
@@ -585,7 +585,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                                 <div className="font-medium">{t.title}</div>
                                                 <div className="text-muted-foreground">{t.assignee} • Due {t.due}</div>
                                             </div>
-                                            <Badge variant="secondary" className="bg-blue-100 text-blue-700">{t.status}</Badge>
+                                            <Badge variant="secondary" className="bg-slate-100 text-blue-700">{t.status}</Badge>
                                         </div>
                                     ))}
                                 </div>
@@ -617,7 +617,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                     </div>
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 text-xs">
-                                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                            <div className="w-2 h-2 rounded-full bg-black"></div>
                                             <span className="font-medium text-muted-foreground">68% Core work</span>
                                         </div>
                                         <div className="flex items-center gap-2 text-xs">
@@ -625,16 +625,16 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                             <span className="font-medium text-muted-foreground">30% Non-core work</span>
                                         </div>
                                         <div className="flex items-center gap-2 text-xs">
-                                            <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                                            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
                                             <span className="font-medium text-muted-foreground">2% Unproductive</span>
                                         </div>
                                     </div>
                                 </div>
                                 {/* Stacked Progress Bar */}
                                 <div className="h-3 w-full rounded-full flex overflow-hidden mb-1">
-                                    <div className="h-full bg-blue-500" style={{ width: '68%' }}></div>
+                                    <div className="h-full bg-black" style={{ width: '68%' }}></div>
                                     <div className="h-full" style={{ width: '30%', backgroundColor: '#A9A9A9' }}></div>
-                                    <div className="h-full bg-orange-500" style={{ width: '2%' }}></div>
+                                    <div className="h-full bg-slate-400" style={{ width: '2%' }}></div>
                                 </div>
                                 <div className="flex justify-between text-xs text-muted-foreground mt-2">
                                     <span>0%</span>
@@ -692,7 +692,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                             <div className="py-6">
                                 <h3 className="text-sm font-medium text-muted-foreground mb-4">Top core work members</h3>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs border border-blue-200">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs border border-slate-200">
                                         68
                                     </div>
                                     <span className="text-sm font-medium">Radhitya Wicaksono</span>
@@ -724,7 +724,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                         <CardHeader className="pb-2">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="text-base font-semibold">Data Status Staff</CardTitle>
-                                <Badge variant="secondary" className="bg-blue-500 text-white hover:bg-blue-600">
+                                <Badge variant="secondary" className="bg-black text-white hover:bg-slate-900">
                                     Jml Staff : {totalStaff}
                                 </Badge>
                             </div>
@@ -811,7 +811,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 ))}
                             </div>
                             <div className="p-3 border-t text-center">
-                                <Button variant="ghost" size="sm" className="w-full text-xs text-blue-600 hover:text-blue-700 h-8">
+                                <Button variant="ghost" size="sm" className="w-full text-xs text-slate-700 hover:text-blue-700 h-8">
                                     Lihat Semua Pengajuan
                                 </Button>
                             </div>
@@ -841,12 +841,12 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-muted-foreground">Keterlambatan</span>
-                                    <span className="font-semibold text-orange-600">2 kali</span>
+                                    <span className="font-semibold text-slate-500">2 kali</span>
                                 </div>
                             </div>
                             <div className="pt-2 border-t">
                                 <Link href="/attendance/list">
-                                    <Button variant="outline" size="sm" className="w-full text-xs text-blue-600 border-blue-200 hover:bg-blue-50">
+                                    <Button variant="outline" size="sm" className="w-full text-xs text-slate-700 border-slate-200 hover:bg-slate-50">
                                         Lihat Detail
                                     </Button>
                                 </Link>
@@ -874,7 +874,7 @@ export default function DashboardView({ initialView }: DashboardViewProps) {
                                                 <div className="text-muted-foreground">{it.shift}</div>
                                             </div>
                                             <div className="text-right">
-                                                <Badge variant={it.missed ? "destructive" : "secondary"} className={it.missed ? "" : "bg-orange-100 text-orange-700"}>
+                                                <Badge variant={it.missed ? "destructive" : "secondary"} className={it.missed ? "" : "bg-slate-100 text-orange-700"}>
                                                     {it.missed ? "Missed" : `Late ${it.lateBy ?? ""}`}
                                                 </Badge>
                                             </div>

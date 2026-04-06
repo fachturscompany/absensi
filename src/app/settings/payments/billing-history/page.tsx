@@ -88,8 +88,8 @@ export default function BillingHistoryPage() {
                                             <td className="px-6 py-4 text-slate-500">{invoice.date}</td>
                                             <td className="px-6 py-4 font-medium text-slate-900">{invoice.amount}</td>
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 text-emerald-600">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                <div className="flex items-center gap-2 text-slate-700">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
                                                     {invoice.status}
                                                 </div>
                                             </td>

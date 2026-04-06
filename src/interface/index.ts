@@ -19,7 +19,9 @@ export interface IUser {
     last_name?: string;
     display_name?: string | null;
     phone?: string;
+    phone_code?: string | null;
     mobile?: string;
+    mobile_code?: string | null;
     date_of_birth?: string;
     gender?: "male" | "female" | "other" | "prefer_not_to_say" | null;
     nationality?: string;
@@ -371,6 +373,7 @@ export interface IOrganization_member {
     probation_end_date?: string;
     contract_type?: string;
     employment_status?: string;
+    employment_comments?: string | null;
     termination_date?: string;
     work_location?: string;
     tax_id_number?: string;

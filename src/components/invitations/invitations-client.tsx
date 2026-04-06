@@ -237,7 +237,7 @@ export default function InvitationsClient() {
         const status = row.original.status;
         const variants = {
           pending: { icon: Clock, color: "bg-yellow-100 text-yellow-800" },
-          accepted: { icon: CheckCircle2, color: "bg-green-100 text-green-800" },
+          accepted: { icon: CheckCircle2, color: "bg-slate-100 text-green-800" },
           expired: { icon: XCircle, color: "bg-red-100 text-red-800" },
           cancelled: { icon: Ban, color: "bg-gray-100 text-gray-800" },
         } as const;
@@ -339,7 +339,7 @@ export default function InvitationsClient() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.accepted}</div>
+            <div className="text-2xl font-bold text-slate-700">{stats.accepted}</div>
           </CardContent>
         </Card>
 

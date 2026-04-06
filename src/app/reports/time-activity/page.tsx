@@ -486,7 +486,7 @@ export default function TimeActivityPage() {
                                                 <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100 font-medium">{formatDecimalHours(item.totalHours)}</td>
                                             )}
                                             {visibleCols.activityPercent && (
-                                                <td className="px-4 py-3 text-right text-green-600 dark:text-green-400 font-medium">{item.activityPercent}%</td>
+                                                <td className="px-4 py-3 text-right text-slate-700 dark:text-green-400 font-medium">{item.activityPercent}%</td>
                                             )}
                                             {visibleCols.totalSpent && (
                                                 <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{formatCurrency(item.totalSpent)}</td>

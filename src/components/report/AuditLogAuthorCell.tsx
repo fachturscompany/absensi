@@ -24,7 +24,7 @@ export function AuditLogAuthorCell({ author, className, avatarClassName, showRin
             {/* Colorful Avatar Logic matching Client Budget Report */}
             {(() => {
                 const name = author.name || ""
-                const colors = ["bg-red-500", "bg-orange-500", "bg-amber-500", "bg-green-500", "bg-blue-500", "bg-indigo-500", "bg-purple-500", "bg-pink-500"]
+                const colors = ["bg-red-500", "bg-slate-400", "bg-amber-500", "bg-slate-600", "bg-black", "bg-indigo-500", "bg-slate-500", "bg-pink-500"]
                 const colorClass = author.color || colors[name.length % colors.length] || "bg-gray-500"
 
                 return (

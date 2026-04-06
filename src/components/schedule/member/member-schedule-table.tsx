@@ -156,7 +156,7 @@ export default function MemberScheduleTable({
         return (
           <Badge
             variant={active ? "default" : "secondary"}
-            className={active ? "bg-green-500 hover:bg-green-600" : ""}
+            className={active ? "bg-slate-600 hover:bg-green-600" : ""}
             role="status"
             aria-label={active ? "Schedule is active" : "Schedule is inactive"}
           >

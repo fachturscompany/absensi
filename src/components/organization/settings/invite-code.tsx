@@ -65,7 +65,7 @@ export function InviteCodeControl({
           className="h-8 w-8 p-0"
         >
           {inviteCodeCopied ? (
-            <Check className="h-3 w-3 text-green-600" />
+            <Check className="h-3 w-3 text-slate-700" />
           ) : (
             <ClipboardCheck className="h-3 w-3" />
           )}

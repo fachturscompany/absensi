@@ -260,7 +260,7 @@ export default function ModernCheckIn() {
                   )}>
                     <div className="flex items-start gap-3">
                       {checkInData.status === 'success' ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
+                        <CheckCircle2 className="h-5 w-5 text-slate-700 dark:text-green-400 mt-0.5" />
                       ) : checkInData.status === 'warning' ? (
                         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
                       ) : (
@@ -373,7 +373,7 @@ export default function ModernCheckIn() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 rounded-full bg-slate-600" />
                   <span>On Time</span>
                 </div>
                 <span className="font-medium">{mockStats.onTime}</span>
@@ -387,7 +387,7 @@ export default function ModernCheckIn() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  <div className="h-2 w-2 rounded-full bg-black" />
                   <span>Early</span>
                 </div>
                 <span className="font-medium">{mockStats.early}</span>
@@ -423,7 +423,7 @@ export default function ModernCheckIn() {
           <CardContent className="space-y-3">
             <div className="text-2xl font-bold">96.5%</div>
             <Progress value={96.5} className="h-2" />
-            <Badge variant="outline" className="gap-1 text-green-600 dark:text-green-400">
+            <Badge variant="outline" className="gap-1 text-slate-700 dark:text-green-400">
               <Activity className="h-3 w-3" />
               Excellent
             </Badge>
@@ -461,7 +461,7 @@ export default function ModernCheckIn() {
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       'h-2 w-2 rounded-full',
-                      record.status === 'present' && 'bg-green-500',
+                      record.status === 'present' && 'bg-slate-600',
                       record.status === 'weekend' && 'bg-gray-400'
                     )} />
                     <div>

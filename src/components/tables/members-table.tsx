@@ -150,7 +150,7 @@ export function MembersTable({
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
                           "h-2 w-2 rounded-full shrink-0",
-                          member.is_active ? "bg-green-500" : "bg-gray-300"
+                          member.is_active ? "bg-slate-600" : "bg-gray-300"
                         )} />
                         <span className="text-xs font-medium">
                           {member.is_active ? "Active" : "Inactive"}

@@ -234,7 +234,7 @@ export default function UnusualActivityPage() {
                                         membersSummary.map((row) => {
                                             const severityBadge: Record<typeof row.severity, string> = {
                                                 highly_unusual: 'bg-red-100 text-red-700',
-                                                unusual: 'bg-orange-100 text-orange-700',
+                                                unusual: 'bg-slate-100 text-orange-700',
                                                 slightly_unusual: 'bg-yellow-100 text-yellow-700',
                                             }
 

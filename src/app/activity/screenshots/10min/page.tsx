@@ -829,7 +829,7 @@ export default function Every10MinPage() {
                     <Info className="h-3.5 w-3.5 text-slate-400" />
                   </div>
                   <div className="flex flex-col items-center justify-center gap-3 py-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-50">
                       <svg className="h-8 w-8 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
@@ -885,7 +885,7 @@ export default function Every10MinPage() {
                     {/* Right: Legend */}
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-slate-600"></div>
                         <span className="text-sm text-gray-700">{workClassificationData.coreWork.percentage}% Core work</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -893,7 +893,7 @@ export default function Every10MinPage() {
                         <span className="text-sm text-gray-700">{workClassificationData.nonCoreWork.percentage}% Non-core work</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-slate-400"></div>
                         <span className="text-sm text-gray-700">{workClassificationData.unproductive.percentage}% Unproductive</span>
                       </div>
                     </div>
@@ -904,7 +904,7 @@ export default function Every10MinPage() {
                     <div className="h-4 rounded-full bg-gray-100 overflow-visible flex relative mb-3">
                       {/* Core work segment */}
                       <div
-                        className="bg-green-500 relative group cursor-pointer transition-opacity hover:opacity-90"
+                        className="bg-slate-600 relative group cursor-pointer transition-opacity hover:opacity-90"
                         style={{ width: `${workClassificationData.coreWork.percentage}%` }}
                         onMouseEnter={() => setHoveredSegment('core')}
                         onMouseLeave={() => setHoveredSegment(null)}
@@ -918,7 +918,7 @@ export default function Every10MinPage() {
                       />
                       {/* Unproductive segment */}
                       <div
-                        className="bg-orange-500 relative group cursor-pointer transition-opacity hover:opacity-90"
+                        className="bg-slate-400 relative group cursor-pointer transition-opacity hover:opacity-90"
                         style={{ width: `${workClassificationData.unproductive.percentage}%` }}
                         onMouseEnter={() => setHoveredSegment('unproductive')}
                         onMouseLeave={() => setHoveredSegment(null)}

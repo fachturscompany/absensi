@@ -694,7 +694,7 @@ export function AddTimeOffPolicyDialog({ open, onOpenChange, onSave, initialData
                                         <div className="border rounded-lg p-4 flex items-center justify-between bg-white">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                    <div className="text-green-600 font-bold text-xs">CSV</div>
+                                                    <div className="text-slate-700 font-bold text-xs">CSV</div>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-sm font-medium text-slate-900 truncate max-w-[200px]">

@@ -212,7 +212,7 @@ export default function DashboardPage() {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Total Pegawai</p>
                                 <h3 className="text-2xl font-bold">156</h3>
                             </div>
-                            <div className="p-3 rounded-full text-blue-600 bg-blue-100">
+                            <div className="p-3 rounded-full text-slate-700 bg-slate-100">
                                 <Users className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                                     {view === 'me' ? 'Hadir' : '142'}
                                 </h3>
                             </div>
-                            <div className="p-3 rounded-full text-green-600 bg-green-100">
+                            <div className="p-3 rounded-full text-slate-700 bg-slate-100">
                                 <UserCheck className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -242,7 +242,7 @@ export default function DashboardPage() {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Terlambat</p>
                                 <h3 className="text-2xl font-bold">8</h3>
                             </div>
-                            <div className="p-3 rounded-full text-orange-600 bg-orange-100">
+                            <div className="p-3 rounded-full text-slate-500 bg-slate-100">
                                 <Clock className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
                                 <p className="text-sm font-medium text-muted-foreground mb-1">Izin / Sakit</p>
                                 <h3 className="text-2xl font-bold">4</h3>
                             </div>
-                            <div className="p-3 rounded-full text-purple-600 bg-purple-100">
+                            <div className="p-3 rounded-full text-slate-600 bg-slate-100">
                                 <FileText className="w-6 h-6" />
                             </div>
                         </CardContent>
@@ -264,13 +264,13 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {visibleWidgets.earned_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned this week</p><h3 className="text-2xl font-bold">Rp 3.450.000</h3></div><div className="p-3 rounded-full bg-blue-100 text-blue-600"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.earned_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned today</p><h3 className="text-2xl font-bold">Rp 550.000</h3></div><div className="p-3 rounded-full bg-blue-100 text-blue-600"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.worked_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked this week</p><h3 className="text-2xl font-bold">38h 25m</h3></div><div className="p-3 rounded-full bg-emerald-100 text-emerald-600"><Clock className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.worked_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked today</p><h3 className="text-2xl font-bold">6h 40m</h3></div><div className="p-3 rounded-full bg-emerald-100 text-emerald-600"><Clock className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.projects_worked && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Projects worked</p><h3 className="text-2xl font-bold">5</h3></div><div className="p-3 rounded-full bg-purple-100 text-purple-600"><Briefcase className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.activity_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Today&apos;s activity</p><h3 className="text-2xl font-bold">Normal</h3></div><div className="p-3 rounded-full bg-cyan-100 text-cyan-600"><Activity className="w-6 h-6" /></div></CardContent></Card>}
-                {visibleWidgets.activity_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Weekly activity</p><h3 className="text-2xl font-bold">↑ 12%</h3></div><div className="p-3 rounded-full bg-cyan-100 text-cyan-600"><Activity className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.earned_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned this week</p><h3 className="text-2xl font-bold">Rp 3.450.000</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.earned_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Earned today</p><h3 className="text-2xl font-bold">Rp 550.000</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><BarChart3 className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.worked_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked this week</p><h3 className="text-2xl font-bold">38h 25m</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><Clock className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.worked_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Worked today</p><h3 className="text-2xl font-bold">6h 40m</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-700"><Clock className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.projects_worked && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Projects worked</p><h3 className="text-2xl font-bold">5</h3></div><div className="p-3 rounded-full bg-slate-100 text-slate-600"><Briefcase className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.activity_today && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Today&apos;s activity</p><h3 className="text-2xl font-bold">Normal</h3></div><div className="p-3 rounded-full bg-slate-50 text-slate-400"><Activity className="w-6 h-6" /></div></CardContent></Card>}
+                {visibleWidgets.activity_week && <Card className="shadow-sm"><CardContent className="p-6 flex justify-between"><div><p className="text-sm text-muted-foreground">Weekly activity</p><h3 className="text-2xl font-bold">↑ 12%</h3></div><div className="p-3 rounded-full bg-slate-50 text-slate-400"><Activity className="w-6 h-6" /></div></CardContent></Card>}
             </div>
 
             {/* Map Section */}
@@ -498,7 +498,7 @@ export default function DashboardPage() {
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Keterlambatan</span>
-                                        <span className="font-semibold text-orange-600">2 kali</span>
+                                        <span className="font-semibold text-slate-500">2 kali</span>
                                     </div>
                                 </div>
                                 <div className="pt-2 border-t">
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                                                 <div className="text-muted-foreground">{it.shift}</div>
                                             </div>
                                             <div className="text-right">
-                                                <Badge variant={it.missed ? "destructive" : "secondary"} className={it.missed ? "" : "bg-orange-100 text-orange-700"}>
+                                                <Badge variant={it.missed ? "destructive" : "secondary"} className={it.missed ? "" : "bg-slate-100 text-orange-700"}>
                                                     {it.missed ? "Missed" : `Late ${it.lateBy ?? ""}`}
                                                 </Badge>
                                             </div>

@@ -23,11 +23,11 @@ import {
 } from "@/components/ui/select"
 
 const statusLabels: Record<string, { label: string; color: string }> = {
-    completed: { label: 'Completed', color: 'bg-green-100 text-green-800' },
+    completed: { label: 'Completed', color: 'bg-slate-100 text-green-800' },
     late: { label: 'Late', color: 'bg-yellow-100 text-yellow-800' },
-    early_leave: { label: 'Early Leave', color: 'bg-orange-100 text-orange-800' },
+    early_leave: { label: 'Early Leave', color: 'bg-slate-100 text-orange-800' },
     missed: { label: 'Missed', color: 'bg-red-100 text-red-800' },
-    upcoming: { label: 'Upcoming', color: 'bg-blue-100 text-blue-800' },
+    upcoming: { label: 'Upcoming', color: 'bg-slate-100 text-blue-800' },
 }
 
 const calculateDuration = (start: string, end: string) => {

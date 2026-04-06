@@ -234,7 +234,7 @@ export default function ShiftManagementClient({
       cell: ({ row }) => {
         const active = row.original.is_active
         return (
-          <Badge variant={active ? "default" : "secondary"} className={active ? "bg-green-500 hover:bg-green-600" : ""}>
+          <Badge variant={active ? "default" : "secondary"} className={active ? "bg-slate-600 hover:bg-green-600" : ""}>
             {active ? "Active" : "Inactive"}
           </Badge>
         )

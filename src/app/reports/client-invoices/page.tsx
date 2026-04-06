@@ -273,8 +273,8 @@ export default function ClientInvoicesPage() {
                                                     <td className="py-3 pl-4 font-medium text-gray-900">
                                                         {groupBy === 'status' ? item.clientName : (
                                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                                            ${item.status === 'Paid' ? 'bg-green-100 text-green-800' :
-                                                                    item.status === 'Open' ? 'bg-blue-100 text-blue-800' :
+                                                            ${item.status === 'Paid' ? 'bg-slate-100 text-green-800' :
+                                                                    item.status === 'Open' ? 'bg-slate-100 text-blue-800' :
                                                                         item.status === 'Closed' ? 'bg-gray-100 text-gray-800' :
                                                                             'bg-red-100 text-red-800'}`}>
                                                                 {item.status}

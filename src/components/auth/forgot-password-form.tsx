@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
         />
 
         {status !== "idle" && (
-          <p className={`text-sm ${status === "success" ? "text-green-600" : "text-red-500"}`}>
+          <p className={`text-sm ${status === "success" ? "text-slate-700" : "text-red-500"}`}>
             {message}
           </p>
         )}

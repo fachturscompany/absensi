@@ -190,7 +190,7 @@ export default function HighlightsPage() {
                             className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${activity.severity === "highly_unusual"
                               ? "bg-red-500"
                               : activity.severity === "unusual"
-                                ? "bg-orange-500"
+                                ? "bg-slate-400"
                                 : "bg-yellow-500"
                               }`}
                           />
@@ -242,7 +242,7 @@ export default function HighlightsPage() {
                             className={`px-2 py-1 text-xs rounded ${notification.severity === "high"
                               ? "bg-red-100 text-red-700"
                               : notification.severity === "medium"
-                                ? "bg-orange-100 text-orange-700"
+                                ? "bg-slate-100 text-orange-700"
                                 : "bg-yellow-100 text-yellow-700"
                               }`}
                           >
@@ -276,10 +276,10 @@ export default function HighlightsPage() {
                           <span className="font-semibold text-sm">{change.memberName}</span>
                           <span
                             className={`px-2 py-1 text-xs rounded ${change.changeType === "productivity_increase"
-                              ? "bg-green-100 text-green-700"
+                              ? "bg-slate-100 text-green-700"
                               : change.changeType === "productivity_decrease"
                                 ? "bg-red-100 text-red-700"
-                                : "bg-blue-100 text-blue-700"
+                                : "bg-slate-100 text-blue-700"
                               }`}
                           >
                             {change.changeType.replace("_", " ")}
@@ -290,7 +290,7 @@ export default function HighlightsPage() {
                           <span>Previous: {change.previousValue}</span>
                           <span>→</span>
                           <span>Current: {change.currentValue}</span>
-                          <span className={`font-semibold ${change.changePercent > 0 ? "text-green-600" : "text-red-600"}`}>
+                          <span className={`font-semibold ${change.changePercent > 0 ? "text-slate-700" : "text-red-600"}`}>
                             {change.changePercent > 0 ? "+" : ""}
                             {change.changePercent.toFixed(1)}%
                           </span>

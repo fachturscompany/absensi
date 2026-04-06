@@ -427,7 +427,7 @@ function ApplicationCard({ item, onToggle, onDismissError }: ApplicationCardProp
               </span>
             )}
             {isLoading && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">
                 <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
                 {item.status === "connecting" ? "Connecting" : "Disconnecting"}
               </span>
@@ -441,7 +441,7 @@ function ApplicationCard({ item, onToggle, onDismissError }: ApplicationCardProp
           </div>
         </div>
 
-        <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+        <h3 className="text-base font-semibold text-gray-900 group-hover:text-slate-700 transition-colors leading-snug">
           {item.name}
         </h3>
         <p className="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">
@@ -617,7 +617,7 @@ function ActiveApplicationsTable({
               </TableCell>
               <TableCell>
                 {item.status === "disconnecting" ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-blue-700 border border-slate-200">
                     <Loader2 className="h-3 w-3 animate-spin" />
                     Disconnecting
                   </span>
@@ -626,7 +626,7 @@ function ActiveApplicationsTable({
                     Error
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-green-800">
                     Active
                   </span>
                 )}

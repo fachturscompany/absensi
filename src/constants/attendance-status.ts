@@ -2,10 +2,10 @@ import { Check, X, Clock, Info } from "lucide-react"
 
 // Static data - tidak perlu fetch dari DB
 export const ATTENDANCE_STATUSES = [
-  { value: "present", label: "Present", color: "bg-green-500 text-white", icon: Check },
+  { value: "present", label: "Present", color: "bg-slate-600 text-white", icon: Check },
   { value: "absent", label: "Absent", color: "bg-gray-300 text-black", icon: X },
   { value: "late", label: "Late", color: "bg-red-500 text-white", icon: Clock },
-  { value: "excused", label: "Excused", color: "bg-blue-500 text-white", icon: Info },
+  { value: "excused", label: "Excused", color: "bg-black text-white", icon: Info },
 ] as const
 
 export const TIME_FORMATS = [

@@ -328,7 +328,7 @@ export function BatchForm({ onSubmit, onCancel, batch: externalBatch }: BatchAtt
                             </p>
                             <p className="text-[10px] text-muted-foreground uppercase">{member?.department || "-"}</p>
                             {sched && (
-                              <p className="text-[9px] text-emerald-600 font-medium">
+                              <p className="text-[9px] text-slate-700 font-medium">
                                 📅 {sched.start_time?.slice(0, 5)} - {sched.end_time?.slice(0, 5)}
                               </p>
                             )}

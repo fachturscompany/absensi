@@ -24,7 +24,7 @@ export function DashboardCard({
   value,
   description,
   icon: Icon,
-  iconColor = "text-blue-600",
+  iconColor = "text-slate-700",
   iconClass,
   trend,
   loading = false,
@@ -59,7 +59,7 @@ export function DashboardCard({
               <div className="flex items-center text-xs">
                 <span className={cn(
                   "font-medium",
-                  trend.value > 0 ? "text-green-600" : 
+                  trend.value > 0 ? "text-slate-700" : 
                   trend.value < 0 ? "text-red-600" : 
                   "text-gray-600"
                 )}>

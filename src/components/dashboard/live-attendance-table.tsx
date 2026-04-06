@@ -58,15 +58,15 @@ interface LiveAttendanceTableProps {
 const statusConfig = {
   present: {
     label: 'Hadir',
-    color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-green-500/20',
+    color: 'bg-slate-600/10 text-slate-700 dark:bg-slate-600/20 dark:text-green-400 border-green-500/20',
     icon: CheckCircle2,
-    dotColor: 'bg-green-500',
+    dotColor: 'bg-slate-600',
   },
   late: {
     label: 'Terlambat',
-    color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 border-orange-500/20',
+    color: 'bg-slate-400/10 text-slate-500 dark:bg-slate-400/20 dark:text-orange-400 border-orange-500/20',
     icon: AlertCircle,
-    dotColor: 'bg-orange-500',
+    dotColor: 'bg-slate-400',
   },
   absent: {
     label: 'Tidak Hadir',
@@ -76,9 +76,9 @@ const statusConfig = {
   },
   'on-leave': {
     label: 'Cuti',
-    color: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border-blue-500/20',
+    color: 'bg-black/10 text-slate-700 dark:bg-black/20 dark:text-blue-400 border-blue-500/20',
     icon: FileText,
-    dotColor: 'bg-blue-500',
+    dotColor: 'bg-black',
   },
 };
 
@@ -379,18 +379,18 @@ export function LiveAttendanceTable({ autoRefresh = true, refreshInterval = 1800
               <p className="font-bold text-foreground">{stats.total}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-green-500/5">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-600/5">
+            <div className="w-2 h-2 rounded-full bg-slate-600" />
             <div className="text-sm">
               <p className="text-muted-foreground">Present</p>
-              <p className="font-bold text-green-600 dark:text-green-400">{stats.present}</p>
+              <p className="font-bold text-slate-700 dark:text-green-400">{stats.present}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-orange-500/5">
-            <div className="w-2 h-2 rounded-full bg-orange-500" />
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-400/5">
+            <div className="w-2 h-2 rounded-full bg-slate-400" />
             <div className="text-sm">
               <p className="text-muted-foreground">Late</p>
-              <p className="font-bold text-orange-600 dark:text-orange-400">{stats.late}</p>
+              <p className="font-bold text-slate-500 dark:text-orange-400">{stats.late}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 p-2 rounded-lg bg-red-500/5">
@@ -520,7 +520,7 @@ export function LiveAttendanceTable({ autoRefresh = true, refreshInterval = 1800
                                           </span>
                                         </div>
                                         {record.late_minutes && record.late_minutes > 0 && (
-                                          <div className="flex justify-between text-orange-600 dark:text-orange-400">
+                                          <div className="flex justify-between text-slate-500 dark:text-orange-400">
                                             <span>Late by:</span>
                                             <span className="font-bold">{record.late_minutes} min</span>
                                           </div>

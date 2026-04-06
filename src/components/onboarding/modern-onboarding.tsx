@@ -55,7 +55,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
           <Sparkles className="h-12 w-12 text-primary" />
         </div>
         <motion.div
-          className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
+          className="absolute -top-2 -right-2 w-6 h-6 bg-slate-600 rounded-full flex items-center justify-center"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.5 }}
@@ -83,11 +83,11 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 
       <div className="flex items-center gap-8 pt-4">
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <CheckCircle2 className="h-5 w-5 text-slate-700" />
           <span className="text-sm">Free 14-day trial</span>
         </div>
         <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-blue-600" />
+          <Shield className="h-5 w-5 text-slate-700" />
           <span className="text-sm">No credit card required</span>
         </div>
         <div className="flex items-center gap-2">
@@ -424,8 +424,8 @@ function CompleteStep() {
         transition={{ type: "spring", bounce: 0.5 }}
         className="relative"
       >
-        <div className="w-24 h-24 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-          <CheckCircle2 className="h-12 w-12 text-green-600 dark:text-green-400" />
+        <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-green-900/20 flex items-center justify-center">
+          <CheckCircle2 className="h-12 w-12 text-slate-700 dark:text-green-400" />
         </div>
         <motion.div
           className="absolute inset-0 rounded-full border-4 border-green-600/20"

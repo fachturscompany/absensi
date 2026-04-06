@@ -270,8 +270,8 @@ export default function ExpensesPage() {
                                         <td className="p-4 text-center">
                                             <span className={cn(
                                                 "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                                                expense.status === 'approved' && "bg-green-100 text-green-800",
-                                                expense.status === 'reimbursed' && "bg-blue-100 text-blue-800",
+                                                expense.status === 'approved' && "bg-slate-100 text-green-800",
+                                                expense.status === 'reimbursed' && "bg-slate-100 text-blue-800",
                                                 expense.status === 'pending' && "bg-yellow-100 text-yellow-800",
                                                 expense.status === 'rejected' && "bg-red-100 text-red-800",
                                             )}>
@@ -280,7 +280,7 @@ export default function ExpensesPage() {
                                         </td>
                                         <td className="p-4 text-center">
                                             {expense.receiptUrl ? (
-                                                <a href={expense.receiptUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 flex justify-center">
+                                                <a href={expense.receiptUrl} target="_blank" rel="noreferrer" className="text-slate-700 hover:text-blue-800 flex justify-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-paperclip"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
                                                 </a>
                                             ) : (
@@ -315,8 +315,8 @@ export default function ExpensesPage() {
                                             <td className="p-4 text-center">
                                                 <span className={cn(
                                                     "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                                                    expense.status === 'approved' && "bg-green-100 text-green-800",
-                                                    expense.status === 'reimbursed' && "bg-blue-100 text-blue-800",
+                                                    expense.status === 'approved' && "bg-slate-100 text-green-800",
+                                                    expense.status === 'reimbursed' && "bg-slate-100 text-blue-800",
                                                     expense.status === 'pending' && "bg-yellow-100 text-yellow-800",
                                                     expense.status === 'rejected' && "bg-red-100 text-red-800",
                                                 )}>
@@ -325,7 +325,7 @@ export default function ExpensesPage() {
                                             </td>
                                             <td className="p-4 text-center">
                                                 {expense.receiptUrl ? (
-                                                    <a href={expense.receiptUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 flex justify-center">
+                                                    <a href={expense.receiptUrl} target="_blank" rel="noreferrer" className="text-slate-700 hover:text-blue-800 flex justify-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-paperclip"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
                                                     </a>
                                                 ) : (

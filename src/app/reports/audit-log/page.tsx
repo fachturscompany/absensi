@@ -139,17 +139,17 @@ export default function AuditLogPage() {
 
         // Orange: Modification/Update
         if (['updated', 'modified'].includes(lowerAction)) {
-            return "bg-orange-100 text-orange-700 border-orange-200"
+            return "bg-slate-100 text-orange-700 border-orange-200"
         }
 
         // Green: Creation/Approval/Positive Actions
         if (['accepted invite', 'approved', 'restored', 'enabled', 'merged', 'submitted'].includes(lowerAction)) {
-            return "bg-green-100 text-green-700 border-green-200"
+            return "bg-slate-100 text-green-700 border-green-200"
         }
 
         // Blue: Informational/New Item Actions
         if (['added', 'created', 'duplicated', 'opened', 'send email', 'transfered'].includes(lowerAction)) {
-            return "bg-blue-100 text-blue-700 border-blue-200"
+            return "bg-slate-100 text-blue-700 border-slate-200"
         }
 
         return "bg-gray-100 text-gray-700 border-gray-200"
@@ -235,7 +235,7 @@ export default function AuditLogPage() {
                                     {expandedGroups[date] && groupedData[date] && groupedData[date]!.map((item) => (
                                         <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
                                             <td className="p-4 align-top">
-                                                <span className="text-xs font-mono text-gray-500 group-hover:text-blue-600 transition-colors">{item.id}</span>
+                                                <span className="text-xs font-mono text-gray-500 group-hover:text-slate-700 transition-colors">{item.id}</span>
                                             </td>
                                             <td className="p-4 align-top">
                                                 <AuditLogAuthorCell author={item.author} />

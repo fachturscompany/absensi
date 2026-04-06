@@ -584,7 +584,7 @@ export function SingleForm({
               )}
 
               {step === "checked_out" && (
-                <div className="flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-900/20 px-4 py-3 text-emerald-600 dark:text-emerald-400 shrink-0">
+                <div className="flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-900/20 px-4 py-3 text-slate-700 dark:text-emerald-400 shrink-0">
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-sm font-medium">Completed</span>
                 </div>

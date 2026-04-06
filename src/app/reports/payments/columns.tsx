@@ -69,8 +69,8 @@ export const columns: ColumnDef<PaymentEntry>[] = [
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[300px] p-4 text-xs">
                             <div className="space-y-2">
-                                <p><span className="font-semibold text-green-600">Automatic:</span> Processed via payroll integration (PayPal, Wise, etc).</p>
-                                <p><span className="font-semibold text-blue-600">Manual:</span> Recorded manually (Bank Transfer, Cash, etc).</p>
+                                <p><span className="font-semibold text-slate-700">Automatic:</span> Processed via payroll integration (PayPal, Wise, etc).</p>
+                                <p><span className="font-semibold text-slate-700">Manual:</span> Recorded manually (Bank Transfer, Cash, etc).</p>
                             </div>
                         </TooltipContent>
                     </Tooltip>

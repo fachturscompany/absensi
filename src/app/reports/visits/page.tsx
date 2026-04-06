@@ -293,10 +293,10 @@ export default function VisitsPage() {
                                                             className="flex items-start gap-2 group/location p-1.5 -ml-1.5 rounded-md transition-colors cursor-pointer"
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0 group-hover/location:text-blue-600 transition-colors" />
+                                                            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0 group-hover/location:text-slate-700 transition-colors" />
                                                             <div>
                                                                 <div className="font-medium text-gray-900 group-hover/location:text-blue-700 transition-colors">{row.locationName}</div>
-                                                                <div className="text-xs text-gray-500 group-hover/location:text-blue-600 transition-colors">{row.address}</div>
+                                                                <div className="text-xs text-gray-500 group-hover/location:text-slate-700 transition-colors">{row.address}</div>
                                                             </div>
                                                         </a>
                                                     </td>

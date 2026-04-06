@@ -150,7 +150,7 @@ export function ResetPasswordForm() {
           </p>
         )}
         {error && <p className="text-sm text-red-500">{error}</p>}
-        {success && <p className="text-sm text-green-600">{success}</p>}
+        {success && <p className="text-sm text-slate-700">{success}</p>}
 
         <Button className="w-full" type="submit" disabled={loading || !sessionReady}>
           {loading ? "Saving..." : "Save New Password"}

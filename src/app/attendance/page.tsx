@@ -483,7 +483,7 @@ export default function AttendanceDashboardPage() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="text-3xl font-bold">{masterData.totalMembers}</div>
-                <Users className="w-8 h-8 text-blue-500 opacity-50" />
+                <Users className="w-8 h-8 text-slate-600 opacity-50" />
               </div>
               <p className="text-xs text-muted-foreground mt-2">Active members in organization</p>
             </CardContent>
@@ -533,12 +533,12 @@ export default function AttendanceDashboardPage() {
           <Card className="border-l-4 border-l-green-500 bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-background">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <CheckCircle2 className="w-4 h-4 text-slate-700" />
                 Attendance Rate
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">{metrics?.attendanceRate.toFixed(1) || '0.0'}%</div>
+              <div className="text-3xl font-bold text-slate-700">{metrics?.attendanceRate.toFixed(1) || '0.0'}%</div>
               <div className="mt-2 h-2 bg-green-200 rounded-full overflow-hidden">
                 <div className="h-full bg-green-600" style={{ width: `${Math.min(100, metrics?.attendanceRate || 0)}%` }} />
               </div>
@@ -551,14 +551,14 @@ export default function AttendanceDashboardPage() {
           <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Timer className="w-4 h-4 text-blue-600" />
+                <Timer className="w-4 h-4 text-slate-700" />
                 Punctuality Rate
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">{metrics?.punctualityRate.toFixed(1) || '0.0'}%</div>
+              <div className="text-3xl font-bold text-slate-700">{metrics?.punctualityRate.toFixed(1) || '0.0'}%</div>
               <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-600" style={{ width: `${Math.min(100, metrics?.punctualityRate || 0)}%` }} />
+                <div className="h-full bg-slate-900" style={{ width: `${Math.min(100, metrics?.punctualityRate || 0)}%` }} />
               </div>
               <p className="text-xs text-muted-foreground mt-2">
                 {metrics ? `${metrics.presentCount} on-time arrivals` : 'No data available'}
@@ -569,12 +569,12 @@ export default function AttendanceDashboardPage() {
           <Card className="border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/20 dark:to-background">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Clock className="w-4 h-4 text-orange-600" />
+                <Clock className="w-4 h-4 text-slate-500" />
                 Avg Work Hours
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{metrics?.avgWorkHours.toFixed(1) || '0.0'}h</div>
+              <div className="text-3xl font-bold text-slate-500">{metrics?.avgWorkHours.toFixed(1) || '0.0'}h</div>
               <p className="text-xs text-muted-foreground mt-4">
                 {metrics ? 'Per member per day average' : 'No data available'}
               </p>
@@ -720,8 +720,8 @@ export default function AttendanceDashboardPage() {
               <div className="space-y-4">
                 {departmentData.map((dept, index) => {
                   const colorSets = [
-                    { name: 'text-blue-700 dark:text-blue-300', badge: 'border-blue-500 text-blue-600', progress: 'bg-blue-500' },
-                    { name: 'text-green-700 dark:text-green-300', badge: 'border-green-500 text-green-600', progress: 'bg-green-500' },
+                    { name: 'text-blue-700 dark:text-blue-300', badge: 'border-blue-500 text-slate-700', progress: 'bg-black' },
+                    { name: 'text-green-700 dark:text-green-300', badge: 'border-green-500 text-slate-700', progress: 'bg-slate-600' },
                     { name: 'text-yellow-700 dark:text-yellow-400', badge: 'border-yellow-500 text-yellow-600', progress: 'bg-yellow-500' },
                   ] as const;
                   const c = colorSets[index % colorSets.length] || colorSets[0];
@@ -736,7 +736,7 @@ export default function AttendanceDashboardPage() {
                           <span className={`font-medium group-hover:underline ${c.name}`}>{displayName}</span>
                         </Link>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="text-green-600 dark:text-green-400">{dept.attended}/{dept.members}✓</span>
+                          <span className="text-slate-700 dark:text-green-400">{dept.attended}/{dept.members}✓</span>
                           <span className="font-bold min-w-[60px] text-right">{dept.rate.toFixed(1)}%</span>
                         </div>
                       </div>

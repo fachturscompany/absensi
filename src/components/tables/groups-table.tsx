@@ -332,7 +332,7 @@ export function GroupsTable({ groups, isLoading = false, onDelete, onEdit }: Gro
                   {visibleColumns.status && (
                     <td className="px-4 py-3 text-sm">
                       {group.is_active ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500 dark:bg-green-600 text-white">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-600 dark:bg-green-600 text-white">
                           Active
                         </span>
                       ) : (

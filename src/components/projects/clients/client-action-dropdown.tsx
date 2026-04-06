@@ -29,7 +29,7 @@ export function ClientActionsDropdown({ isArchived, onEdit, onArchive, onRestore
                         Restore
                     </DropdownMenuItem>
                 ) : (
-                    <DropdownMenuItem onClick={onArchive} className="text-orange-600">
+                    <DropdownMenuItem onClick={onArchive} className="text-slate-500">
                         Archive
                     </DropdownMenuItem>
                 )}

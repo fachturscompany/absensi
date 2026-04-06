@@ -379,7 +379,7 @@ export default function GeofencingPage() {
                                                         className={cn(
                                                             "text-[10px] h-6 px-2 min-w-[60px] flex justify-center uppercase font-bold border-0",
                                                             geo.is_active 
-                                                                ? "bg-emerald-100 text-emerald-700" 
+                                                                ? "bg-slate-100 text-emerald-700" 
                                                                 : "bg-slate-100 text-slate-500"
                                                         )}
                                                     >

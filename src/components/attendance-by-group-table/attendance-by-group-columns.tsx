@@ -36,7 +36,7 @@ export const attendanceByGroupColumns: ColumnDef<AttendanceByGroupRow>[] = [
       return (
         <div className="flex items-center gap-3 ml-4">
           <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center">
-            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-sm font-bold text-slate-700 dark:text-blue-400">
               {group?.charAt(0) || '?'}
             </span>
           </div>
@@ -173,15 +173,15 @@ export const attendanceByGroupColumns: ColumnDef<AttendanceByGroupRow>[] = [
           <div className="flex items-center justify-between">
             <span className={cn(
               "text-xl font-bold tabular-nums",
-              percentage >= 80 ? "text-green-600 dark:text-green-400" :
-              percentage >= 60 ? "text-blue-600 dark:text-blue-400" :
+              percentage >= 80 ? "text-slate-700 dark:text-green-400" :
+              percentage >= 60 ? "text-slate-700 dark:text-blue-400" :
               "text-red-600 dark:text-red-400"
             )}>
               {percentage.toFixed(1)}%
             </span>
             <div className={cn(
               "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
-              trend === 'up' ? "bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400" :
+              trend === 'up' ? "bg-slate-100 dark:bg-green-950/30 text-green-700 dark:text-green-400" :
               trend === 'down' ? "bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400" :
               "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400"
             )}>

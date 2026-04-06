@@ -21,9 +21,9 @@ type GroupBy = "task" | "assignee"
 
 const STATUS_COLORS: Record<string, string> = {
     todo: "bg-zinc-400",
-    in_progress: "bg-blue-500",
+    in_progress: "bg-black",
     review: "bg-amber-500",
-    done: "bg-green-500",
+    done: "bg-slate-600",
 }
 
 function startOfDay(d: Date): Date { const dt = new Date(d); dt.setHours(0, 0, 0, 0); return dt }
@@ -147,7 +147,7 @@ export default function TimelinePage() {
 
     const renderDayCells = (rowIndex: number, borderBottom: boolean, colOffset: number) =>
         days.map((d, ci) => (
-            <div key={d.toISOString()} className={["border-r", borderBottom ? "border-b" : "", d.getTime() === startOfDay(new Date()).getTime() ? "bg-blue-50/20 dark:bg-blue-950/20" : "", "hover:bg-muted/20 transition-colors"].join(" ")} style={{ gridRow: rowIndex + 2, gridColumn: ci + colOffset }} />
+            <div key={d.toISOString()} className={["border-r", borderBottom ? "border-b" : "", d.getTime() === startOfDay(new Date()).getTime() ? "bg-slate-50/20 dark:bg-blue-950/20" : "", "hover:bg-muted/20 transition-colors"].join(" ")} style={{ gridRow: rowIndex + 2, gridColumn: ci + colOffset }} />
         ))
 
     const renderTodayLine = (colOffset: number, totalRows: number) =>
@@ -158,10 +158,10 @@ export default function TimelinePage() {
     const dayHeader = (d: Date) => {
         const isToday = d.getTime() === startOfDay(new Date()).getTime()
         return (
-            <div key={d.toISOString()} className={`sticky top-0 z-20 border-b border-r px-2 py-2 text-center ${isToday ? "bg-blue-50/50 dark:bg-blue-950/30" : "bg-white dark:bg-background"}`}>
-                <div className={`text-[10px] font-medium uppercase ${isToday ? "text-blue-600" : "text-muted-foreground"}`}>{d.toLocaleDateString(undefined, { weekday: "short" })}</div>
-                <div className={`text-xl font-bold tabular-nums leading-tight ${isToday ? "text-blue-600" : ""}`}>{d.getDate()}</div>
-                <div className={`text-[10px] ${isToday ? "text-blue-500" : "text-muted-foreground/60"}`}>{d.toLocaleDateString(undefined, { month: "short" })}</div>
+            <div key={d.toISOString()} className={`sticky top-0 z-20 border-b border-r px-2 py-2 text-center ${isToday ? "bg-slate-50/50 dark:bg-blue-950/30" : "bg-white dark:bg-background"}`}>
+                <div className={`text-[10px] font-medium uppercase ${isToday ? "text-slate-700" : "text-muted-foreground"}`}>{d.toLocaleDateString(undefined, { weekday: "short" })}</div>
+                <div className={`text-xl font-bold tabular-nums leading-tight ${isToday ? "text-slate-700" : ""}`}>{d.getDate()}</div>
+                <div className={`text-[10px] ${isToday ? "text-slate-600" : "text-muted-foreground/60"}`}>{d.toLocaleDateString(undefined, { month: "short" })}</div>
             </div>
         )
     }
@@ -244,7 +244,7 @@ export default function TimelinePage() {
                                 <span className="text-xs font-medium truncate">{task.name}</span>
                             </div>
                             {days.map((d, ci) => (
-                                <div key={d.toISOString()} className={`border-r ${bb} ${d.getTime() === startOfDay(new Date()).getTime() ? "bg-blue-50/20" : ""} hover:bg-muted/20 transition-colors`} style={{ gridRow: rowIndex + 2, gridColumn: ci + D_OFF }} />
+                                <div key={d.toISOString()} className={`border-r ${bb} ${d.getTime() === startOfDay(new Date()).getTime() ? "bg-slate-50/20" : ""} hover:bg-muted/20 transition-colors`} style={{ gridRow: rowIndex + 2, gridColumn: ci + D_OFF }} />
                             ))}
                             {barCols && (
                                 <div className="flex items-center px-0.5 z-10 pointer-events-none py-2" style={{ gridRow: rowIndex + 2, gridColumn: `${barCols.startCol} / ${barCols.endCol}` }}>

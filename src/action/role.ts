@@ -1,20 +1,25 @@
 
 "use server";
-import {createSupabaseClient} from "@/config/supabase-config";
-import {IRole } from "@/interface";
+import { createAdminClient } from "@/utils/supabase/admin";
+import { createSupabaseClient } from "@/config/supabase-config";
+import { IRole } from "@/interface";
 
 export const getAllRole = async () => {
-    const supabase = await createSupabaseClient();
-    const { data, error } = await supabase.from("system_roles")
+    // Gunakan admin client untuk bypass RLS pada server side
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient
+        .from("system_roles")
         .select("*")
-        .order("created_at", { ascending: false })
+        .order("priority", { ascending: true })
 
     if (error) {
-        return { success: false, message: error.message, data: [] };
+        console.error("[getAllRole] error:", error.message);
+        return { success: false, message: error.message, data: [] as IRole[] };
     }
 
     return { success: true, data: data as IRole[] };
 };
+
 
 export async function createRole(payload: Partial<IRole>) {
     const supabase = await createSupabaseClient();

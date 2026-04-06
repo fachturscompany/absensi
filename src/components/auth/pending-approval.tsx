@@ -58,7 +58,7 @@ export function PendingApproval({
             {/* Status Steps */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center border border-green-500/30">
+                <div className="w-8 h-8 bg-slate-600/20 rounded-full flex items-center justify-center border border-green-500/30">
                   <CheckCircle2 className="h-5 w-5 text-green-400" />
                 </div>
                 <div className="flex-1">
@@ -89,7 +89,7 @@ export function PendingApproval({
             </div>
 
             {/* What's Next */}
-            <div className="bg-blue-500/10 border border-blue-500/20 p-6 rounded-xl">
+            <div className="bg-black/10 border border-blue-500/20 p-6 rounded-xl">
               <div className="flex items-center gap-3 mb-3">
                 <AlertCircle className="h-5 w-5 text-blue-400" />
                 <span className="font-medium text-blue-300">What happens next?</span>

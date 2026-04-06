@@ -217,7 +217,7 @@ export default function UrlsPage() {
                                   )}
                                 </button>
                               )}
-                              {!hasDetails && <span className="text-blue-600">+</span>}
+                              {!hasDetails && <span className="text-slate-700">+</span>}
                               <span>{item.projectName}</span>
                             </div>
                           </td>
@@ -244,7 +244,7 @@ export default function UrlsPage() {
                                     href={detail.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                                    className="text-slate-700 hover:text-blue-700 hover:underline"
                                   >
                                     {detail.url.length > 60 ? `${detail.url.substring(0, 60)}...` : detail.url}
                                   </a>

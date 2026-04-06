@@ -240,8 +240,8 @@ export default function JoinOrganizationPage() {
                     {/* ── Step: submitted ── */}
                     {step === "submitted" && orgPreview && (
                         <div className="px-6 py-10 flex flex-col items-center text-center space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
+                                <CheckCircle2 className="w-8 h-8 text-slate-700" />
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-slate-900">Request Submitted!</h2>

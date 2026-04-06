@@ -60,10 +60,10 @@ export function SaveReportDialog({ open, onOpenChange, onSave }: SaveReportDialo
                     </div>
 
                     {scheduleEnabled && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 flex gap-3">
+                        <div className="bg-slate-50 border border-slate-200 rounded-md p-3 flex gap-3">
                             <div className="mt-0.5">
                                 <div className="w-4 h-4 rounded-full border-2 border-blue-500 flex items-center justify-center">
-                                    <div className="w-0.5 h-2 bg-blue-500 rounded-full" />
+                                    <div className="w-0.5 h-2 bg-black rounded-full" />
                                 </div>
                             </div>
                             <div className="text-sm text-blue-700">
@@ -73,11 +73,11 @@ export function SaveReportDialog({ open, onOpenChange, onSave }: SaveReportDialo
                         </div>
                     )}
                     {!scheduleEnabled && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 flex gap-3 relative">
-                            <button className="absolute top-2 right-2 text-blue-400 hover:text-blue-600">
+                        <div className="bg-slate-50 border border-slate-200 rounded-md p-3 flex gap-3 relative">
+                            <button className="absolute top-2 right-2 text-blue-400 hover:text-slate-700">
                                 <X className="w-4 h-4" />
                             </button>
-                            <div className="mt-0.5 text-blue-600">
+                            <div className="mt-0.5 text-slate-700">
                                 <Lightbulb className="w-5 h-5" />
                             </div>
                             <div className="text-sm text-blue-700">
@@ -89,7 +89,7 @@ export function SaveReportDialog({ open, onOpenChange, onSave }: SaveReportDialo
                 </div>
 
                 <DialogFooter className="mt-6 flex items-center justify-between sm:justify-between w-full">
-                    <button className="text-sm text-blue-500 hover:underline flex items-center gap-1">
+                    <button className="text-sm text-slate-600 hover:underline flex items-center gap-1">
                         <span className="text-lg">▷</span> Send preview
                     </button>
                     <div className="flex gap-2">

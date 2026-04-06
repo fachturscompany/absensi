@@ -518,10 +518,10 @@ export function AccountForm({ initialData }: AccountFormProps) {
                     time: "Today, 08:00 AM",
                     desc: "Successfully checked in at the main office.",
                     badge: "On Time",
-                    badgeClass: "bg-green-100 text-green-700 dark:bg-green-400/20 dark:text-green-300",
+                    badgeClass: "bg-slate-100 text-green-700 dark:bg-green-400/20 dark:text-green-300",
                   },
                   {
-                    icon: <Clock className="h-5 w-5 text-blue-500" />,
+                    icon: <Clock className="h-5 w-5 text-slate-600" />,
                     title: "Work Hours Logged",
                     time: "Yesterday",
                     desc: "Completed 8 hours of productive work time.",

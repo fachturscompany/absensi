@@ -1638,7 +1638,7 @@ export default function MembersExportPage() {
                     <>
                       {exportResult.success ? (
                         <Alert className="border-green-500/50 bg-green-50 dark:bg-green-950">
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          <CheckCircle2 className="h-4 w-4 text-slate-700" />
                           <AlertDescription>
                             Export berhasil! {exportResult.exportedCount?.toLocaleString()} data berhasil diexport
                           </AlertDescription>

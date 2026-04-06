@@ -98,7 +98,7 @@ export default function ClientCompression({ onCompressed }: ClientCompressionPro
 
                     {compressedPreview && (
                         <div className="space-y-2">
-                            <p className="font-semibold text-sm text-green-600">
+                            <p className="font-semibold text-sm text-slate-700">
                                 Compressed: {formatSize(compressedFile?.size || 0)}
                                 ({originalFile && compressedFile ? Math.round((1 - compressedFile.size / originalFile.size) * 100) : 0}% hemat)
                             </p>

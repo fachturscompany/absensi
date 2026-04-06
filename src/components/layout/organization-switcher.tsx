@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, Building2, Plus, Check, Command } from "lucide-react";
+import { ChevronsUpDown, Building2, Plus, Check } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/user-store";
 import { useOrgStore } from "@/store/org-store";
@@ -158,9 +158,11 @@ export function OrganizationSwitcher() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
+              tooltip={selectedOrg?.organization_name || "Select Organization"}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-sidebar-primary bg-transparent text-sidebar-primary-foreground overflow-hidden">
+              {/* Logo container — saat collapsed ini yang tampil sebagai ikon */}
+              <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-md overflow-hidden border border-sidebar-border/50">
                 {selectedOrg?.logo_url ? (
                   <img
                     src={selectedOrg.logo_url}
@@ -168,7 +170,7 @@ export function OrganizationSwitcher() {
                     className="size-full object-cover"
                   />
                 ) : (
-                  <Command className="size-4" />
+                  <Building2 className="size-4 text-sidebar-foreground/70" />
                 )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">

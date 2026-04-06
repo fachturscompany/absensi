@@ -180,7 +180,7 @@ export function ImportMembers({ onNext, onPrev }: ImportMembersProps) {
       {/* Success Alert */}
       {success && (
         <Alert className="border-green-500 bg-green-50">
-          <CheckCircle className="h-4 w-4 text-green-600" />
+          <CheckCircle className="h-4 w-4 text-slate-700" />
           <AlertDescription className="text-green-800">{success}</AlertDescription>
         </Alert>
       )}
@@ -199,7 +199,7 @@ export function ImportMembers({ onNext, onPrev }: ImportMembersProps) {
                   {(wizardStore.importMembers.file.size / 1024).toFixed(2)} KB
                 </p>
               </div>
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-5 w-5 text-slate-700" />
             </div>
           </CardContent>
         </Card>

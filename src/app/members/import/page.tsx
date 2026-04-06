@@ -327,7 +327,7 @@ export default function MembersImportPage() {
                 <a
                   href="/templates/members-import-template.xlsx"
                   download
-                  className="text-blue-600 hover:underline font-semibold dark:text-blue-400 dark:hover:text-blue-300"
+                  className="text-slate-700 hover:underline font-semibold dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Download Template
                 </a>
@@ -511,8 +511,8 @@ export default function MembersImportPage() {
 
                   {/* Test Results - Success Message */}
                   {testSummary && testSummary.failed === 0 && testSummary.success > 0 && (
-                    <Alert className="border-green-500/50 bg-green-500/5">
-                      <AlertCircle className="h-4 w-4 text-green-600" />
+                    <Alert className="border-green-500/50 bg-slate-600/5">
+                      <AlertCircle className="h-4 w-4 text-slate-700" />
                       <AlertDescription className="text-green-700 dark:text-green-400">
                         <strong>All rows are valid!</strong> {testSummary.success} row(s) are ready to
                         import.
@@ -641,7 +641,7 @@ export default function MembersImportPage() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Status</p>
-                        <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                        <p className="text-sm font-medium text-slate-700 dark:text-green-400">
                           Ready to Import
                         </p>
                       </div>
@@ -676,7 +676,7 @@ export default function MembersImportPage() {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <p className="text-xs text-muted-foreground">Valid Rows</p>
-                            <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                            <p className="text-sm font-semibold text-slate-700 dark:text-green-400">
                               {testSummary.success}
                             </p>
                           </div>

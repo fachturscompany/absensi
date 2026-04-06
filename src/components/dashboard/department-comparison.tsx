@@ -43,8 +43,8 @@ const rankConfig = {
   },
   3: {
     icon: Award,
-    color: 'text-orange-600 dark:text-orange-400',
-    bgColor: 'bg-orange-500/10 dark:bg-orange-500/20',
+    color: 'text-slate-500 dark:text-orange-400',
+    bgColor: 'bg-slate-400/10 dark:bg-slate-400/20',
     borderColor: 'border-orange-200 dark:border-orange-800',
     label: '🥉 3rd Place'
   }
@@ -138,9 +138,9 @@ export const DepartmentComparison = memo(function DepartmentComparison({
                       <div className={cn(
                         "text-2xl font-bold tabular-nums",
                         group.attendanceRate >= 90 
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-slate-700 dark:text-green-400"
                           : group.attendanceRate >= 75 
-                          ? "text-blue-600 dark:text-blue-400"
+                          ? "text-slate-700 dark:text-blue-400"
                           : "text-amber-600 dark:text-amber-400"
                       )}>
                         {group.attendanceRate}%
@@ -171,8 +171,8 @@ export const DepartmentComparison = memo(function DepartmentComparison({
                 Showing top {topGroups.length} groups
               </span>
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <span className="font-medium text-green-600 dark:text-green-400">
+                <TrendingUp className="h-4 w-4 text-slate-700 dark:text-green-400" />
+                <span className="font-medium text-slate-700 dark:text-green-400">
                   {topGroups[0]?.name || 'N/A'} leads!
                 </span>
               </div>

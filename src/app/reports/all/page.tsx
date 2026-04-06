@@ -45,7 +45,7 @@ export default function AllReportsPage() {
                     href: "/reports/amounts-owed",
                     isPopular: true,
                     isStarred: true,
-                    icon: <div className="p-3 bg-green-100 rounded-lg"><DollarSign className="w-8 h-8 text-green-600" /></div>
+                    icon: <div className="p-3 bg-slate-100 rounded-lg"><DollarSign className="w-8 h-8 text-slate-700" /></div>
                 },
                 {
                     title: "Daily totals",
@@ -53,7 +53,7 @@ export default function AllReportsPage() {
                     href: "/reports/daily-totals",
                     isPopular: true,
                     isStarred: true,
-                    icon: <div className="p-3 bg-purple-100 rounded-lg"><BarChart3 className="w-8 h-8 text-purple-600" /></div>
+                    icon: <div className="p-3 bg-slate-100 rounded-lg"><BarChart3 className="w-8 h-8 text-slate-600" /></div>
                 }
             ]
         },

@@ -426,7 +426,7 @@ export default function WorkScheduleDetailsPage() {
               <span className="ml-1 text-xs">({getTimezoneOffset(organizationTimezone)})</span>
             </span>
             {(isDirty || selectedMemberIds.length > 0) && (
-              <Badge variant="outline" className="ml-auto text-orange-600 border-orange-300">
+              <Badge variant="outline" className="ml-auto text-slate-500 border-orange-300">
                 Unsaved Changes
               </Badge>
             )}
@@ -860,7 +860,7 @@ export default function WorkScheduleDetailsPage() {
           variant="outline"
           onClick={discardChanges}
           disabled={!isDirty}
-          className="gap-2 text-orange-600 border-orange-300 hover:bg-orange-50 disabled:text-muted-foreground disabled:border-muted"
+          className="gap-2 text-slate-500 border-orange-300 hover:bg-orange-50 disabled:text-muted-foreground disabled:border-muted"
         >
           Discard Changes
         </Button>

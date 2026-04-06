@@ -50,7 +50,7 @@ export function ScreenshotCard({ screenshot }: ScreenshotCardProps) {
                     </div>
                 )}
 
-                <div className="mb-2 text-center text-xs font-medium text-blue-600">
+                <div className="mb-2 text-center text-xs font-medium text-slate-700">
                     {screenshot.screenCount} screen{screenshot.screenCount !== 1 ? 's' : ''}
                 </div>
 

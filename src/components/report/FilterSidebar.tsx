@@ -118,7 +118,7 @@ export function FilterSubsection({ title, children, onClear }: { title: string, 
                 {onClear && (
                     <button
                         onClick={onClear}
-                        className="text-[10px] text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                        className="text-[10px] text-slate-700 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                     >
                         CLEAR
                     </button>

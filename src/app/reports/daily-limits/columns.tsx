@@ -46,7 +46,7 @@ export const columns: ColumnDef<DailyLimitEntry>[] = [
                     </div>
                     <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                         <div
-                            className={cn("h-full rounded-full", percentage >= 100 ? "bg-red-500" : percentage >= 80 ? "bg-yellow-500" : "bg-green-500")}
+                            className={cn("h-full rounded-full", percentage >= 100 ? "bg-red-500" : percentage >= 80 ? "bg-yellow-500" : "bg-slate-600")}
                             style={{ width: `${clampedPercentage}%` }}
                         />
                     </div>
@@ -62,7 +62,7 @@ export const columns: ColumnDef<DailyLimitEntry>[] = [
             return (
                 <div className={cn(
                     "font-bold",
-                    remaining < 0 ? "text-red-600" : "text-green-600"
+                    remaining < 0 ? "text-red-600" : "text-slate-700"
                 )}>
                     {remaining.toFixed(2)} hrs
                 </div>

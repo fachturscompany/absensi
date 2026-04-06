@@ -42,7 +42,7 @@
 //                             <button
 //                                 onClick={() => setActiveTab("basics")}
 //                                 className={`w-full text-left px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "basics"
-//                                     ? "bg-white text-blue-600 shadow-sm"
+//                                     ? "bg-white text-slate-700 shadow-sm"
 //                                     : "text-slate-600 hover:bg-white/50"
 //                                     }`}
 //                             >
@@ -51,7 +51,7 @@
 //                             <button
 //                                 onClick={() => setActiveTab("timers")}
 //                                 className={`w-full text-left px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "timers"
-//                                     ? "bg-white text-blue-600 shadow-sm"
+//                                     ? "bg-white text-slate-700 shadow-sm"
 //                                     : "text-slate-600 hover:bg-white/50"
 //                                     }`}
 //                             >
@@ -60,7 +60,7 @@
 //                             <button
 //                                 onClick={() => setActiveTab("how-it-works")}
 //                                 className={`w-full text-left px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "how-it-works"
-//                                     ? "bg-white text-blue-600 shadow-sm"
+//                                     ? "bg-white text-slate-700 shadow-sm"
 //                                     : "text-slate-600 hover:bg-white/50"
 //                                     }`}
 //                             >
@@ -81,7 +81,7 @@
 //                                     {/* 51-100% */}
 //                                     <div className="flex items-start gap-4">
 //                                         <div className="flex-shrink-0">
-//                                             <span className="inline-flex items-center rounded-full bg-green-500 px-4 py-1.5 text-sm font-semibold text-white">
+//                                             <span className="inline-flex items-center rounded-full bg-slate-600 px-4 py-1.5 text-sm font-semibold text-white">
 //                                                 51-100%
 //                                             </span>
 //                                         </div>
@@ -123,7 +123,7 @@
 //                                         </div>
 //                                         <div className="text-sm text-slate-600 pt-1">
 //                                             <p>You weren't touching the mouse or keyboard at all.</p>
-//                                             <a href="#" className="text-blue-600 hover:underline">
+//                                             <a href="#" className="text-slate-700 hover:underline">
 //                                                 Idle settings
 //                                             </a>
 //                                             {" "}can be customized for each team member.
@@ -138,7 +138,7 @@
 //                                     </h3>
 //                                     <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
 //                                         <div className="absolute inset-0 flex items-center justify-center">
-//                                             <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-blue-600 shadow-lg hover:bg-blue-700 transition-colors cursor-pointer">
+//                                             <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-slate-900 shadow-lg hover:bg-blue-700 transition-colors cursor-pointer">
 //                                                 <svg
 //                                                     className="h-10 w-10 text-white ml-1"
 //                                                     fill="currentColor"
@@ -283,11 +283,11 @@
 //                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 //                                                     </svg>
 //                                                     <span className="text-lg font-mono text-slate-700">00:30:12</span>
-//                                                     <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//                                                     <svg className="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 //                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
 //                                                     </svg>
 //                                                 </div>
-//                                                 <a href="#" className="text-sm text-blue-600 hover:underline">
+//                                                 <a href="#" className="text-sm text-slate-700 hover:underline">
 //                                                     Web timer
 //                                                 </a>
 //                                             </div>

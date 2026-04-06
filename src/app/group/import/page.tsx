@@ -465,9 +465,9 @@ export default function GroupImportPage() {
                       <>
                         <div className="flex justify-center">
                           <div className="relative">
-                            <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-2xl"></div>
-                            <div className="relative bg-purple-100 dark:bg-purple-900/30 rounded-full p-8">
-                              <FileText className="h-16 w-16 text-purple-600 dark:text-purple-400" />
+                            <div className="absolute inset-0 bg-slate-500/20 rounded-full blur-2xl"></div>
+                            <div className="relative bg-slate-100 dark:bg-purple-900/30 rounded-full p-8">
+                              <FileText className="h-16 w-16 text-slate-600 dark:text-purple-400" />
                             </div>
                           </div>
                         </div>
@@ -479,7 +479,7 @@ export default function GroupImportPage() {
                 <a
                   href="/templates/group-import-template.xlsx"
                   download
-                  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                  className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Download className="h-4 w-4" />
@@ -591,8 +591,8 @@ export default function GroupImportPage() {
                 </div>
 
                 <div className="pt-6 border-t space-y-4">
-                  <Alert className="border-blue-500/50 bg-blue-500/5">
-                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                  <Alert className="border-blue-500/50 bg-black/5">
+                    <AlertCircle className="h-4 w-4 text-slate-700" />
                     <AlertDescription>
                       Mapping kolom Excel ke field group. Minimal Name atau Code harus diisi.
                     </AlertDescription>
@@ -730,8 +730,8 @@ export default function GroupImportPage() {
                       <div className="flex items-center gap-4">
                         {testSummary.success > 0 && (
                           <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                            <p className="text-sm font-medium text-green-600">
+                            <CheckCircle2 className="h-5 w-5 text-slate-700" />
+                            <p className="text-sm font-medium text-slate-700">
                               Success: <span className="font-bold">{testSummary.success}</span>
                             </p>
                           </div>
@@ -776,10 +776,10 @@ export default function GroupImportPage() {
                       )}
 
                       {testSummary.success > 0 && testSummary.failed === 0 && (
-                        <Alert className="border-green-500/50 bg-green-500/5">
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <Alert className="border-green-500/50 bg-slate-600/5">
+                          <CheckCircle2 className="h-4 w-4 text-slate-700" />
                           <AlertDescription>
-                            <p className="text-sm font-medium text-green-600">
+                            <p className="text-sm font-medium text-slate-700">
                               Semua data valid! Anda dapat melanjutkan ke step Import.
                             </p>
                           </AlertDescription>
@@ -908,10 +908,10 @@ export default function GroupImportPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 border rounded-lg bg-green-50 dark:bg-green-950">
                           <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="h-5 w-5 text-slate-700" />
                             <span className="font-semibold">Success</span>
                           </div>
-                          <p className="text-2xl font-bold text-green-600">{importSummary.success}</p>
+                          <p className="text-2xl font-bold text-slate-700">{importSummary.success}</p>
                         </div>
                         <div className="p-4 border rounded-lg bg-red-50 dark:bg-red-950">
                           <div className="flex items-center gap-2 mb-2">
@@ -956,8 +956,8 @@ export default function GroupImportPage() {
                                         <TableCell className="min-w-[200px]">
                                           {isSuccess ? (
                                             <div className="flex items-center gap-2">
-                                              <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                                              <span className="text-sm text-green-600 font-medium">Success</span>
+                                              <CheckCircle2 className="h-4 w-4 text-slate-700 shrink-0" />
+                                              <span className="text-sm text-slate-700 font-medium">Success</span>
                                             </div>
                                           ) : (
                                             <div className="flex items-start gap-2">

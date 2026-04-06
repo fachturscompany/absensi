@@ -37,7 +37,7 @@ const getStatusBadge = (status: string) => {
         case 'approved':
             return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">Approved</span>
         case 'submitted':
-            return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Submitted</span>
+            return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-50 text-blue-700 border border-slate-200">Submitted</span>
         case 'open':
             return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">Open</span>
         case 'rejected':
@@ -52,7 +52,7 @@ const getPaymentBadge = (status?: string) => {
         case 'paid':
             return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">Paid</span>
         case 'processing':
-            return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Processing</span>
+            return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-50 text-blue-700 border border-slate-200">Processing</span>
         case 'unpaid':
             return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">Unpaid</span>
         default:
@@ -317,7 +317,7 @@ export default function TimesheetApprovalsPage() {
                     <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">MEMBERS</label>
                     <button
                         onClick={() => setSelectedFilter({ type: "members", all: true, id: "all" })}
-                        className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                        className="text-xs font-semibold text-slate-700 hover:text-blue-700"
                     >
 
                     </button>
@@ -514,7 +514,7 @@ export default function TimesheetApprovalsPage() {
                                         {visibleCols.screenshots && (
                                             <td className="p-4">
                                                 <Link href={`/activity/screenshots?memberId=${row.memberId}`}>
-                                                    <Button variant="outline" size="sm" className="hover:cursor-pointer h-7 text-xs text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 hover:text-blue-700 rounded-full">
+                                                    <Button variant="outline" size="sm" className="hover:cursor-pointer h-7 text-xs text-slate-700 bg-slate-50 border-slate-200 hover:bg-slate-100 hover:text-blue-700 rounded-full">
                                                         Screens
                                                     </Button>
                                                 </Link>
@@ -541,7 +541,7 @@ export default function TimesheetApprovalsPage() {
                                                         {row.status === 'submitted' && (
                                                             <>
                                                                 <DropdownMenuSeparator />
-                                                                <DropdownMenuItem onClick={() => handleApproveClick(row.id)} className="text-green-600 focus:text-green-600 focus:bg-green-50">
+                                                                <DropdownMenuItem onClick={() => handleApproveClick(row.id)} className="text-slate-700 focus:text-slate-700 focus:bg-green-50">
                                                                     <CheckCircle2 className="mr-2 h-4 w-4" />
                                                                     Approve
                                                                 </DropdownMenuItem>

@@ -55,7 +55,7 @@ export function getGroupColumns({
       header: "Status",
       cell: ({ row }) =>
         row.original.is_active ? (
-          <Badge className="bg-green-500 text-primary-foreground">Active</Badge>
+          <Badge className="bg-slate-600 text-primary-foreground">Active</Badge>
         ) : (
           <Badge variant="destructive">Inactive</Badge>
         ),

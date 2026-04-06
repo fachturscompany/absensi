@@ -112,10 +112,10 @@ const EnhancedStatCard = ({
   delay?: number;
 }) => {
   const iconColorClasses = {
-    blue: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
-    green: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400',
-    orange: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400',
-    purple: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400',
+    blue: 'bg-black/10 text-slate-700 dark:bg-black/20 dark:text-blue-400',
+    green: 'bg-slate-600/10 text-slate-700 dark:bg-slate-600/20 dark:text-green-400',
+    orange: 'bg-slate-400/10 text-slate-500 dark:bg-slate-400/20 dark:text-orange-400',
+    purple: 'bg-slate-500/10 text-slate-600 dark:bg-slate-500/20 dark:text-purple-400',
   };
 
   return (
@@ -139,12 +139,12 @@ const EnhancedStatCard = ({
 
           {trend && (
             <div className="flex items-center gap-1.5 text-sm">
-              {trend === 'up' && <ArrowUp className="w-4 h-4 text-green-600 dark:text-green-400" />}
+              {trend === 'up' && <ArrowUp className="w-4 h-4 text-slate-700 dark:text-green-400" />}
               {trend === 'down' && <ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400" />}
               {trend === 'neutral' && <Minus className="w-4 h-4 text-muted-foreground" />}
               <span className={cn(
                 "font-semibold",
-                trend === 'up' && "text-green-600 dark:text-green-400",
+                trend === 'up' && "text-slate-700 dark:text-green-400",
                 trend === 'down' && "text-red-600 dark:text-red-400",
                 trend === 'neutral' && "text-muted-foreground"
               )}>
