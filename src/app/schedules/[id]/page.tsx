@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Globe, Save, RotateCcw, Copy, Search, Plus, Minus, Clock, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { TableSkeleton } from "@/components/ui/loading-skeleton"
 import { formatTime } from "@/utils/format-time"
 import { useTimeFormat } from "@/store/time-format-store"
 import { getTimezoneLabel, getTimezoneOffset } from "@/constants/attendance-status"
@@ -22,6 +21,8 @@ import {
 import { getAllOrganization_member } from "@/action/members"
 import { createMemberSchedulesBulk } from "@/action/member-schedule"
 import { useFormatDate } from "@/hooks/use-format-date"
+
+import LoadingScheduleDetails from "./loading"
 
 // Day keys for iteration
 type DayIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6
@@ -398,10 +399,11 @@ export default function WorkScheduleDetailsPage() {
     return formatTime(time, timeFormat)
   }
 
+  // Menggunakan skeleton loading yang baru terintegrasi
   if (loading) {
     return (
-      <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 w-full">
-        <TableSkeleton rows={7} columns={4} />
+      <div className="w-full">
+        <LoadingScheduleDetails />
       </div>
     )
   }

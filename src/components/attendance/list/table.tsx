@@ -269,10 +269,10 @@ export function AttendanceTable({
             </th>
             <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Member</th>
             <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Group</th>
-            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Check In</th>
-            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Break In</th>
-            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Break Out</th>
-            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Check Out</th>
+            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Check In</th>
+            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Break In</th>
+            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Break Out</th>
+            <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Check Out</th>
             <th className="p-3 text-center text-xs font-semibold uppercase tracking-wider">Work Hours</th>
             <th className="p-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
             <th className="p-3 text-center text-xs font-semibold uppercase tracking-wider w-24">Actions</th>
