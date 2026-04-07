@@ -509,7 +509,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* Table */}
-          <div className="rounded-lg border overflow-hidden">
+          <div>
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40">
