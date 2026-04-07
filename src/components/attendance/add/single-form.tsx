@@ -10,7 +10,7 @@ import { TabsContent } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import {
   LogIn, LogOut, Coffee, Clock, Search,
-  AlertCircle, CheckCircle2, Loader2, CalendarOff,
+  AlertCircle, CheckCircle2, Loader2, CalendarOff, Ban
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -150,7 +150,9 @@ export function SingleForm({
   const [memberSearch, setMemberSearch] = useState("")
   const searchRef = useRef<HTMLInputElement>(null)
 
+  // STATE BARU: Menyimpan status waktu kerja
   const [inBreakWindow, setInBreakWindow] = useState(false)
+  const [inWorkingWindow, setInWorkingWindow] = useState(false)
 
   const [today, setToday] = useState(() => todayISO(timezone))
 
@@ -169,25 +171,38 @@ export function SingleForm({
 
   useEffect(() => { setCurrentPage(1) }, [memberSearch])
 
+  // EFFECT DIPERBARUI: Mengecek Working Window & Break Window
   useEffect(() => {
-    const checkBreakWindow = () => {
-      if (!schedule?.break_start || !schedule?.break_end) {
+    const checkWindows = () => {
+      if (!schedule?.start_time || !schedule?.end_time) {
+        setInWorkingWindow(false)
         setInBreakWindow(false)
         return
       }
-      const cur =
-        dayjs().tz(timezone).hour() * 60 + dayjs().tz(timezone).minute()
+
+      const cur = dayjs().tz(timezone).hour() * 60 + dayjs().tz(timezone).minute()
       const parse = (t: string) => {
         const parts = t.split(":").map(Number)
         return (parts[0] ?? 0) * 60 + (parts[1] ?? 0)
       }
-      const bs = parse(schedule.break_start)
-      const be = parse(schedule.break_end)
-      setInBreakWindow(cur >= bs && cur <= be)
+
+      // 1. Cek Working Window
+      const ws = parse(schedule.start_time)
+      const we = parse(schedule.end_time)
+      setInWorkingWindow(cur >= ws && cur <= we)
+
+      // 2. Cek Break Window
+      if (schedule.break_start && schedule.break_end) {
+        const bs = parse(schedule.break_start)
+        const be = parse(schedule.break_end)
+        setInBreakWindow(cur >= bs && cur <= be)
+      } else {
+        setInBreakWindow(false)
+      }
     }
 
-    checkBreakWindow()
-    const id = setInterval(checkBreakWindow, 30_000)
+    checkWindows()
+    const id = setInterval(checkWindows, 30_000)
     return () => clearInterval(id)
   }, [schedule, timezone])
 
@@ -201,6 +216,7 @@ export function SingleForm({
     setIsHoliday(false)
     setScheduleError(null)
     setInBreakWindow(false)
+    setInWorkingWindow(false)
     form.setValue("remarks", "")
 
     const init = async () => {
@@ -351,10 +367,11 @@ export function SingleForm({
   const startIndex = (currentPage - 1) * pageSize
   const paginatedMembers = filteredMembers.slice(startIndex, startIndex + pageSize)
 
-  const canCheckIn = !isHoliday && step === "idle" && !!externalMemberId && !!schedule
-  const canBreakIn = !isHoliday && step === "checked_in" && !!schedule?.break_start && inBreakWindow
-  const canBreakOut = !isHoliday && step === "break_in"
-  const canCheckOut = !isHoliday && (step === "checked_in" || step === "break_out")
+  // LOGIKA DIPERBARUI: Semua syarat ditambah `&& inWorkingWindow`
+  const canCheckIn = !isHoliday && step === "idle" && !!externalMemberId && !!schedule && inWorkingWindow
+  const canBreakIn = !isHoliday && step === "checked_in" && !!schedule?.break_start && inBreakWindow && inWorkingWindow
+  const canBreakOut = !isHoliday && step === "break_in" && inWorkingWindow
+  const canCheckOut = !isHoliday && (step === "checked_in" || step === "break_out") && inWorkingWindow
 
   const selectedMember = members.find((m: MemberOption) => m.id === externalMemberId)
 
@@ -488,6 +505,15 @@ export function SingleForm({
               <LiveClock timezone={timezone} />
             </div>
           )}
+          
+          {externalMemberId && !scheduleLoading && schedule && !isHoliday && !inWorkingWindow && step !== "checked_out" && (
+            <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700 shrink-0">
+              <Ban className="h-3.5 w-3.5 shrink-0" />
+              <span className="font-medium">
+                Action disabled. You are currently outside your scheduled working hours.
+              </span>
+            </div>
+          )}
 
           {externalMemberId ? (
             <div className="space-y-4">
@@ -555,7 +581,7 @@ export function SingleForm({
                 </div>
               )}
 
-              {step === "checked_in" && schedule?.break_start && !inBreakWindow && (
+              {step === "checked_in" && schedule?.break_start && !inBreakWindow && inWorkingWindow && (
                 <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700 shrink-0">
                   <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                   <span>
