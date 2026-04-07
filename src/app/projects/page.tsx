@@ -5,8 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import { Search, Pencil, Plus, Upload, LayoutGrid, List, X, Trash2, Archive } from "lucide-react"
+import { Search, Pencil, Plus, Upload, X, Trash2, Archive } from "lucide-react"
 import {
     Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 } from "@/components/ui/dialog"
@@ -20,7 +19,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import AddProjectDialog from "@/components/projects/dialogs/add-project"
 import EditProjectDialog from "@/components/projects/dialogs/edit-project"
 import TransferProjectDialog from "@/components/projects/dialogs/transfer-project"
-import ProjectGridView from "@/components/projects/ProjectGridView"
 import {
     getAllProjects, createProject, updateProject, deleteProject,
     archiveProject, unarchiveProject, getSimpleMembersForDropdown,
@@ -28,19 +26,17 @@ import {
 import { getTeams } from "@/action/teams"
 import { useOrgStore } from "@/store/org-store"
 import type {
-    ITeams, IProject, ISimpleMember,
-    IProjectTeamProject, IProjectTeamMember,
-    Project, NewProjectForm,
+    ITeams, ISimpleMember, Project, NewProjectForm,
 } from "@/interface"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
 
 // ─── Mapper ──────────────────────────────────────────────────────────────────
 
-function mapProjectData(p: IProject): Project {
+function mapProjectData(p: any): Project {
     const memberMap = new Map<string, { id: string; name: string; avatarUrl: string | null }>()
 
-    p.team_projects?.forEach((tp: IProjectTeamProject) => {
-        tp.teams?.team_members?.forEach((tm: IProjectTeamMember) => {
+    p.team_projects?.forEach((tp: any) => {
+        tp.teams?.team_members?.forEach((tm: any) => {
             const profile = tm.organization_members?.user
             if (profile) {
                 const uid = profile.id ?? tm.organization_members?.user_id
@@ -53,10 +49,16 @@ function mapProjectData(p: IProject): Project {
     })
 
     const tNames = p.team_projects
-        ?.map((tp: IProjectTeamProject) => tp.teams?.name)
-        .filter((n): n is string => Boolean(n)) ?? []
+        ?.map((tp: any) => tp.teams?.name)
+        .filter((n: any): n is string => Boolean(n)) ?? []
 
-
+    // Membaca budget langsung dari kolom database fisik
+    let budgetLabel = "No budget"
+    if (p.budget_amount && Number(p.budget_amount) > 0) {
+        budgetLabel = `${p.currency_code?.trim() || "USD"} ${Number(p.budget_amount).toLocaleString()}`
+    } else if (p.budget_hours && Number(p.budget_hours) > 0) {
+        budgetLabel = `${Number(p.budget_hours)} hours`
+    }
 
     return {
         id: String(p.id),
@@ -64,9 +66,7 @@ function mapProjectData(p: IProject): Project {
         teams: tNames,
         members: Array.from(memberMap.values()),
         taskCount: p.tasks?.[0]?.count ?? 0,
-        budgetLabel: p.metadata?.budgetType === "cost"
-            ? `$${p.metadata?.budgetCost ?? 0}`
-            : `${p.metadata?.budgetCost ?? 0} hours`,
+        budgetLabel: budgetLabel,
         memberLimitLabel: p.metadata?.memberLimits
             ? `${p.metadata.memberLimits.length} limits`
             : "0 limits",
@@ -80,7 +80,6 @@ export default function ProjectsPage() {
     const router = useRouter()
 
     const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
-    const [viewMode, setViewMode] = useState<"list" | "grid">("list")
     const [search, setSearch] = useState("")
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [data, setData] = useState<Project[]>([])
@@ -262,113 +261,91 @@ export default function ProjectsPage() {
                             <Input placeholder="Search projects" value={search} onChange={e => setSearch(e.target.value)} className="ps-10 pl-10" />
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center p-1 bg-white rounded-lg border border-gray-200 shadow-sm mr-2">
-                                <Button variant="ghost" className={cn("h-8 gap-2 px-4 rounded-md transition-all text-sm", viewMode === "list" ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white" : "text-muted-foreground hover:bg-muted")} onClick={() => setViewMode("list")}>
-                                    <List className={cn("h-4 w-4", viewMode === "list" ? "text-white" : "text-gray-400")} />
-                                    <span className="font-semibold text-xs uppercase tracking-tight">List</span>
-                                </Button>
-                                <Button variant="ghost" className={cn("h-8 gap-2 px-4 rounded-md transition-all text-sm", viewMode === "grid" ? "bg-gray-900 text-white hover:bg-gray-800 hover:text-white" : "text-muted-foreground hover:bg-muted")} onClick={() => setViewMode("grid")}>
-                                    <LayoutGrid className={cn("h-4 w-4", viewMode === "grid" ? "text-white" : "text-gray-400")} />
-                                    <span className="font-semibold text-xs uppercase tracking-tight">Grid</span>
-                                </Button>
-                            </div>
                             <Button variant="outline" className="px-3 hidden md:inline-flex" onClick={() => setImportOpen(true)}>
-                                <Upload />Import
+                                <Upload className="mr-2 h-4 w-4" />Import
                             </Button>
                             <Button className="px-3" onClick={() => setAddOpen(true)}>
-                                <Plus />Add
+                                <Plus className="mr-2 h-4 w-4" />Add
                             </Button>
                         </div>
                     </div>
 
-                    {/* Content */}
+                    {/* Content (Table List View Only) */}
                     <div>
-                        {viewMode === "list" ? (
-                            <Table>
-                                <TableHeader>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-10">
+                                        <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="rounded border-gray-300" />
+                                    </TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Teams</TableHead>
+                                    <TableHead>Members</TableHead>
+                                    <TableHead>Tasks</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filtered.length === 0 ? (
                                     <TableRow>
-                                        <TableHead className="w-10">
-                                            <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="rounded border-gray-300" />
-                                        </TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Teams</TableHead>
-                                        <TableHead>Members</TableHead>
-                                        <TableHead>Tasks</TableHead>
-                                        <TableHead>Actions</TableHead>
+                                        <TableCell colSpan={6} className="text-center text-muted-foreground py-12">
+                                            {fetchError
+                                                ? <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
+                                                : isLoading ? "Loading projects..." : "No projects found"}
+                                        </TableCell>
                                     </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {filtered.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
-                                                {fetchError
-                                                    ? <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
-                                                    : isLoading ? "Loading projects..." : "No projects found"}
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : paginated.map(p => (
-                                        <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => router.push(`/projects/${p.id}/tasks/list`)}>
-                                            <TableCell className="align-top" onClick={e => e.stopPropagation()}>
-                                                <input type="checkbox" checked={selectedIds.includes(p.id)} onChange={() => toggleSelect(p.id)} className="rounded border-gray-300" />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Link href={`/projects/${p.id}/tasks/list`} className="font-medium text-sm hover:underline block truncate">{p.name}</Link>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">{p.teams.length === 0 ? "None" : p.teams.join(", ")}</TableCell>
-                                            <TableCell><span className="text-sm text-muted-foreground">{p.members.length} members</span></TableCell>
-                                            <TableCell className="text-muted-foreground">{p.taskCount}</TableCell>
-                                            <TableCell onClick={e => e.stopPropagation()}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" size="sm" className="px-3"><Pencil className="h-4 w-4" /></Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-48">
-                                                        {!p.archived ? (
-                                                            <>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("general"); setEditing(p) }}>Edit project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("budget"); setEditing(p) }}>Edit budget</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem>Duplicate project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setArchiveTargets([p.id]); setArchiveOpen(true) }}>Archive project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setTransferProject(p); setTransferOpen(true) }}>Transfer</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => { setDeleteTarget(p); setDeleteOpen(true) }}>Delete project</DropdownMenuItem>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <DropdownMenuItem disabled>Edit project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
-                                                                <DropdownMenuItem disabled>Duplicate project</DropdownMenuItem>
-                                                                <DropdownMenuItem onSelect={async () => {
-                                                                    await unarchiveProject(Number(p.id))
-                                                                    setData(prev => prev.map(it => it.id === p.id ? { ...it, archived: false } : it))
-                                                                    setSelectedIds(prev => prev.filter(id => id !== p.id))
-                                                                    setActiveTab("active")
-                                                                }}>Restore project</DropdownMenuItem>
-                                                                <DropdownMenuItem disabled>Transfer</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => { setDeleteTarget(p); setDeleteOpen(true) }}>Delete project</DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        ) : (
-                            filtered.length === 0 ? (
-                                <div className="text-center text-muted-foreground py-12 bg-muted/20 rounded-lg border-2 border-dashed">
-                                    {fetchError
-                                        ? <div className="text-red-500 font-medium">Error loading projects: {fetchError}</div>
-                                        : isLoading ? "Loading projects..." : "No projects found"}
-                                </div>
-                            ) : (
-                                <ProjectGridView projects={paginated} selectedIds={selectedIds} onToggleSelect={toggleSelect} />
-                            )
-                        )}
+                                ) : paginated.map(p => (
+                                    <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => router.push(`/projects/${p.id}/tasks/list`)}>
+                                        <TableCell className="align-top" onClick={e => e.stopPropagation()}>
+                                            <input type="checkbox" checked={selectedIds.includes(p.id)} onChange={() => toggleSelect(p.id)} className="rounded border-gray-300" />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Link href={`/projects/${p.id}/tasks/list`} className="font-medium text-sm hover:underline block truncate">{p.name}</Link>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">{p.teams.length === 0 ? "None" : p.teams.join(", ")}</TableCell>
+                                        <TableCell><span className="text-sm text-muted-foreground">{p.members.length} members</span></TableCell>
+                                        <TableCell className="text-muted-foreground">{p.taskCount}</TableCell>
+                                        <TableCell onClick={e => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="sm" className="px-3"><Pencil className="h-4 w-4" /></Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    {!p.archived ? (
+                                                        <>
+                                                            <DropdownMenuItem onSelect={() => { setEditTab("general"); setEditing(p) }}>Edit project</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={() => { setEditTab("budget"); setEditing(p) }}>Edit budget</DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem>Duplicate project</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={() => { setArchiveTargets([p.id]); setArchiveOpen(true) }}>Archive project</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={() => { setTransferProject(p); setTransferOpen(true) }}>Transfer</DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => { setDeleteTarget(p); setDeleteOpen(true) }}>Delete project</DropdownMenuItem>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <DropdownMenuItem disabled>Edit project</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={() => { setEditTab("members"); setEditing(p) }}>Manage members</DropdownMenuItem>
+                                                            <DropdownMenuItem disabled>Duplicate project</DropdownMenuItem>
+                                                            <DropdownMenuItem onSelect={async () => {
+                                                                await unarchiveProject(Number(p.id))
+                                                                setData(prev => prev.map(it => it.id === p.id ? { ...it, archived: false } : it))
+                                                                setSelectedIds(prev => prev.filter(id => id !== p.id))
+                                                                setActiveTab("active")
+                                                            }}>Restore project</DropdownMenuItem>
+                                                            <DropdownMenuItem disabled>Transfer</DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => { setDeleteTarget(p); setDeleteOpen(true) }}>Delete project</DropdownMenuItem>
+                                                        </>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </div>
 
                     <PaginationFooter
