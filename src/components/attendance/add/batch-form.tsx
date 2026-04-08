@@ -112,7 +112,6 @@ function MemberRowItem({ row, mode, onToggle, onOverride }: MemberRowProps) {
         <UserAvatar
           name={row.label}
           photoUrl={row.avatar}
-          // PERBAIKAN 2: Konversi null menjadi undefined
           userId={row.userId ?? undefined}
           className="h-8 w-8 shrink-0 border border-border"
         />
@@ -128,14 +127,13 @@ function MemberRowItem({ row, mode, onToggle, onOverride }: MemberRowProps) {
         </div>
 
         {row.scheduleStatus === "ok" && row.startTime && (
-          <div className="flex items-center gap-1.5 shrink-0 hidden sm:flex">
-            {/* Tambahkan Nama Schedule di sini */}
+          <div className="flex flex-col items-end sm:flex-row sm:items-center gap-1 sm:gap-2 shrink-0">
             {row.scheduleName && (
-              <span className="text-[10px] font-medium text-foreground truncate max-w-[120px]" title={row.scheduleName}>
+              <span className="text-[10px] font-semibold text-foreground truncate max-w-[120px]" title={row.scheduleName}>
                 {row.scheduleName}
               </span>
             )}
-            <span className="text-[10px] text-muted-foreground font-mono">
+            <span className="text-[10px] text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded-md">
               {row.startTime.slice(0, 5)}–{row.endTime?.slice(0, 5)}
             </span>
           </div>
@@ -145,7 +143,7 @@ function MemberRowItem({ row, mode, onToggle, onOverride }: MemberRowProps) {
           <Badge
             variant="outline"
             className={cn(
-              "text-[10px] px-1.5 py-0 h-5 shrink-0",
+              "text-[10px] px-1.5 py-0 h-5 shrink-0 ml-2 hidden sm:inline-flex",
               row.computedStatus === "present" && "text-emerald-600 border-emerald-200 bg-emerald-50",
               row.computedStatus === "late" && "text-amber-600 border-amber-200 bg-amber-50",
               row.computedStatus === "absent" && "text-red-600 border-red-200 bg-red-50",
@@ -159,7 +157,7 @@ function MemberRowItem({ row, mode, onToggle, onOverride }: MemberRowProps) {
           <button
             type="button"
             onClick={() => setExpanded((e) => !e)}
-            className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+            className="shrink-0 text-muted-foreground hover:text-foreground transition-colors ml-2"
           >
             {expanded ? (
               <ChevronUp className="h-3.5 w-3.5" />
@@ -380,7 +378,6 @@ function MemberPicker({ members, addedIds, onAdd }: MemberPickerProps) {
                 <UserAvatar
                   name={m.label}
                   photoUrl={m.avatar}
-                  // PERBAIKAN 2: Konversi null menjadi undefined
                   userId={m.userId ?? undefined}
                   className="h-7 w-7 shrink-0 border border-border"
                 />
@@ -498,7 +495,7 @@ export function BatchForm({ members, timezone, onCancel }: BatchFormProps) {
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Filter batch..."
                     value={bv2.search}
                     onChange={(e) => bv2.setSearch(e.target.value)}
                     className="w-full h-8 rounded-xl border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-2 focus:ring-foreground/20"
@@ -579,6 +576,8 @@ export function BatchForm({ members, timezone, onCancel }: BatchFormProps) {
           isSubmitting={bv2.isSubmitting}
           onToggleItem={bv2.togglePreviewItem}
           onUpdateStatus={bv2.updatePreviewStatus}
+          onUpdateCheckIn={bv2.updatePreviewCheckIn}
+          onUpdateCheckOut={bv2.updatePreviewCheckOut}
           onConfirm={bv2.submitBatch}
         />
       </div>

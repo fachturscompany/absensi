@@ -164,15 +164,14 @@ export function useBatchAttendanceV2(
           const ciTime = row.overrideCheckIn
             ? `${row.overrideCheckIn}:00`
             : mode === "realtime"
-              ? dayjs().tz(timezone).format("HH:mm:ss")
-              : rule.start_time
+            ? dayjs().tz(timezone).format("HH:mm:ss")
+            : rule.start_time
 
           const status = computeStatus(ciTime, rule.start_time)
 
           return {
             ...row,
             scheduleStatus: "ok" as MemberScheduleStatus,
-            scheduleName: rule.name || rule.schedule_name || rule.title,
             startTime: rule.start_time,
             endTime: rule.end_time,
             breakStart: rule.break_start ?? null,
@@ -185,6 +184,7 @@ export function useBatchAttendanceV2(
         }),
       )
 
+      // Memperbaiki bug tertimpa dengan Map
       setRows((prev) => {
         const updatedMap = new Map(updated.map((r) => [r.memberId, r]))
         return prev.map((row) => updatedMap.get(row.memberId) || row)
@@ -210,8 +210,8 @@ export function useBatchAttendanceV2(
           mode === "realtime"
             ? dayjs().tz(timezone).format("HH:mm:ss")
             : row.overrideCheckIn
-              ? `${row.overrideCheckIn}:00`
-              : row.startTime
+            ? `${row.overrideCheckIn}:00`
+            : row.startTime
         return {
           ...row,
           computedStatus: computeStatus(ciTime, row.startTime),
@@ -396,6 +396,45 @@ export function useBatchAttendanceV2(
     [],
   )
 
+  // Fungsi tambahan untuk update waktu check in dari dialog preview
+  const updatePreviewCheckIn = useCallback(
+    (memberId: string, timeValue: string) => {
+      if (!timeValue) return
+
+      const newIso = toISO(date, timeValue)
+
+      setPreviewItems((prev) =>
+        prev.map((item) =>
+          item.memberId === memberId ? { ...item, checkIn: newIso } : item,
+        ),
+      )
+    },
+    [date, toISO],
+  )
+
+  // Fungsi tambahan untuk update waktu check out dari dialog preview
+  const updatePreviewCheckOut = useCallback(
+    (memberId: string, timeValue: string) => {
+      if (!timeValue) {
+        setPreviewItems((prev) =>
+          prev.map((item) =>
+            item.memberId === memberId ? { ...item, checkOut: null } : item,
+          ),
+        )
+        return
+      }
+
+      const newIso = toISO(date, timeValue)
+
+      setPreviewItems((prev) =>
+        prev.map((item) =>
+          item.memberId === memberId ? { ...item, checkOut: newIso } : item,
+        ),
+      )
+    },
+    [date, toISO],
+  )
+
   const submitBatch = useCallback(async (): Promise<BatchSubmitResult> => {
     const toSubmit = previewItems.filter((item) => item.include)
     if (toSubmit.length === 0) {
@@ -481,6 +520,8 @@ export function useBatchAttendanceV2(
     buildPreview,
     togglePreviewItem,
     updatePreviewStatus,
+    updatePreviewCheckIn,
+    updatePreviewCheckOut,
     addMembers,
     removeMember,
     toggleSelect,

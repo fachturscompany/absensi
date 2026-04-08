@@ -1,4 +1,3 @@
-// src/components/attendance/add/batch-preview-dialog.tsx
 "use client"
 
 import {
@@ -31,6 +30,7 @@ const STATUS_STYLES = {
   present: "bg-emerald-100 text-emerald-700 border-emerald-200",
   late: "bg-amber-100 text-amber-700 border-amber-200",
   absent: "bg-red-100 text-red-700 border-red-200",
+  excused: "bg-gray-100 text-gray-700 border-gray-200",
 }
 
 interface BatchPreviewDialogProps {
@@ -42,6 +42,8 @@ interface BatchPreviewDialogProps {
   isSubmitting: boolean
   onToggleItem: (memberId: string) => void
   onUpdateStatus: (memberId: string, status: "present" | "late" | "absent") => void
+  onUpdateCheckIn: (memberId: string, timeValue: string) => void
+  onUpdateCheckOut: (memberId: string, timeValue: string) => void
   onConfirm: () => void
 }
 
@@ -54,29 +56,32 @@ export function BatchPreviewDialog({
   isSubmitting,
   onToggleItem,
   onUpdateStatus,
+  onUpdateCheckIn,   // <--- Terima props baru
+  onUpdateCheckOut,  // <--- Terima props baru
   onConfirm,
 }: BatchPreviewDialogProps) {
   const toSave = items.filter((i) => i.include)
   const warnings = items.filter((i) => i.hasWarning && i.include)
   const excluded = items.filter((i) => !i.include)
 
-  const formatTime = (iso: string | null) => {
-    if (!iso) return "—"
+  // Fungsi helper: Mengubah format ISO dari database (2026-04-08T07:30:00Z) 
+  // menjadi format jam "HH:mm" untuk ditampilkan di input type="time".
+  const getHHmm = (iso: string | null) => {
+    if (!iso) return ""
     return dayjs.utc(iso).tz(timezone).format("HH:mm")
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col gap-0 p-0">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col gap-0 p-0">
         <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-base font-semibold">
-            Preview Batch Attendance
+            Preview & Edit Batch Attendance
           </DialogTitle>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {date} · {toSave.length} records will be saved
+            {date} · You can adjust the Check In and Check Out times before saving.
           </p>
 
-          {/* Summary badges */}
           <div className="flex flex-wrap gap-2 mt-3">
             <Badge variant="outline" className="gap-1 text-xs font-normal">
               <CheckCircle2 className="h-3 w-3 text-emerald-500" />
@@ -96,16 +101,14 @@ export function BatchPreviewDialog({
           </div>
         </DialogHeader>
 
-        {/* Table */}
         <div className="flex-1 overflow-y-auto px-6 py-3">
           <div className="space-y-1">
-            {/* Header row */}
-            <div className="grid grid-cols-[auto_1fr_80px_80px_100px_32px] gap-2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="grid grid-cols-[auto_1fr_100px_100px_100px_32px] gap-2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               <span className="w-4" />
               <span>Member</span>
-              <span>Check In</span>
-              <span>Check Out</span>
-              <span>Status</span>
+              <span className="text-center">Check In</span>
+              <span className="text-center">Check Out</span>
+              <span className="text-center">Status</span>
               <span />
             </div>
 
@@ -113,12 +116,11 @@ export function BatchPreviewDialog({
               <div
                 key={item.memberId}
                 className={cn(
-                  "grid grid-cols-[auto_1fr_80px_80px_100px_32px] gap-2 items-center px-2 py-2 rounded-lg transition-colors",
+                  "grid grid-cols-[auto_1fr_100px_100px_100px_32px] gap-2 items-center px-2 py-2 rounded-lg transition-colors",
                   item.include ? "bg-background" : "bg-muted/30 opacity-50",
                   item.hasWarning && item.include && "bg-amber-50/50 dark:bg-amber-950/20",
                 )}
               >
-                {/* Checkbox */}
                 <input
                   type="checkbox"
                   checked={item.include}
@@ -126,7 +128,6 @@ export function BatchPreviewDialog({
                   className="h-4 w-4 rounded border-border cursor-pointer accent-foreground"
                 />
 
-                {/* Member info */}
                 <div className="min-w-0">
                   <p className="text-xs font-semibold truncate leading-tight">
                     {item.label}
@@ -139,27 +140,34 @@ export function BatchPreviewDialog({
                   </p>
                 </div>
 
-                {/* Check In */}
-                <span className="text-xs font-mono tabular-nums text-center">
-                  {formatTime(item.checkIn)}
-                </span>
+                {/* --- INPUT EDITABLE CHECK IN --- */}
+                <input
+                  type="time"
+                  value={getHHmm(item.checkIn)}
+                  onChange={(e) => onUpdateCheckIn(item.memberId, e.target.value)}
+                  disabled={!item.include || isSubmitting}
+                  className="w-full h-7 rounded border border-border bg-background px-2 text-xs font-mono text-center focus:outline-none focus:ring-1 focus:ring-foreground/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
 
-                {/* Check Out */}
-                <span className="text-xs font-mono tabular-nums text-center text-muted-foreground">
-                  {formatTime(item.checkOut)}
-                </span>
+                {/* --- INPUT EDITABLE CHECK OUT --- */}
+                <input
+                  type="time"
+                  value={getHHmm(item.checkOut)}
+                  onChange={(e) => onUpdateCheckOut(item.memberId, e.target.value)}
+                  disabled={!item.include || isSubmitting}
+                  className="w-full h-7 rounded border border-border bg-background px-2 text-xs font-mono text-center text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
 
-                {/* Status select */}
                 <Select
                   value={item.status}
                   onValueChange={(v) =>
                     onUpdateStatus(item.memberId, v as any)
                   }
-                  disabled={!item.include}
+                  disabled={!item.include || isSubmitting}
                 >
                   <SelectTrigger
                     className={cn(
-                      "h-6 text-[10px] font-medium border rounded-full px-2",
+                      "h-7 text-[10px] font-medium border rounded-md px-2",
                       STATUS_STYLES[item.status],
                     )}
                   >
@@ -172,7 +180,6 @@ export function BatchPreviewDialog({
                   </SelectContent>
                 </Select>
 
-                {/* Warning icon */}
                 <div className="flex items-center justify-center">
                   {item.hasWarning && item.include && (
                     <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
