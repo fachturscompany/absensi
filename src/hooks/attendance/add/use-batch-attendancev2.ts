@@ -165,8 +165,8 @@ export function useBatchAttendanceV2(
           const ciTime = row.overrideCheckIn
             ? `${row.overrideCheckIn}:00`
             : mode === "realtime"
-            ? dayjs().tz(timezone).format("HH:mm:ss")
-            : rule.start_time
+              ? dayjs().tz(timezone).format("HH:mm:ss")
+              : rule.start_time
 
           const status = computeStatus(ciTime, rule.start_time)
 
@@ -185,7 +185,11 @@ export function useBatchAttendanceV2(
         }),
       )
 
-      setRows(updated)
+      setRows((prev) => {
+        const updatedMap = new Map(updated.map((r) => [r.memberId, r]))
+        return prev.map((row) => updatedMap.get(row.memberId) || row)
+      })
+
       setIsLoadingSchedules(false)
     },
     [mode, timezone, computeStatus],
@@ -206,8 +210,8 @@ export function useBatchAttendanceV2(
           mode === "realtime"
             ? dayjs().tz(timezone).format("HH:mm:ss")
             : row.overrideCheckIn
-            ? `${row.overrideCheckIn}:00`
-            : row.startTime
+              ? `${row.overrideCheckIn}:00`
+              : row.startTime
         return {
           ...row,
           computedStatus: computeStatus(ciTime, row.startTime),
