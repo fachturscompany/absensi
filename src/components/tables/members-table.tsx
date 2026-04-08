@@ -37,6 +37,7 @@ import {
   computeReligion 
 } from "@/lib/members-mapping"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge" // Pastikan import Badge ada
 
 interface MembersTableProps {
   members: IOrganization_member[]
@@ -49,7 +50,6 @@ export function MembersTable({
   members, 
   isLoading = false, 
   onDelete,
-  // showPagination digunakan jika ada logika internal, jika tidak biarkan sebagai prop opsional
 }: MembersTableProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -99,7 +99,6 @@ export function MembersTable({
               </TableRow>
             ) : (
               members.map((member: IOrganization_member) => {
-                // Type Casting aman karena struktur IOrganization_member kompatibel dengan MemberLike
                 const mLike = member as unknown as MemberLike
                 
                 const fullName = computeName(mLike)
@@ -111,7 +110,6 @@ export function MembersTable({
                 return (
                   <TableRow
                     key={member.id}
-                    className="transition-colors hover:bg-muted/50"
                   >
                     <TableCell className="px-4 py-3">
                       <UserAvatar
@@ -146,17 +144,23 @@ export function MembersTable({
                     <TableCell className="hidden md:table-cell text-sm text-muted-foreground capitalize">
                       {religion}
                     </TableCell>
+                    
+                    {/* --- BAGIAN STATUS BADGE YANG DISIPERBAIKI --- */}
                     <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <span className={cn(
-                          "h-2 w-2 rounded-full shrink-0",
-                          member.is_active ? "bg-slate-600" : "bg-gray-300"
-                        )} />
-                        <span className="text-xs font-medium">
-                          {member.is_active ? "Active" : "Inactive"}
-                        </span>
-                      </div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "font-medium",
+                          member.is_active
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+                            : "bg-red-50 text-red-600 border-red-200 hover:bg-red-50 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50"
+                        )}
+                      >
+                        {member.is_active ? "Active" : "Inactive"}
+                      </Badge>
                     </TableCell>
+                    {/* -------------------------------------------- */}
+
                     <TableCell className="px-4 pr-6 text-right">
                       <div className="flex justify-end gap-1">
                         <Button 

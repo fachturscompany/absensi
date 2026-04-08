@@ -275,12 +275,18 @@ export default function GroupsPage() {
     {
       accessorKey: "is_active",
       header: "Status",
-      cell: ({ row }) =>
-        row.original.is_active ? (
-          <Badge className="bg-slate-600 text-primary-foreground">Active</Badge>
-        ) : (
-          <Badge variant="destructive">Inactive</Badge>
-        ),
+      cell: ({ row }) => (
+        <Badge
+          variant="outline"
+          className={
+            row.original.is_active
+              ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 font-medium"
+              : "bg-red-50 text-red-600 border-red-200 hover:bg-red-50 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 font-medium"
+          }
+        >
+          {row.original.is_active ? "Active" : "Inactive"}
+        </Badge>
+      ),
     },
     {
       id: "actions",
@@ -346,95 +352,95 @@ export default function GroupsPage() {
       <div className="mt-4 space-y-4">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Search groups..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-8"
-            disabled={loading}
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Search groups..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-8"
+              disabled={loading}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[150px] h-9">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={loading}
+              className="h-9"
             >
-              <X className="h-3.5 w-3.5" />
-            </button>
+              <RotateCcw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button asChild variant="outline" size="sm" className="h-9">
+              <Link href="/group/import">
+                <FileSpreadsheet className="mr-2 h-4 w-4" />Import
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div>
+          {loading ? (
+            <TableSkeleton rows={6} columns={groupsSkeletonColumns} />
+          ) : groups.length === 0 ? (
+            <div className="py-20">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <GroupIcon className="h-14 w-14 text-muted-foreground mx-auto" />
+                  </EmptyMedia>
+                  <EmptyTitle>No groups yet</EmptyTitle>
+                  <EmptyDescription>
+                    {searchQuery ? `No groups found matching "${searchQuery}"` : "There are no groups for this organization."}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={filteredGroups} showColumnToggle={false} />
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px] h-9">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={loading}
-            className="h-9"
-          >
-            <RotateCcw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button asChild variant="outline" size="sm" className="h-9">
-            <Link href="/group/import">
-              <FileSpreadsheet className="mr-2 h-4 w-4" />Import
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div>
-        {loading ? (
-          <TableSkeleton rows={6} columns={groupsSkeletonColumns} />
-        ) : groups.length === 0 ? (
-          <div className="py-20">
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <GroupIcon className="h-14 w-14 text-muted-foreground mx-auto" />
-                </EmptyMedia>
-                <EmptyTitle>No groups yet</EmptyTitle>
-                <EmptyDescription>
-                  {searchQuery ? `No groups found matching "${searchQuery}"` : "There are no groups for this organization."}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          </div>
-        ) : (
-          <DataTable columns={columns} data={filteredGroups} showColumnToggle={false} />
-        )}
-      </div>
 
 
-      {/* Dialogs — di luar layout */}
-      <GroupFormDialog
-        open={modalOpen}
-        onOpenChange={handleModalClose}
-        editingId={editingGroup?.id ?? null}
-        form={form}
-        onSubmit={handleSubmit}
-        organizationId={organizationId}
-        organizations={organizations}
-      />
+        {/* Dialogs — di luar layout */}
+        <GroupFormDialog
+          open={modalOpen}
+          onOpenChange={handleModalClose}
+          editingId={editingGroup?.id ?? null}
+          form={form}
+          onSubmit={handleSubmit}
+          organizationId={organizationId}
+          organizations={organizations}
+        />
 
-      <GroupDeleteDialog
-        open={deleteOpen}
-        onOpenChange={(o) => { setDeleteOpen(o); if (!o) setDeleteTarget(null) }}
-        target={deleteTarget}
-        onConfirm={handleDelete}
-      />
+        <GroupDeleteDialog
+          open={deleteOpen}
+          onOpenChange={(o) => { setDeleteOpen(o); if (!o) setDeleteTarget(null) }}
+          target={deleteTarget}
+          onConfirm={handleDelete}
+        />
       </div>
     </>
   )
