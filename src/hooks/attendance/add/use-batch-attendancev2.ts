@@ -12,7 +12,6 @@ import {
   checkExistingAttendance,
   bulkCreateAttendance,
 } from "@/action/attendance"
-// Import calculateAttendanceStatus dihapus karena tidak dipakai
 
 import type { MemberOption } from "@/types/attendance"
 
@@ -173,6 +172,7 @@ export function useBatchAttendanceV2(
           return {
             ...row,
             scheduleStatus: "ok" as MemberScheduleStatus,
+            scheduleName: rule.name || rule.schedule_name || rule.title,
             startTime: rule.start_time,
             endTime: rule.end_time,
             breakStart: rule.break_start ?? null,
@@ -325,7 +325,7 @@ export function useBatchAttendanceV2(
       label = `${(row.startTime ?? "").slice(0, 5)} – ${(row.endTime ?? "").slice(0, 5)}`
     }
     if (!acc[key]) acc[key] = { label, rows: [] }
-    acc[key]!.rows.push(row) // PERBAIKAN: ditambah tanda seru (!) agar aman dari undefined
+    acc[key]!.rows.push(row)
     return acc
   }, {})
 

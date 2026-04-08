@@ -13,7 +13,7 @@ import { MemberDialog } from "@/components/attendance/add/dialogs/member-dialog"
 import { singleFormSchema, type SingleFormValues } from "@/types/attendance"
 import { useRouter } from "next/navigation"
 import { useMembers } from "@/hooks/attendance/add/use-members"
-import { useBatchAttendance } from "@/hooks/attendance/add/use-batch-attendance"
+import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useOrganizationId } from "@/hooks/use-organization-id"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,12 @@ export default function AttendancePage() {
   const [selectedMemberId, setSelectedMemberId] = useState<string>("")
   const [activeTab, setActiveTab] = useState<"single" | "batch">("single")
 
+  // State untuk MemberDialog (single mode only)
+  const [memberDialogOpen, setMemberDialogOpen] = useState(false)
+  const [memberSearch, setMemberSearch] = useState("")
+  const [departmentFilter, setDepartmentFilter] = useState("all")
+  const [activeBatchEntryId, setActiveBatchEntryId] = useState<string | null>(null)
+
   const singleForm = useForm<SingleFormValues>({
     resolver: zodResolver(singleFormSchema),
     defaultValues: {
@@ -40,7 +46,17 @@ export default function AttendancePage() {
   })
 
   const { members, departments, loading: membersLoading } = useMembers()
-  const batch = useBatchAttendance()
+
+  const dialogHandlers: DialogHandlers = {
+    memberDialogOpen,
+    memberSearch,
+    departmentFilter,
+    activeBatchEntryId,
+    setMemberDialogOpen,
+    setMemberSearch,
+    setDepartmentFilter,
+    setActiveBatchEntryId,
+  }
 
   // Reset form when organization changes
   useEffect(() => {
@@ -52,7 +68,6 @@ export default function AttendancePage() {
         status: "present",
         remarks: ""
       })
-      batch.clearAllEntries()
       setSelectedMemberId("")
     }
   }, [organizationId, orgTimezone])
@@ -64,7 +79,7 @@ export default function AttendancePage() {
     }
   }, [watchedMemberId, selectedMemberId])
 
-  const loading = membersLoading || batch.isSubmitting
+  const loading = membersLoading
 
   return (
     <>
@@ -85,7 +100,7 @@ export default function AttendancePage() {
             members={members}
             loading={loading}
             timezone={orgTimezone}
-            dialogHandlers={batch}
+            dialogHandlers={dialogHandlers}
             selectedMemberId={selectedMemberId}
             onMemberSelect={setSelectedMemberId}
           />
@@ -113,7 +128,7 @@ export default function AttendancePage() {
           departments={departments}
           loading={membersLoading}
           form={singleForm}
-          batch={batch}
+          batch={dialogHandlers}
         />
       </div>
     </>

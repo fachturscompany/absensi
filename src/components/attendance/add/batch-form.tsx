@@ -128,9 +128,17 @@ function MemberRowItem({ row, mode, onToggle, onOverride }: MemberRowProps) {
         </div>
 
         {row.scheduleStatus === "ok" && row.startTime && (
-          <span className="text-[10px] text-muted-foreground font-mono shrink-0 hidden sm:block">
-            {row.startTime.slice(0, 5)}–{row.endTime?.slice(0, 5)}
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0 hidden sm:flex">
+            {/* Tambahkan Nama Schedule di sini */}
+            {row.scheduleName && (
+              <span className="text-[10px] font-medium text-foreground truncate max-w-[120px]" title={row.scheduleName}>
+                {row.scheduleName}
+              </span>
+            )}
+            <span className="text-[10px] text-muted-foreground font-mono">
+              {row.startTime.slice(0, 5)}–{row.endTime?.slice(0, 5)}
+            </span>
+          </div>
         )}
 
         {row.isSelected && row.scheduleStatus === "ok" && !isDisabled && (
@@ -490,7 +498,7 @@ export function BatchForm({ members, timezone, onCancel }: BatchFormProps) {
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Filter batch..."
+                    placeholder="Search..."
                     value={bv2.search}
                     onChange={(e) => bv2.setSearch(e.target.value)}
                     className="w-full h-8 rounded-xl border bg-background pl-8 pr-3 text-xs focus:outline-none focus:ring-2 focus:ring-foreground/20"
