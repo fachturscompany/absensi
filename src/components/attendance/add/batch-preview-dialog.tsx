@@ -26,7 +26,7 @@ import timezonePlugin from "dayjs/plugin/timezone"
 dayjs.extend(utc)
 dayjs.extend(timezonePlugin)
 
-const STATUS_STYLES = {
+const STATUS_STYLES: Record<string, string> = {
   present: "bg-emerald-100 text-emerald-700 border-emerald-200",
   late: "bg-amber-100 text-amber-700 border-amber-200",
   absent: "bg-red-100 text-red-700 border-red-200",
