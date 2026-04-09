@@ -69,7 +69,7 @@ export default function TeamMembersPage() {
     return rawMembers.filter((m: ITeamMember) => {
       const name = (m.organization_members?.user?.name || "").toLowerCase()
       const email = (m.organization_members?.user?.email || "").toLowerCase()
-      const role = (m.role || "").toLowerCase()
+      const role = (m.positions_detail?.title || "").toLowerCase()
       return name.includes(s) || email.includes(s) || role.includes(s)
     })
   }, [membersData, debouncedSearch])

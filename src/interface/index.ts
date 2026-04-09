@@ -181,7 +181,7 @@ export interface ITeamMember {
   id: number;
   team_id: number;
   organization_member_id: number;
-  role: string;
+  positions: number | null; // Sudah diperbaiki dari postions
   is_primary_team: boolean;
   joined_at: string;
   organization_members: {
@@ -192,7 +192,11 @@ export interface ITeamMember {
       profile_photo_url: string | null;
       email: string;
     }
-  }
+  };
+  positions_detail?: {
+    id: number;
+    title: string;
+  } | null;
 }
 
 // ── Domain types (used throughout the app) ───────────────────────────────────
