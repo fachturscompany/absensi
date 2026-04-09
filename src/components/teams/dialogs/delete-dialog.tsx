@@ -1,6 +1,5 @@
 "use client"
 
-import React from "react"
 import { ITeams } from "@/interface"
 import {
   AlertDialog,
@@ -32,8 +31,9 @@ export function TeamDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Team</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete the team <strong>{target?.name}</strong>? 
-            This action cannot be undone and may affect members currently assigned to this team.
+            Are you sure you want to delete the team{" "}
+            <strong>{target?.name}</strong>? This action cannot be undone and
+            may affect members currently assigned to this team.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

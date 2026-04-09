@@ -36,11 +36,11 @@ export function TeamsTable({ data, isLoading = false, onEdit, onDelete }: TeamsT
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-medium text-xs uppercase tracking-wide py-3 px-4">Code</TableHead>
-              <TableHead className="font-medium text-xs uppercase tracking-wide">Name</TableHead>
-              <TableHead className="font-medium text-xs uppercase tracking-wide">Description</TableHead>
-              <TableHead className="font-medium text-xs uppercase tracking-wide">Status</TableHead>
-              <TableHead className="w-20 text-right pr-6 font-medium text-xs uppercase tracking-wide">Actions</TableHead>
+              <TableHead className="font-semibold text-xs propercase tracking-wide py-3 px-4">Code</TableHead>
+              <TableHead className="font-semibold text-xs propercase tracking-wide">Name</TableHead>
+              <TableHead className="font-semibold text-xs propercase tracking-wide">Description</TableHead>
+              <TableHead className="font-semibold text-xs propercase tracking-wide">Status</TableHead>
+              <TableHead className="w-20 text-right pr-6 font-semibold text-xs propercase tracking-wide">Actions</TableHead>
             </TableRow>
           </TableHeader>
           

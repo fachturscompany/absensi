@@ -10,7 +10,11 @@ import { getTeamBySlug, getTeamMembers } from "@/action/teams"
 import { ITeamMember } from "@/interface"
 import { Button } from "@/components/ui/button"
 import {
-  Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia,
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyMedia,
 } from "@/components/ui/empty"
 import { TableSkeleton, membersColumns } from "@/components/skeleton/tables-loading"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
@@ -25,7 +29,7 @@ export default function TeamMembersPage() {
   const { isHydrated, organizationId } = useHydration()
   const slug = decodeURIComponent(params.slug as string)
 
-  // ── Local state ─────────────────────────────────────────────────────────
+  // ── Local state ──────────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = React.useState("")
   const [page, setPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(10)
@@ -35,7 +39,7 @@ export default function TeamMembersPage() {
     setPage(1)
   }, [debouncedSearch])
 
-  // ── Team Identity Resolve ───────────────────────────────────────────────
+  // ── Resolve team by slug ─────────────────────────────────────────────────────
   const { data: teamResult, isLoading: teamLoading } = useQuery({
     queryKey: ["team-by-slug", slug, organizationId],
     queryFn: () => getTeamBySlug(slug),
@@ -47,39 +51,50 @@ export default function TeamMembersPage() {
   const teamId = team?.id ?? null
   const teamName = team?.name ?? slug
 
-  // ── Fetch Members ───────────────────────────────────────────────────────
+  // ── Fetch members ────────────────────────────────────────────────────────────
+  // FIX: getTeamMembers sekarang selalu return { data: [] } saat error,
+  // sehingga .data ?? [] tidak akan undefined
   const {
-    data: membersData,
+    data: membersResult,
     isLoading: membersLoading,
     isFetching,
     refetch,
   } = useQuery({
     queryKey: ["team-members", teamId, organizationId],
-    queryFn: () => getTeamMembers(Number(teamId)),
+    queryFn: async () => {
+      const result = await getTeamMembers(Number(teamId))
+      if (!result.success) {
+        toast.error(result.message || "Failed to fetch members")
+      }
+      return result
+    },
     enabled: !!teamId,
     staleTime: 60_000,
   })
 
-  // ── Filter Logic ────────────────────────────────────────────────────────
+  // FIX: Gunakan membersResult?.data bukan membersData?.data
+  const allMembers: ITeamMember[] = membersResult?.data ?? []
+
+  // ── Filter ───────────────────────────────────────────────────────────────────
   const filteredMembers = React.useMemo(() => {
-    const rawMembers = membersData?.data ?? []
-    if (!debouncedSearch.trim()) return rawMembers
+    if (!debouncedSearch.trim()) return allMembers
 
     const s = debouncedSearch.toLowerCase().trim()
-    return rawMembers.filter((m: ITeamMember) => {
+    return allMembers.filter((m: ITeamMember) => {
       const name = (m.organization_members?.user?.name || "").toLowerCase()
       const email = (m.organization_members?.user?.email || "").toLowerCase()
       const role = (m.positions_detail?.title || "").toLowerCase()
       return name.includes(s) || email.includes(s) || role.includes(s)
     })
-  }, [membersData, debouncedSearch])
+  }, [allMembers, debouncedSearch])
 
-  // ── Pagination Logic (FIXED: filteredMembers.slice) ─────────────────────
+  // ── Pagination ───────────────────────────────────────────────────────────────
   const total = filteredMembers.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const paginatedMembers = React.useMemo(() => {
-    return filteredMembers.slice((page - 1) * pageSize, page * pageSize)
-  }, [filteredMembers, page, pageSize])
+  const paginatedMembers = React.useMemo(
+    () => filteredMembers.slice((page - 1) * pageSize, page * pageSize),
+    [filteredMembers, page, pageSize]
+  )
 
   const handleRefresh = React.useCallback(async () => {
     try {
@@ -91,6 +106,7 @@ export default function TeamMembersPage() {
     }
   }, [queryClient, teamId, refetch])
 
+  // ── Loading state ────────────────────────────────────────────────────────────
   if (!isHydrated || teamLoading) {
     return (
       <div className="flex flex-col gap-4 p-4 pt-0 mt-6">
@@ -100,11 +116,38 @@ export default function TeamMembersPage() {
     )
   }
 
+  // ── Team not found ───────────────────────────────────────────────────────────
+  if (!team) {
+    return (
+      <div className="flex flex-col gap-4 p-4 pt-0">
+        <Link
+          href="/teams"
+          className="flex items-center text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ChevronLeft className="h-3 w-3 mr-1" /> Back to Teams
+        </Link>
+        <div className="py-20">
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <User className="h-14 w-14 text-muted-foreground mx-auto" />
+              </EmptyMedia>
+              <EmptyTitle>Team not found</EmptyTitle>
+              <EmptyDescription>
+                The team &quot;{slug}&quot; could not be found.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-4 p-4 pt-0">
       <div className="flex flex-col gap-1">
-        <Link 
-          href="/teams" 
+        <Link
+          href="/teams"
           className="flex items-center text-xs text-muted-foreground hover:text-primary transition-colors mb-1"
         >
           <ChevronLeft className="h-3 w-3 mr-1" /> Back to Teams
@@ -112,6 +155,7 @@ export default function TeamMembersPage() {
         <h1 className="text-xl font-semibold">{teamName} — Members</h1>
       </div>
 
+      {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
@@ -132,6 +176,7 @@ export default function TeamMembersPage() {
             </button>
           )}
         </div>
+
         <Button
           variant="outline"
           size="sm"
@@ -139,11 +184,14 @@ export default function TeamMembersPage() {
           disabled={membersLoading || isFetching}
           className="h-9"
         >
-          <RefreshCw className={`mr-2 h-4 w-4 ${(membersLoading || isFetching) ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${membersLoading || isFetching ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
 
+      {/* Content */}
       <div className="min-h-[400px]">
         {membersLoading ? (
           <TableSkeleton rows={8} columns={membersColumns} />
@@ -156,17 +204,16 @@ export default function TeamMembersPage() {
                 </EmptyMedia>
                 <EmptyTitle>No members</EmptyTitle>
                 <EmptyDescription>
-                  {searchQuery ? `No members found matching "${searchQuery}"` : "This team doesn't have any members yet."}
+                  {searchQuery
+                    ? `No members found matching "${searchQuery}"`
+                    : "This team doesn't have any members yet."}
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>
           </div>
         ) : (
           <div className="relative overflow-x-auto">
-            <TeamMembersTable 
-              members={paginatedMembers} 
-              isLoading={isFetching} 
-            />
+            <TeamMembersTable members={paginatedMembers} isLoading={isFetching} />
           </div>
         )}
       </div>
@@ -180,7 +227,10 @@ export default function TeamMembersPage() {
         to={Math.min(page * pageSize, total)}
         total={total}
         pageSize={pageSize}
-        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        onPageSizeChange={(s) => {
+          setPageSize(s)
+          setPage(1)
+        }}
         pageSizeOptions={[10, 50, 100]}
       />
     </div>
