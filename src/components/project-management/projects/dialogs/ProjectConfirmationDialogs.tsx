@@ -10,7 +10,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import TransferProjectDialog from "@/components/projects/dialogs/transfer-project"
+import TransferProjectDialog from "@/components/project-management/dialogs/transfer-project"
 import type { Project } from "@/interface"
 
 type ProjectRow = Project & { name: string }

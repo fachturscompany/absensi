@@ -35,7 +35,7 @@ import { toast } from "sonner"
 import { ITask } from "@/interface"
 import { cn } from "@/lib/utils"
 import { TaskNode } from "@/types/tasks"
-import { buildTaskTree, flattenTree, StackedAssignees } from "@/components/projects/tasks/header"
+import { buildTaskTree, flattenTree, StackedAssignees } from "@/components/project-management/tasks/header"
 import { useTasksContext } from "../layout"
 
 export default function ListPage() {

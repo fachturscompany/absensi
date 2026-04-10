@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/alert-dialog"
 
 // Custom Components
-import { ProjectsTable } from "@/components/projects/projects-table"
-import ManageProjectDialog from "@/components/projects/dialogs/manage-project-dialog"
-import TransferProjectDialog from "@/components/projects/dialogs/transfer-project"
+import { ProjectsTable } from "@/components/project-management/projects/projects-table"
+import ManageProjectDialog from "@/components/project-management/projects/dialogs/manage-project-dialog"
+import TransferProjectDialog from "@/components/project-management/projects/dialogs/transfer-project"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
 
 // Actions & Logic
@@ -51,9 +51,9 @@ const EMPTY_FORM: NewProjectForm = {
   names: "", billable: true, disableActivity: false, allowTracking: true,
   disableIdle: false, members: [], teams: [], budgetType: "", budgetBasedOn: "",
   budgetCost: "", budgetNotifyMembers: false, budgetNotifyAt: "80",
-  budgetNotifyWho: "", 
+  budgetNotifyWho: "",
   // FIX: Menggunakan nullish coalescing agar tidak bernilai undefined
-  startDate: new Date().toISOString().split("T")[0] ?? null, 
+  startDate: new Date().toISOString().split("T")[0] ?? null,
   budgetStopTimers: false, budgetStopAt: "100",
   budgetResets: "never", budgetIncludeNonBillable: false,
   memberLimits: [{ members: [], type: "", basedOn: "", cost: "", resets: "never", startDate: "" }],
@@ -143,7 +143,7 @@ export default function ProjectsPage() {
   const filtered = useMemo(() => {
     let result = data.filter(p => activeTab === "active" ? !p.archived : p.archived)
     if (search) result = result.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
-    
+
     return [...result].sort((a, b) => {
       let cmp = 0
       if (sortField === "name") cmp = a.name.localeCompare(b.name)
@@ -263,7 +263,7 @@ export default function ProjectsPage() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 onClick={async () => {
                   if (deleteTarget) await deleteProject(Number(deleteTarget.id))

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Plus, Search, Loader2 } from "lucide-react"
-import { AddClientDialog, type ClientFormData } from "@/components/projects/clients/add-client-dilaog"
-import { ClientsTable, type Client } from "@/components/projects/clients/clients-table"
+import { AddClientDialog, type ClientFormData } from "@/components/project-management/clients/add-client-dilaog"
+import { ClientsTable, type Client } from "@/components/project-management/clients/clients-table"
 import { PaginationFooter } from "@/components/customs/pagination-footer"
 import { getClients, createClientAction, updateClientAction, updateClientStatus, deleteClientAction } from "@/action/client"
 import { useSearchParams } from "next/navigation"
@@ -54,7 +54,7 @@ export default function ClientsPage() {
                 netTermsDays: c.net_terms_days || 30,
                 autoInvoiceFrequency: c.auto_invoice_frequency || "",
                 createdAt: c.created_at
-            })) 
+            }))
             setClients(mappedClients)
         } else {
             toast.error(response.message || "Failed to fetch clients")

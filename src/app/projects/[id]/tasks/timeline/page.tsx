@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo, useCallback } from "react"
 import { ChevronRight, ChevronDown, Users, AlignLeft, ChevronsDownUp, ChevronsUpDown } from "lucide-react"
-import { buildTaskTree, flattenTree } from "@/components/projects/tasks/header"
+import { buildTaskTree, flattenTree } from "@/components/project-management/tasks/header"
 import { getAssigneeInfo } from "../layout"
 import { TaskNode } from "@/types/tasks"
 import { ITask } from "@/interface"
