@@ -19,21 +19,11 @@ import {
   checkExistingAttendance,
   createManualAttendance,
   updateAttendanceRecord,
-  createAttendanceLog,
 } from "@/action/attendance"
 import type { MemberOption, ScheduleRule, AttendanceFormValues } from "@/types/attendance"
 import type { DialogHandlers } from "@/components/attendance/add/dialogs/member-dialog"
 import { PaginationFooterCompact } from "@/components/customs/pagination-footer-compact"
 import { UserAvatar } from "@/components/profile&image/user-avatar"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 
 dayjs.extend(utc)
 dayjs.extend(timezonePlugin)
@@ -163,11 +153,6 @@ export function SingleForm({
   // STATE BARU: Menyimpan status waktu kerja
   const [inBreakWindow, setInBreakWindow] = useState(false)
   const [inWorkingWindow, setInWorkingWindow] = useState(false)
-  const [isPreShift, setIsPreShift] = useState(false)
-  const [isPostShift, setIsPostShift] = useState(false)
-  const [hasLoggedToday, setHasLoggedToday] = useState(false)
-  const [showLogDialog, setShowLogDialog] = useState(false)
-  const [logType, setLogType] = useState<"check_in" | "check_out" | null>(null)
 
   const [today, setToday] = useState(() => todayISO(timezone))
 
@@ -204,21 +189,7 @@ export function SingleForm({
       // 1. Cek Working Window
       const ws = parse(schedule.start_time)
       const we = parse(schedule.end_time)
-      
-      const wasPreShift = isPreShift
-      const nowInWorkingWindow = cur >= ws && cur <= we
-      const nowIsPreShift = cur < ws
-      const nowIsPostShift = cur > we
-
-      setInWorkingWindow(nowInWorkingWindow)
-      setIsPreShift(nowIsPreShift)
-      setIsPostShift(nowIsPostShift)
-
-      // Jika sebelumnya pre-shift dan sekarang masuk jam kerja, 
-      // reset hasLoggedToday agar tombol absen resmi aktif.
-      if (wasPreShift && nowInWorkingWindow) {
-        setHasLoggedToday(false)
-      }
+      setInWorkingWindow(cur >= ws && cur <= we)
 
       // 2. Cek Break Window
       if (schedule.break_start && schedule.break_end) {
@@ -246,9 +217,6 @@ export function SingleForm({
     setScheduleError(null)
     setInBreakWindow(false)
     setInWorkingWindow(false)
-    setIsPreShift(false)
-    setIsPostShift(false)
-    setHasLoggedToday(false)
     form.setValue("remarks", "")
 
     const init = async () => {
@@ -297,24 +265,6 @@ export function SingleForm({
     const existing = await checkExistingAttendance(externalMemberId, today)
     if (existing.exists) {
       toast.error("Already checked in today")
-      setActionLoading(null)
-      return
-    }
-
-    // Jika Kepagian -> Simpan ke Log
-    if (isPreShift && !inWorkingWindow) {
-      const res = await createAttendanceLog({
-        organization_member_id: externalMemberId,
-        event_type: "check_in"
-      })
-
-      if (res.success) {
-        setHasLoggedToday(true)
-        setLogType("check_in")
-        setShowLogDialog(true)
-      } else {
-        toast.error(res.message || "Failed to log event")
-      }
       setActionLoading(null)
       return
     }
@@ -387,33 +337,10 @@ export function SingleForm({
   }
 
   const handleCheckOut = async () => {
-    if (!recordId && !isPostShift) return
+    if (!recordId) return
     setActionLoading("check_out")
-
-    // Jika Kemalaman -> Simpan ke Log
-    if (isPostShift && !inWorkingWindow) {
-      const res = await createAttendanceLog({
-        organization_member_id: externalMemberId,
-        event_type: "check_out"
-      })
-
-      if (res.success) {
-        setHasLoggedToday(true)
-        setLogType("check_out")
-        setShowLogDialog(true)
-      } else {
-        toast.error(res.message || "Failed to log event")
-      }
-      setActionLoading(null)
-      return
-    }
-
-    if (!recordId) {
-      setActionLoading(null)
-      return
-    }
-
     const now = nowISO()
+
     const res = await updateAttendanceRecord({
       id: recordId,
       actual_check_out: now,
@@ -440,17 +367,18 @@ export function SingleForm({
   const startIndex = (currentPage - 1) * pageSize
   const paginatedMembers = filteredMembers.slice(startIndex, startIndex + pageSize)
 
-  // LOGIKA DIPERBARUI: Mengizinkan klik sebelum/sesudah jam kerja untuk mode Log
-  const canCheckIn = !isHoliday && step === "idle" && !!externalMemberId && !!schedule && (inWorkingWindow || isPreShift) && !hasLoggedToday
-  const canBreakIn = !isHoliday && step === "checked_in" && !!schedule?.break_start && inBreakWindow && inWorkingWindow && !hasLoggedToday
-  const canBreakOut = !isHoliday && step === "break_in" && inWorkingWindow && !hasLoggedToday
-  const canCheckOut = !isHoliday && (step === "checked_in" || step === "break_out" || (step === "idle" && isPostShift)) && !!externalMemberId && (inWorkingWindow || (isPostShift && !inWorkingWindow)) && !hasLoggedToday
+  // LOGIKA DIPERBARUI: Semua syarat ditambah `&& inWorkingWindow`
+  const canCheckIn = !isHoliday && step === "idle" && !!externalMemberId && !!schedule && inWorkingWindow
+  const canBreakIn = !isHoliday && step === "checked_in" && !!schedule?.break_start && inBreakWindow && inWorkingWindow
+  const canBreakOut = !isHoliday && step === "break_in" && inWorkingWindow
+  const canCheckOut = !isHoliday && (step === "checked_in" || step === "break_out") && inWorkingWindow
 
   const selectedMember = members.find((m: MemberOption) => m.id === externalMemberId)
 
   return (
     <TabsContent value="single" asChild>
       <div className="flex gap-4 h-[600px] overflow-hidden mb-2 mt-2">
+
         <div className="hidden md:flex w-[280px] shrink-0 flex-col gap-3 h-full border-r pr-2 border-border pb-1 mt-2 mb-2">
           <div className="relative shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -679,7 +607,7 @@ export function SingleForm({
               )}
 
               {step === "checked_out" && (
-                <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 px-4 py-3 text-slate-600 dark:text-slate-400 shrink-0">
+                <div className="flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-900/20 px-4 py-3 text-slate-700 dark:text-emerald-400 shrink-0">
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-sm font-medium">Completed</span>
                 </div>
@@ -694,32 +622,6 @@ export function SingleForm({
             </div>
           )}
         </div>
-
-        <AlertDialog open={showLogDialog} onOpenChange={setShowLogDialog}>
-          <AlertDialogContent className="rounded-2xl border-2">
-            <AlertDialogHeader>
-              <div className="mx-auto bg-blue-50 dark:bg-blue-950/30 p-3 rounded-full mb-2">
-                <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <AlertDialogTitle className="text-center text-lg">
-                {logType === "check_in" ? "Check In Tercatat (Log)" : "Check Out Tercatat (Log)"}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-center text-sm">
-                {logType === "check_in" 
-                  ? "Kehadiran Anda telah dicatat di log sistem karena masih di luar jam kerja. Silakan lakukan Check In kembali saat jam kerja dimulai untuk pencatatan resmi."
-                  : "Kepulangan Anda telah dicatat di log sistem. Terima kasih atas kerja kerasnya hari ini."}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction 
-                onClick={() => setShowLogDialog(false)}
-                className="w-full rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all font-semibold"
-              >
-                Mengerti
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </TabsContent>
   )

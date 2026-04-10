@@ -42,22 +42,38 @@ export interface ProjectRow extends Project {
   endDate: string | null
   createdAt: string | null
   archived: boolean
+  budgetLabel: string
 }
 
 const ADMIN_ROLE_CODES = ["admin", "owner", "super_admin", "administrator"]
 const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 }
 
 const EMPTY_FORM: NewProjectForm = {
-  names: "", billable: true, disableActivity: false, allowTracking: true,
-  disableIdle: false, members: [], teams: [], budgetType: "", budgetBasedOn: "",
-  budgetCost: "", budgetNotifyMembers: false, budgetNotifyAt: "80",
+  names: "",
+  description: "",
+  billable: true,
+  disableActivity: false,
+  allowTracking: true,
+  disableIdle: false,
+  members: [],
+  teams: [],
+  budgetType: "",
+  budgetBasedOn: "",
+  budgetCost: "",
+  budgetNotifyMembers: false,
+  budgetNotifyAt: "80",
   budgetNotifyWho: "",
-  // FIX: Menggunakan nullish coalescing agar tidak bernilai undefined
   startDate: new Date().toISOString().split("T")[0] ?? null,
-  budgetStopTimers: false, budgetStopAt: "100",
-  budgetResets: "never", budgetIncludeNonBillable: false,
+  endDate: null,
+  priority: "medium",
+  lifecycleStatus: "active",
+  budgetStopTimers: false,
+  budgetStopAt: "100",
+  budgetResets: "never",
+  budgetIncludeNonBillable: false,
   memberLimits: [{ members: [], type: "", basedOn: "", cost: "", resets: "never", startDate: "" }],
-  memberLimitNotifyAt: "80", memberLimitNotifyMembers: false,
+  memberLimitNotifyAt: "80",
+  memberLimitNotifyMembers: false,
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -102,6 +118,8 @@ export default function ProjectsPage() {
       setData(res.data.map((p: any) => ({
         ...p,
         id: String(p.id),
+        description: p.description ?? null,
+        priority: p.priority ?? "medium",
         lifecycleStatus: p.lifecycle_status ?? "active",
         isBillable: p.is_billable ?? true,
         budgetAmount: p.budget_amount ? Number(p.budget_amount) : null,
@@ -109,7 +127,9 @@ export default function ProjectsPage() {
         endDate: p.end_date ?? null,
         createdAt: p.created_at ?? null,
         archived: p.lifecycle_status === "archived",
-        budgetLabel: p.budget_amount ? `${p.currency_code || 'USD'} ${p.budget_amount}` : "No budget",
+        budgetLabel: p.budget_amount
+          ? `${p.currency_code || "USD"} ${Number(p.budget_amount).toLocaleString()}`
+          : "No budget",
       })))
     } else {
       setFetchError(res.message || "Failed to fetch projects")
@@ -125,13 +145,18 @@ export default function ProjectsPage() {
     }
   }, [organizationId])
 
+  // Populate form when editing
   useEffect(() => {
     if (editing) {
       setForm({
         ...EMPTY_FORM,
         names: editing.name,
+        description: editing.description ?? "",
         billable: editing.isBillable,
+        priority: (editing.priority as "high" | "medium" | "low") ?? "medium",
+        lifecycleStatus: editing.lifecycleStatus ?? "active",
         startDate: editing.startDate,
+        endDate: editing.endDate,
         budgetCost: editing.budgetAmount ? String(editing.budgetAmount) : "",
         teams: editing.teams?.map(tName => String(teams.find(t => t.name === tName)?.id || "")) || [],
       })
@@ -159,12 +184,24 @@ export default function ProjectsPage() {
 
   const handleSave = async (formData?: NewProjectForm) => {
     const f = formData || form
+
+    // Map NewProjectForm → API payload shape
+    const payload = {
+      description:      f.description || null,
+      priority:         f.priority,
+      lifecycle_status: f.lifecycleStatus,
+      is_billable:      f.billable,
+      start_date:       f.startDate,
+      end_date:         f.endDate,
+      teams:            f.teams.map(Number),
+    }
+
     if (editing) {
-      await updateProject(Number(editing.id), { ...f, teams: f.teams.map(Number) })
+      await updateProject(Number(editing.id), { name: f.names, ...payload })
     } else {
       const names = f.names.split("\n").filter(Boolean)
       for (const n of names) {
-        await createProject({ ...f, name: n, teams: f.teams.map(Number) }, organizationId!)
+        await createProject({ name: n, ...payload }, organizationId!)
       }
     }
     setAddOpen(false)
@@ -179,29 +216,45 @@ export default function ProjectsPage() {
           <h1 className="text-xl font-semibold">Projects</h1>
         </div>
 
+        {/* Tabs: Active / Archived */}
         <div className="flex items-center gap-6 text-sm border-b">
-          {["active", "archived"].map((tab) => (
+          {(["active", "archived"] as const).map((tab) => (
             <button
               key={tab}
-              className={`pb-2 border-b-2 transition-colors capitalize ${activeTab === tab ? "border-foreground font-medium" : "text-muted-foreground border-transparent"}`}
-              onClick={() => { setActiveTab(tab as any); setSelectedIds([]); setCurrentPage(1) }}
+              className={`pb-2 border-b-2 transition-colors capitalize ${
+                activeTab === tab
+                  ? "border-foreground font-medium"
+                  : "text-muted-foreground border-transparent"
+              }`}
+              onClick={() => { setActiveTab(tab); setSelectedIds([]); setCurrentPage(1) }}
             >
               {tab} ({data.filter(p => tab === "active" ? !p.archived : p.archived).length})
             </button>
           ))}
         </div>
 
+        {/* Toolbar */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input
+              placeholder="Search projects…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 h-9"
+            />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm"><Upload className="mr-2 h-3.5 w-3.5" />Import</Button>
-            <Button size="sm" onClick={() => setAddOpen(true)}><Plus className="mr-2 h-3.5 w-3.5" />Add Project</Button>
+            <Button variant="outline" size="sm">
+              <Upload className="mr-2 h-3.5 w-3.5" />Import
+            </Button>
+            <Button size="sm" onClick={() => setAddOpen(true)}>
+              <Plus className="mr-2 h-3.5 w-3.5" />Add
+            </Button>
           </div>
         </div>
 
+        {/* Table */}
         <ProjectsTable
           isLoading={isLoading}
           fetchError={fetchError}
@@ -222,7 +275,9 @@ export default function ProjectsPage() {
             if (isAllSelected) setSelectedIds(prev => prev.filter(id => !paginated.find(p => p.id === id)))
             else setSelectedIds(prev => [...new Set([...prev, ...paginated.map(p => p.id)])])
           }}
-          onToggleSelect={(id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])}
+          onToggleSelect={(id) =>
+            setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+          }
           onRowClick={(p) => router.push(`/projects/${p.id}/tasks/list`)}
           onEdit={(p, t) => { setEditTab(t); setEditing(p) }}
           onArchive={async (id) => { await archiveProject(Number(id)); fetchProjects() }}
@@ -231,13 +286,20 @@ export default function ProjectsPage() {
           onTransfer={(p) => { setTransferProject(p); setTransferOpen(true) }}
         />
 
+        {/* Pagination */}
         <PaginationFooter
-          page={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}
-          isLoading={false} total={filtered.length} pageSize={pageSize}
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          isLoading={false}
+          total={filtered.length}
+          pageSize={pageSize}
           onPageSizeChange={setPageSize}
-          from={(currentPage - 1) * pageSize + 1} to={Math.min(currentPage * pageSize, filtered.length)}
+          from={(currentPage - 1) * pageSize + 1}
+          to={Math.min(currentPage * pageSize, filtered.length)}
         />
 
+        {/* Add / Edit Dialog */}
         <ManageProjectDialog
           mode={editing ? "edit" : "add"}
           open={addOpen || !!editing}
@@ -251,14 +313,22 @@ export default function ProjectsPage() {
           onSave={handleSave}
         />
 
-        <TransferProjectDialog open={transferOpen} onOpenChange={setTransferOpen} project={transferProject} onTransfer={fetchProjects} />
+        {/* Transfer Dialog */}
+        <TransferProjectDialog
+          open={transferOpen}
+          onOpenChange={setTransferOpen}
+          project={transferProject}
+          onTransfer={fetchProjects}
+        />
 
+        {/* Delete Confirmation */}
         <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete <strong>{deleteTarget?.name}</strong>.
+                This action cannot be undone. This will permanently delete{" "}
+                <strong>{deleteTarget?.name}</strong>.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -267,7 +337,8 @@ export default function ProjectsPage() {
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 onClick={async () => {
                   if (deleteTarget) await deleteProject(Number(deleteTarget.id))
-                  setDeleteOpen(false); fetchProjects()
+                  setDeleteOpen(false)
+                  fetchProjects()
                 }}
               >
                 Delete

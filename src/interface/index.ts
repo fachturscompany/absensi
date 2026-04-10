@@ -162,7 +162,7 @@ export interface IProjectMetadata {
     memberLimitNotifyAt?: string;
     memberLimitNotifyMembers?: boolean;
     clientName?: string | null;
-    tracking_enabled?: boolean;  // per-project tracking override
+    tracking_enabled?: boolean;
     [key: string]: unknown;
 }
 
@@ -178,8 +178,6 @@ export interface ITeams {
     settings?: string;
     metadata?: string;
 }
-
-// Ganti ITeamMember yang lama dengan ini di @/interface/index.ts
 
 export interface ITeamMember {
   id: number;
@@ -205,7 +203,7 @@ export interface ITeamMember {
   } | null;
 }
 
-// ── Domain types (used throughout the app) ───────────────────────────────────
+// ── Domain types ─────────────────────────────────────────────────────────────
 
 export interface IProjectTeamMemberUser {
     id: string;
@@ -238,13 +236,11 @@ export interface IProjectTeamProject {
     teams: IProjectTeam | null;
 }
 
-// ── Raw Supabase response types (SDK infers joins as arrays) ─────────────────
-// Used only inside action/projects.ts to type raw query results before mapping.
+// ── Raw Supabase response types ──────────────────────────────────────────────
 
 export interface ISupabaseProjectOrganizationMember {
     id: number;
     user_id: string;
-    // Supabase SDK infers joined user as array even for 1-to-1 foreign keys
     user: IProjectTeamMemberUser[];
 }
 
@@ -252,7 +248,6 @@ export interface ISupabaseProjectTeamMember {
     team_id: number;
     organization_member_id: number;
     role: string;
-    // Supabase SDK infers joined org member as array
     organization_members: ISupabaseProjectOrganizationMember[];
 }
 
@@ -268,7 +263,7 @@ export interface IProject {
     name: string;
     description?: string | null;
     lifecycle_status: string;
-    priority?: string;
+    priority?: string | null;
     start_date?: string | null;
     end_date?: string | null;
     is_billable: boolean;
@@ -282,7 +277,6 @@ export interface IProject {
     updated_at?: string;
     deleted_at?: string | null;
 
-    // Joined relations (populated via Supabase select)
     organizations?: { id: number; name: string };
     team_projects?: IProjectTeamProject[];
     tasks?: { count: number }[];
@@ -309,22 +303,29 @@ export interface ISimpleMember {
 
 export interface CreateProjectPayload {
     name: string;
+    description?: string | null;
+    priority?: string | null;
+    lifecycle_status?: string;
     is_billable?: boolean;
     start_date?: string | null;
+    end_date?: string | null;
     metadata?: IProjectMetadata;
     teams?: number[];
 }
 
 export interface UpdateProjectPayload {
     name?: string;
+    description?: string | null;
+    priority?: string | null;
+    lifecycle_status?: string;
     is_billable?: boolean;
     start_date?: string | null;
+    end_date?: string | null;
     metadata?: IProjectMetadata;
     teams?: number[];
-    lifecycle_status?: string;
 }
 
-// ─── Project UI Types (used in components/projects/) ────────────────────────
+// ─── Project UI Types ─────────────────────────────────────────────────────────
 
 export interface MemberLimit {
     members: string[];
@@ -336,24 +337,35 @@ export interface MemberLimit {
 }
 
 export interface NewProjectForm {
+    // General
     names: string;
+    description: string;
+    priority: "high" | "medium" | "low";
+    lifecycleStatus: string;
+    // Dates
+    startDate: string | null;
+    endDate: string | null;
+    // Billing
     billable: boolean;
+    // Tracking
     disableActivity: boolean;
     allowTracking: boolean;
     disableIdle: boolean;
+    // Relations
     members: string[];
     teams: string[];
+    // Budget
     budgetType: string;
     budgetBasedOn: string;
     budgetCost: string;
     budgetNotifyMembers: boolean;
     budgetNotifyAt: string;
     budgetNotifyWho: string;
-    startDate: string | null;
     budgetStopTimers: boolean;
     budgetStopAt: string;
     budgetResets: string;
     budgetIncludeNonBillable: boolean;
+    // Member limits
     memberLimits: MemberLimit[];
     memberLimitNotifyAt: string;
     memberLimitNotifyMembers: boolean;
@@ -365,7 +377,6 @@ export interface ProjectMember {
     avatarUrl: string | null;
 }
 
-/** UI-level project model used in the projects list page and dialogs */
 export interface Project {
     id: string;
     name: string;

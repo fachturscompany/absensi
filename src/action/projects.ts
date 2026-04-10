@@ -45,7 +45,6 @@ export const getAllProjects = async (organizationId?: number | string) => {
         return { success: false, message: error.message, data: [] as IProject[] };
     }
 
-    // Collect all team_ids across all projects
     const allTeamIds: number[] = [];
     (data ?? []).forEach((proj) => {
         (proj.team_projects as IProjectTeamProject[] ?? []).forEach((tp) => {
@@ -55,7 +54,6 @@ export const getAllProjects = async (organizationId?: number | string) => {
         });
     });
 
-    // Fetch team members via admin client to bypass RLS
     const adminClient = createAdminClient();
     const teamMembersByTeamId: Record<number, IProjectTeamMember[]> = {};
 
@@ -84,7 +82,6 @@ export const getAllProjects = async (organizationId?: number | string) => {
         } else {
             (tmData as ISupabaseProjectTeamMember[]).forEach((raw) => {
                 const tid = raw.team_id;
-                // Normalize: Supabase returns joins as arrays, domain types expect single objects
                 const rawOrgMember = Array.isArray(raw.organization_members)
                     ? raw.organization_members[0] ?? null
                     : raw.organization_members ?? null;
@@ -105,7 +102,6 @@ export const getAllProjects = async (organizationId?: number | string) => {
         }
     }
 
-    // Inject team_members into each project's team_projects
     const enrichedData: IProject[] = (data ?? []).map((proj) => ({
         ...proj,
         team_projects: (proj.team_projects as IProjectTeamProject[] ?? []).map((tp) => ({
@@ -120,10 +116,6 @@ export const getAllProjects = async (organizationId?: number | string) => {
     return { success: true, data: enrichedData };
 };
 
-/**
- * Fetch a flat list of projects (id + name only).
- * Used by: dropdowns, task form project picker.
- */
 export const getProjectNames = async (organizationId: number | string) => {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -137,10 +129,6 @@ export const getProjectNames = async (organizationId: number | string) => {
     return { success: true, data: (data ?? []) as { id: number; name: string }[] };
 };
 
-/**
- * Fetch a single project with its full member list.
- * Used by: project settings, member management.
- */
 export const getProjectWithMembers = async (
     id: string | number
 ): Promise<{ success: boolean; message?: string; data: IProjectWithMembers | null }> => {
@@ -148,10 +136,7 @@ export const getProjectWithMembers = async (
 
     const { data: project, error: projectError } = await adminClient
         .from("projects")
-        .select(`
-            *,
-            organizations(id, name)
-        `)
+        .select(`*, organizations(id, name)`)
         .eq("id", id)
         .single();
 
@@ -177,12 +162,7 @@ export const getProjectWithMembers = async (
             organization_members!team_members_organization_member_id_fkey(
                 id,
                 user_id,
-                user:user_id(
-                    id,
-                    first_name,
-                    last_name,
-                    profile_photo_url
-                )
+                user:user_id(id, first_name, last_name, profile_photo_url)
             )
         `)
         .in("team_id", teamIds);
@@ -210,15 +190,9 @@ export const getProjectWithMembers = async (
         }
     });
 
-    return {
-        success: true,
-        data: { ...project, members: Array.from(memberMap.values()) }
-    };
+    return { success: true, data: { ...project, members: Array.from(memberMap.values()) } };
 };
 
-/**
- * Create a new project.
- */
 export const createProject = async (
     payload: CreateProjectPayload,
     organizationId?: number
@@ -251,9 +225,12 @@ export const createProject = async (
             organization_id: orgId,
             code,
             name: payload.name,
+            description: payload.description ?? null,
+            priority: payload.priority ?? "medium",
             is_billable: payload.is_billable !== false,
-            start_date: payload.start_date,
-            lifecycle_status: "active",
+            start_date: payload.start_date ?? null,
+            end_date: payload.end_date ?? null,
+            lifecycle_status: payload.lifecycle_status ?? "active",
             metadata: payload.metadata ?? {},
         })
         .select()
@@ -270,18 +247,18 @@ export const createProject = async (
     return { success: true, data };
 };
 
-/**
- * Update an existing project.
- */
 export const updateProject = async (id: number, payload: UpdateProjectPayload) => {
     const supabase = await createClient();
 
     const updateData: Record<string, unknown> = {};
-    if (payload.name !== undefined) updateData.name = payload.name;
-    if (payload.is_billable !== undefined) updateData.is_billable = payload.is_billable;
-    if (payload.start_date !== undefined) updateData.start_date = payload.start_date;
-    if (payload.metadata !== undefined) updateData.metadata = payload.metadata;
+    if (payload.name !== undefined)             updateData.name             = payload.name;
+    if (payload.description !== undefined)      updateData.description      = payload.description;
+    if (payload.priority !== undefined)         updateData.priority         = payload.priority;
+    if (payload.is_billable !== undefined)      updateData.is_billable      = payload.is_billable;
+    if (payload.start_date !== undefined)       updateData.start_date       = payload.start_date;
+    if (payload.end_date !== undefined)         updateData.end_date         = payload.end_date;
     if (payload.lifecycle_status !== undefined) updateData.lifecycle_status = payload.lifecycle_status;
+    if (payload.metadata !== undefined)         updateData.metadata         = payload.metadata;
     updateData.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -305,21 +282,9 @@ export const updateProject = async (id: number, payload: UpdateProjectPayload) =
     return { success: true, data };
 };
 
-/**
- * Archive a project (moves to archived tab).
- */
-export const archiveProject = async (id: number) =>
-    updateProject(id, { lifecycle_status: "archived" });
+export const archiveProject  = async (id: number) => updateProject(id, { lifecycle_status: "archived" });
+export const unarchiveProject = async (id: number) => updateProject(id, { lifecycle_status: "active" });
 
-/**
- * Restore an archived project back to active.
- */
-export const unarchiveProject = async (id: number) =>
-    updateProject(id, { lifecycle_status: "active" });
-
-/**
- * Soft-delete a project.
- */
 export const deleteProject = async (id: number) => {
     const supabase = await createClient();
     const { error } = await supabase
@@ -363,6 +328,7 @@ export const getSimpleMembersForDropdown = async (
                 first_name?: string | null;
                 last_name?: string | null;
                 display_name?: string | null;
+                profile_photo_url?: string | null;
             } | null;
             const name = profile
                 ? [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "Unknown"
@@ -370,10 +336,222 @@ export const getSimpleMembersForDropdown = async (
             return {
                 id: String(m.id),
                 name,
+                photoUrl: profile?.profile_photo_url ?? null,
                 department_id: m.department_id ? String(m.department_id) : null,
             };
         })
         .filter((m) => m.name !== "Unknown");
 
     return { success: true, data: members };
+};
+
+// ─── Project Members ──────────────────────────────────────────────────────────
+
+export interface ProjectMemberRow {
+    id: number;
+    organization_member_id: number;
+    role: "manager" | "lead" | "member" | "viewer";
+    hourly_rate: number | null;
+    joined_at: string;
+    name: string;
+    photoUrl: string | null;
+}
+
+export const getProjectMembers = async (
+    projectId: number | string
+): Promise<{ success: boolean; data: ProjectMemberRow[] }> => {
+    const adminClient = createAdminClient();
+
+    const { data, error } = await adminClient
+        .from("project_members")
+        .select(`
+            id,
+            organization_member_id,
+            role,
+            hourly_rate,
+            joined_at,
+            organization_members!project_members_organization_member_id_fkey(
+                id,
+                user_profiles!organization_members_user_id_fkey(
+                    first_name,
+                    last_name,
+                    display_name,
+                    profile_photo_url
+                )
+            )
+        `)
+        .eq("project_id", projectId);
+
+    if (error) {
+        console.error("[getProjectMembers] error:", error.message);
+        return { success: false, data: [] };
+    }
+
+    const rows: ProjectMemberRow[] = (data ?? []).map((row: any) => {
+        const om = Array.isArray(row.organization_members)
+            ? row.organization_members[0]
+            : row.organization_members;
+        const profile = om
+            ? Array.isArray(om.user_profiles)
+                ? om.user_profiles[0]
+                : om.user_profiles
+            : null;
+        const name = profile
+            ? [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "Unknown"
+            : "Unknown";
+        return {
+            id: row.id,
+            organization_member_id: row.organization_member_id,
+            role: row.role ?? "member",
+            hourly_rate: row.hourly_rate ?? null,
+            joined_at: row.joined_at,
+            name,
+            photoUrl: profile?.profile_photo_url ?? null,
+        };
+    });
+
+    return { success: true, data: rows };
+};
+
+export const addProjectMember = async (
+    projectId: number,
+    organizationMemberId: number,
+    role: "manager" | "lead" | "member" | "viewer" = "member"
+): Promise<{ success: boolean; message?: string }> => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("project_members")
+        .insert({ project_id: projectId, organization_member_id: organizationMemberId, role });
+
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+};
+
+export const removeProjectMember = async (
+    projectId: number,
+    organizationMemberId: number
+): Promise<{ success: boolean; message?: string }> => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("project_members")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("organization_member_id", organizationMemberId);
+
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+};
+
+export const updateProjectMemberRole = async (
+    projectId: number,
+    organizationMemberId: number,
+    role: "manager" | "lead" | "member" | "viewer"
+): Promise<{ success: boolean; message?: string }> => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("project_members")
+        .update({ role })
+        .eq("project_id", projectId)
+        .eq("organization_member_id", organizationMemberId);
+
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+};
+
+// ─── Project Teams ────────────────────────────────────────────────────────────
+
+export interface ProjectTeamRow {
+    team_id: number;
+    name: string;
+    description: string | null;
+    member_count: number;
+    assigned_at: string;
+}
+
+export const getProjectTeams = async (
+    projectId: number | string
+): Promise<{ success: boolean; data: ProjectTeamRow[] }> => {
+    const adminClient = createAdminClient();
+
+    const { data, error } = await adminClient
+        .from("team_projects")
+        .select(`
+            team_id,
+            assigned_at,
+            teams!team_projects_team_id_fkey(
+                id,
+                name,
+                description
+            )
+        `)
+        .eq("project_id", projectId);
+
+    if (error) {
+        console.error("[getProjectTeams] error:", error.message);
+        return { success: false, data: [] };
+    }
+
+    const teamIds = (data ?? []).map((row: any) => {
+        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
+        return t?.id as number;
+    }).filter(Boolean);
+
+    // count members per team
+    const memberCounts: Record<number, number> = {};
+    if (teamIds.length > 0) {
+        const { data: countData } = await adminClient
+            .from("team_members")
+            .select("team_id")
+            .in("team_id", teamIds);
+
+        (countData ?? []).forEach((row: { team_id: number }) => {
+            memberCounts[row.team_id] = (memberCounts[row.team_id] ?? 0) + 1;
+        });
+    }
+
+    const rows: ProjectTeamRow[] = (data ?? []).map((row: any) => {
+        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
+        return {
+            team_id: row.team_id,
+            name: t?.name ?? "Unknown",
+            description: t?.description ?? null,
+            member_count: memberCounts[row.team_id] ?? 0,
+            assigned_at: row.assigned_at,
+        };
+    });
+
+    return { success: true, data: rows };
+};
+
+export const addProjectTeam = async (
+    projectId: number,
+    teamId: number
+): Promise<{ success: boolean; message?: string }> => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("team_projects")
+        .insert({ project_id: projectId, team_id: teamId });
+
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+};
+
+export const removeProjectTeam = async (
+    projectId: number,
+    teamId: number
+): Promise<{ success: boolean; message?: string }> => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("team_projects")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("team_id", teamId);
+
+    if (error) return { success: false, message: error.message };
+    return { success: true };
 };
