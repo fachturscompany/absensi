@@ -24,14 +24,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 
+// settings & metadata dihapus dari schema — tidak ditampilkan di form
 export const teamSchema = z.object({
   organization_id: z.coerce.number().min(1, "Organization ID is required"),
-  code: z.string().optional().or(z.literal("")),
+  code: z.string().optional().default(""),
   name: z.string().min(1, "Team name is required"),
-  description: z.string().optional().or(z.literal("")),
-  is_active: z.boolean(),
-  settings: z.string().optional().or(z.literal("")),
-  metadata: z.string().optional().or(z.literal("")),
+  description: z.string().optional().default(""),
+  is_active: z.boolean().default(true),
 })
 
 export type TeamForm = z.infer<typeof teamSchema>
@@ -55,14 +54,6 @@ export function TeamFormDialog({
 }: TeamFormDialogProps) {
   const isEditing = !!editingId
 
-  // DEBUG SEMENTARA - hapus setelah fix
-  React.useEffect(() => {
-    console.log("form errors:", form.formState.errors)
-    console.log("form values:", form.getValues())
-  }, [form.formState.errors])
-
-  // Pastikan organization_id terisi saat modal buka
-  // form.reset() di openAdd/openEdit sudah set ini, useEffect ini safety fallback
   React.useEffect(() => {
     if (open && organizationId) {
       const current = form.getValues("organization_id")
@@ -75,14 +66,11 @@ export function TeamFormDialog({
     }
   }, [open, organizationId, form])
 
-  // Wrapper submit: inject organization_id langsung ke values sebelum kirim
-  // Ini memastikan organization_id selalu terisi meski hidden input tidak ada
   const handleSubmit = (values: TeamForm) => {
-    const finalValues: TeamForm = {
+    return onSubmit({
       ...values,
       organization_id: values.organization_id || Number(organizationId) || 0,
-    }
-    return onSubmit(finalValues)
+    })
   }
 
   return (
@@ -96,18 +84,6 @@ export function TeamFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          {/*
-            TIDAK ada hidden input untuk organization_id.
-            Hidden input menyebabkan react-hook-form kehilangan track field
-            karena HTML input selalu return string, bukan number,
-            sehingga z.coerce.number().min(1) gagal diam-diam dan
-            handleSubmit tidak pernah memanggil onSubmit.
-            
-            organization_id di-set via:
-            1. form.reset() di openAdd/openEdit (page.tsx) — jalur utama
-            2. useEffect setValue di atas — safety fallback
-            3. handleSubmit wrapper di atas — last resort
-          */}
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4 pt-4"

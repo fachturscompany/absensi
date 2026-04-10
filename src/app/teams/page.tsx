@@ -38,8 +38,6 @@ export default function TeamsPage() {
   const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [deleteTarget, setDeleteTarget] = React.useState<ITeams | null>(null)
 
-  // FIX: Generic ketiga <TeamForm, unknown, TeamForm> + cast resolver
-  // z.coerce menghasilkan type `unknown` di TypeScript, cast ini memperbaikinya
   const form = useForm<TeamForm, unknown, TeamForm>({
     resolver: zodResolver(teamSchema) as Resolver<TeamForm>,
     defaultValues: {
@@ -48,8 +46,7 @@ export default function TeamsPage() {
       name: "",
       description: "",
       is_active: true,
-      settings: "",
-      metadata: "",
+      // settings & metadata dihapus
     },
   })
 
@@ -118,7 +115,10 @@ export default function TeamsPage() {
     setEditingTeam(null)
     form.reset({
       organization_id: Number(organizationId),
-      code: "", name: "", description: "", is_active: true, settings: "", metadata: "",
+      code: "",
+      name: "",
+      description: "",
+      is_active: true,
     })
     setModalOpen(true)
   }
@@ -131,8 +131,7 @@ export default function TeamsPage() {
       name: team.name,
       description: team.description || "",
       is_active: team.is_active,
-      settings: team.settings || "",
-      metadata: team.metadata || "",
+      // settings & metadata tidak di-reset, tidak ditampilkan di form
     })
     setModalOpen(true)
   }
