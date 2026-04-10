@@ -593,7 +593,7 @@ export default function MemberProfilePage({ params }: { params: Promise<{ id: st
               </Dialog>
 
               <Button className="bg-black hover:bg-slate-800 text-white h-10 px-6 rounded-md transition-colors shadow-sm" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Changes"}
+                {isSaving ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>
