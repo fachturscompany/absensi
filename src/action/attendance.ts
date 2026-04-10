@@ -870,12 +870,47 @@ export async function bulkCreateAttendance(
 
     revalidatePath('/attendance', 'layout');
 
-    return {
-      success: true,
-      count: Number(data?.length || entries.length)
-    };
+    return { success: true, count: Number(data?.length || entries.length) };
   } catch (err) {
     attendanceLogger.error('Bulk create exception:', err);
     return { success: false, message: err instanceof Error ? err.message : 'Server error' };
+  }
+}
+
+/**
+ * Mendapatkan log aktifitas absen real-time ke tabel attendance_logs.
+ * Digunakan untuk mencatat check-in kepagian atau check-out kemalaman.
+ */
+export async function createAttendanceLog(payload: {
+  organization_member_id: string | number;
+  event_type: "check_in" | "check_out" | "break_in" | "break_out";
+}) {
+  try {
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+
+    const insertPayload = {
+      organization_member_id: Number(payload.organization_member_id),
+      event_type: payload.event_type,
+      event_time: now,
+    };
+
+    const { error } = await supabase
+      .from("attendance_logs")
+      .insert([insertPayload]);
+
+    if (error) {
+      attendanceLogger.error("❌ Error creating attendance log:", error);
+      return { success: false, message: error.message };
+    }
+
+    attendanceLogger.debug("✓ Attendance log created successfully");
+    return { success: true };
+  } catch (err) {
+    attendanceLogger.error("❌ Exception creating attendance log:", err);
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : "An error occurred"
+    };
   }
 }

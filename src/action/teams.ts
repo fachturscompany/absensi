@@ -71,7 +71,7 @@ export const getTeamBySlug = async (slug: string) => {
   }
 
   // Coba cari berdasarkan code
-  const { data: byCode, error: codeError } = await query.eq("code", slug).maybeSingle();
+  const { data: byCode } = await query.eq("code", slug).maybeSingle();
   if (byCode) return { success: true, data: byCode as ITeams };
 
   // Coba cari berdasarkan name

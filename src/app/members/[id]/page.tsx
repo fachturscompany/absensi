@@ -109,53 +109,6 @@ function ContactInfoRow({ icon: Icon, text, href }: { icon: typeof Mail; text: s
   return content
 }
 
-function FormField({
-  label,
-  value,
-  placeholder,
-  type = "text",
-  linkText,
-  disabled = false,
-}: {
-  label: string
-  value?: string
-  placeholder?: string
-  type?: "text" | "email" | "phone" | "date"
-  linkText?: string
-  disabled?: boolean
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {label}
-        </Label>
-        {linkText && (
-          <button className="text-xs text-primary hover:underline">{linkText}</button>
-        )}
-      </div>
-      {type === "phone" ? (
-        <div className="flex gap-2">
-          <Input
-            type="tel"
-            defaultValue={value}
-            placeholder={placeholder || "+1 201-555-0123"}
-            disabled={disabled}
-            className="flex-1"
-          />
-        </div>
-      ) : (
-        <Input
-          type={type}
-          defaultValue={value}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="w-full"
-        />
-      )}
-    </div>
-  )
-}
 
 function MemberProfileHeader({
   displayName,
