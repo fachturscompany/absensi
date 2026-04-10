@@ -177,8 +177,8 @@ export function TeamFormDialog({
                 {form.formState.isSubmitting
                   ? "Saving..."
                   : isEditing
-                  ? "Save changes"
-                  : "Create team"}
+                  ? "Save"
+                  : "Create"}
               </Button>
             </DialogFooter>
           </form>
