@@ -23,11 +23,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { Sparkles } from "lucide-react"
 
-// settings & metadata dihapus dari schema — tidak ditampilkan di form
+// code dihapus dari schema form — di-generate otomatis oleh database trigger
 export const teamSchema = z.object({
   organization_id: z.coerce.number().min(1, "Organization ID is required"),
-  code: z.string().optional().default(""),
   name: z.string().min(1, "Team name is required"),
   description: z.string().optional().default(""),
   is_active: z.boolean().default(true),
@@ -39,6 +40,7 @@ interface TeamFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   editingId: number | string | null
+  editingCode?: string | null
   form: UseFormReturn<TeamForm, unknown, TeamForm>
   onSubmit: (values: TeamForm) => Promise<void>
   organizationId: string | number | null | undefined
@@ -48,6 +50,7 @@ export function TeamFormDialog({
   open,
   onOpenChange,
   editingId,
+  editingCode,
   form,
   onSubmit,
   organizationId,
@@ -75,48 +78,54 @@ export function TeamFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Team" : "Add Team"}</DialogTitle>
           <DialogDescription>
-            {isEditing ? "Update team details." : "Create a new team."}
+            {isEditing
+              ? "Update team details."
+              : "Create a new team. Code will be generated automatically."}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4 pt-4"
+            className="space-y-4 pt-2"
             noValidate
           >
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team Code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. DEV-01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Engineering" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Team Code — readonly display saat edit, hidden saat add */}
+            {isEditing && editingCode && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Team Code</span>
+                <Badge variant="outline" className="font-mono text-xs">
+                  {editingCode}
+                </Badge>
+              </div>
+            )}
+
+            {!isEditing && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Team code will be auto-generated</span>
+              </div>
+            )}
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Name <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Engineering" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -126,8 +135,9 @@ export function TeamFormDialog({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Team description..."
+                      placeholder="What does this team do?"
                       className="resize-none"
+                      rows={3}
                       {...field}
                     />
                   </FormControl>

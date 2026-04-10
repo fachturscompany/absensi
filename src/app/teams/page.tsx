@@ -42,11 +42,9 @@ export default function TeamsPage() {
     resolver: zodResolver(teamSchema) as Resolver<TeamForm>,
     defaultValues: {
       organization_id: 0,
-      code: "",
       name: "",
       description: "",
       is_active: true,
-      // settings & metadata dihapus
     },
   })
 
@@ -115,7 +113,6 @@ export default function TeamsPage() {
     setEditingTeam(null)
     form.reset({
       organization_id: Number(organizationId),
-      code: "",
       name: "",
       description: "",
       is_active: true,
@@ -127,11 +124,9 @@ export default function TeamsPage() {
     setEditingTeam(team)
     form.reset({
       organization_id: Number(team.organization_id),
-      code: team.code || "",
       name: team.name,
       description: team.description || "",
       is_active: team.is_active,
-      // settings & metadata tidak di-reset, tidak ditampilkan di form
     })
     setModalOpen(true)
   }
@@ -223,6 +218,7 @@ export default function TeamsPage() {
           open={modalOpen}
           onOpenChange={setModalOpen}
           editingId={editingTeam?.id ?? null}
+          editingCode={editingTeam?.code ?? null}
           form={form}
           onSubmit={handleSubmit}
           organizationId={organizationId}
